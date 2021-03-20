@@ -92,3 +92,45 @@ def build_tree(frequencies : dict[T, int]) -> Node[tuple[T, int]]:
 
 def drop_weights(tree : Node[tuple[T, int]]) -> Node[T]:
     return tree.map(lambda pair: pair[0])
+
+
+def build_codebook(tree : Node[T]) -> dict[T, Bits]:
+    def build(node : Node[T], prefix : Bits, book : dict[T, Bits]) -> None:
+        if isinstance(node, Leaf):
+            book[node.datum] = prefix
+        elif isinstance(node, Branch):
+            build(node.left, [*prefix, 0], book)
+            build(node.right, [*prefix, 1], book)
+        else:
+            raise NotImplementedError()
+    result : dict[T, Bits] = {}
+    build(tree, [], result)
+    return result
+
+
+def encode_tree(tree : Node[Bits]) -> Bits:
+    result = []
+    def encode(tree : Node[Bits]) -> None:
+        nonlocal result
+        if isinstance(tree, Leaf):
+            bitcount = len(tree.datum)
+            result += [ 1, *bits(bitcount), *tree.datum ]
+        elif isinstance(tree, Branch):
+            result.append(0)
+            encode(tree.left)
+            encode(tree.right)
+        else:
+            raise NotImplementedError()
+    encode(tree)
+    return result
+
+
+def decode_tree(bits : Bits) -> Node[Bits]:
+    if bits.pop(0) == 0:
+        left = decode_tree(bits)
+        right = decode_tree(bits)
+        return Branch(left, right)
+    else:
+        bitcount = from_bits(shift(bits, 8))
+        bs = shift(bits, bitcount)
+        return Leaf(bs)

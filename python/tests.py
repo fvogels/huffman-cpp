@@ -81,3 +81,30 @@ def test_drop_weights():
     yield check, Leaf('a'), Leaf(('a', 2))
     yield check, Branch( Leaf('a'), Leaf('b') ), Branch( Leaf(('a', 1)), Leaf(('b', 2)) )
     yield check, Branch( Leaf('b'), Leaf('a') ), Branch( Leaf(('b', 1)), Leaf(('a', 2)) )
+
+
+def test_build_codebook():
+    def check(expected, tree):
+        actual = build_codebook(tree)
+        assert expected == actual, repr(actual)
+    yield check, { 'a': [0], 'b': [1] }, Branch( Leaf('a'), Leaf('b') )
+    yield check, { 'a': [0, 0], 'b': [0, 1], 'c': [1, 0], 'd': [1, 1] }, Branch( Branch( Leaf('a'), Leaf('b') ), Branch( Leaf('c'), Leaf('d') ) )
+
+
+def test_tree_encoding():
+    def check(tree):
+        encoded = encode_tree(tree)
+        decoded = decode_tree(encoded)
+        assert tree == decoded
+    def l(*bits):
+        return Leaf(list(bits))
+    def b(left, right):
+        return Branch(left, right)
+    yield check, l(0)
+    yield check, l(1)
+    yield check, l(0,0)
+    yield check, l(0,1)
+    yield check, l(1,0,0,1,0,1)
+    yield check, b(l(0), l(1))
+    yield check, b(l(0), l(1,0))
+    yield check, b(b(l(0), l(1)), l(1,0,1))

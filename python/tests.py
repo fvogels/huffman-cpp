@@ -63,3 +63,21 @@ def test_frequencies():
     yield check, {1: 2}, [1, 1]
     yield check, {2: 2}, [2, 2]
     yield check, {1: 1, 2: 1}, [1, 2]
+
+
+def test_build_tree():
+    def check(expected, freqs):
+        assert expected == build_tree(freqs)
+    yield check, Leaf(('a', 1)), { 'a': 1 }
+    yield check, Leaf(('a', 2)), { 'a': 2 }
+    yield check, Branch( Leaf(('a', 1)), Leaf(('b', 2)) ), { 'a': 1, 'b': 2 }
+    yield check, Branch( Leaf(('b', 1)), Leaf(('a', 2)) ), { 'a': 2, 'b': 1 }
+
+
+def test_drop_weights():
+    def check(expected, tree):
+        assert expected == drop_weights(tree)
+    yield check, Leaf('a'), Leaf(('a', 1))
+    yield check, Leaf('a'), Leaf(('a', 2))
+    yield check, Branch( Leaf('a'), Leaf('b') ), Branch( Leaf(('a', 1)), Leaf(('b', 2)) )
+    yield check, Branch( Leaf('b'), Leaf('a') ), Branch( Leaf(('b', 1)), Leaf(('a', 2)) )

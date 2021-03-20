@@ -143,3 +143,7 @@ def pack(code : list[int]) -> bytes:
 
 def unpack(bs : bytes) -> list[int]:
     return [ t[0] for t in struct.iter_unpack('B', bs) ]
+
+
+def encode_data(xs : list[T], book : dict[T, Bits]) -> Bits:
+    return [ bit for x in xs for bit in book[x] ]

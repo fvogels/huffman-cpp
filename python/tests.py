@@ -119,3 +119,14 @@ def test_packing():
     yield check, [1]
     yield check, [255]
     yield check, list(range(100))
+
+
+
+def test_encode_data():
+    def check(expected, data, book):
+        assert expected == encode_data(data, book)
+    yield check, [0], 'a', { 'a': [0] }
+    yield check, [0, 0], 'aa', { 'a': [0] }
+    yield check, [0, 1], 'ab', { 'a': [0], 'b': [1] }
+    yield check, [1, 0, 1], 'bab', { 'a': [0], 'b': [1] }
+    yield check, [1, 0, 0, 1, 0], 'bab', { 'a': [0], 'b': [1, 0] }

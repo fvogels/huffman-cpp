@@ -21,3 +21,14 @@ def test_group():
     yield check, [[1, 2], [3]], [1, 2, 3], 2
     yield check, [[1, 2], [3, 4]], [1, 2, 3, 4], 2
     yield check, [[1, 2], [3, 4], [5, 6]], [1, 2, 3, 4, 5, 6], 2
+
+
+def test_bits():
+    def check(expected, n, size):
+        assert expected == bits(n, size)
+    yield check, [0, 0, 0, 0], 0, 4
+    yield check, [0, 0, 0, 1], 1, 4
+    yield check, [0, 0, 1, 0], 2, 4
+    yield check, [0, 1, 0], 2, 3
+    yield check, [0, 0, 0, 1, 0], 2, 5
+    yield check, [0, 0, 0, 1, 1], 3, 5

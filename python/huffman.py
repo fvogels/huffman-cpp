@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, TypeVar, Union, Literal, Generic, Callable
 from math import ceil
+import struct
 
 
 T = TypeVar('T')
@@ -134,3 +135,11 @@ def decode_tree(bits : Bits) -> Node[Bits]:
         bitcount = from_bits(shift(bits, 8))
         bs = shift(bits, bitcount)
         return Leaf(bs)
+
+
+def pack(code : list[int]) -> bytes:
+    return struct.pack('B' * len(code), *code)
+
+
+def unpack(bs : bytes) -> list[int]:
+    return [ t[0] for t in struct.iter_unpack('B', bs) ]

@@ -108,3 +108,14 @@ def test_tree_encoding():
     yield check, b(l(0), l(1))
     yield check, b(l(0), l(1,0))
     yield check, b(b(l(0), l(1)), l(1,0,1))
+
+
+def test_packing():
+    def check(bs):
+        packed = pack(bs)
+        unpacked = unpack(packed)
+        assert bs == unpacked, repr(unpacked)
+    yield check, [0]
+    yield check, [1]
+    yield check, [255]
+    yield check, list(range(100))

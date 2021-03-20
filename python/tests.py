@@ -32,3 +32,14 @@ def test_bits():
     yield check, [0, 1, 0], 2, 3
     yield check, [0, 0, 0, 1, 0], 2, 5
     yield check, [0, 0, 0, 1, 1], 3, 5
+
+
+def test_from_bits():
+    def check(expected, bits):
+        assert expected == from_bits(bits)
+    yield check, 0, [0]
+    yield check, 1, [1]
+    yield check, 1, [0, 1]
+    yield check, 2, [0, 1, 0]
+    yield check, 3, [0, 1, 1]
+    yield check, 7, [1, 1, 1]

@@ -20,3 +20,7 @@ def group(xs : list[T], group_size : int) -> list[list[T]]:
 
 def bits(n : int, size : int = 8) -> Bits:
     return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
+
+
+def from_bits(bits : Bits) -> int:
+    return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)

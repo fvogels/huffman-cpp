@@ -130,3 +130,20 @@ def test_encode_data():
     yield check, [0, 1], 'ab', { 'a': [0], 'b': [1] }
     yield check, [1, 0, 1], 'bab', { 'a': [0], 'b': [1] }
     yield check, [1, 0, 0, 1, 0], 'bab', { 'a': [0], 'b': [1, 0] }
+
+
+def test_decode_data():
+    def check(expected, data, tree, eof):
+        actual = decode_data(data, tree, eof)
+        assert [*expected] == actual, repr(actual)
+    def l(datum):
+        return Leaf(datum)
+    def b(left, right):
+        return Branch(left, right)
+    yield check, '', [0], b(l('a'), l('b')), 'a'
+    yield check, 'a', [0,1], b(l('a'), l('b')), 'b'
+    yield check, 'aa', [0,0,1], b(l('a'), l('b')), 'b'
+    yield check, 'a', [0,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
+    yield check, 'b', [0,1,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
+    yield check, 'c', [1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
+    yield check, 'abc', [0,0,0,1,1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'

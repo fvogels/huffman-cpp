@@ -147,3 +147,27 @@ def unpack(bs : bytes) -> list[int]:
 
 def encode_data(xs : list[T], book : dict[T, Bits]) -> Bits:
     return [ bit for x in xs for bit in book[x] ]
+
+
+def decode_data(bits : Bits, tree : Node[T], eof : T) -> list[T]:
+    result : list[T] = []
+    index = 0
+    current_node = tree
+    end_reached = False
+    while not end_reached:
+        if isinstance(current_node, Leaf):
+            datum = current_node.datum
+            if datum == eof:
+                end_reached = True
+            else:
+                result.append(datum)
+                current_node = tree
+        elif isinstance(current_node, Branch):
+            if bits[index] == 0:
+                current_node = current_node.left
+            else:
+                current_node = current_node.right
+            index += 1
+        else:
+            raise NotImplementedError()
+    return result

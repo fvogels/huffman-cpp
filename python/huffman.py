@@ -24,3 +24,9 @@ def bits(n : int, size : int = 8) -> Bits:
 
 def from_bits(bits : Bits) -> int:
     return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
+
+
+def shift(xs : list[T], n : int) -> list[T]:
+    result = xs[:n]
+    del xs[:n]
+    return result

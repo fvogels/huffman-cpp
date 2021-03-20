@@ -53,3 +53,13 @@ def test_shift():
     yield check, [1], [2, 3], [1, 2, 3], 1
     yield check, [1, 2], [3], [1, 2, 3], 2
     yield check, [1, 2, 3], [], [1, 2, 3], 3
+
+
+def test_frequencies():
+    def check(expected, xs):
+        assert expected == frequencies(xs)
+    yield check, {}, []
+    yield check, {1: 1}, [1]
+    yield check, {1: 2}, [1, 1]
+    yield check, {2: 2}, [2, 2]
+    yield check, {1: 1, 2: 1}, [1, 2]

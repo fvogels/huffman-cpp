@@ -30,3 +30,12 @@ def shift(xs : list[T], n : int) -> list[T]:
     result = xs[:n]
     del xs[:n]
     return result
+
+
+def count_frequencies(xs : list[T]) -> dict[T, int]:
+    result : dict[T, int] = {}
+    for x in xs:
+        old_frequency = result.setdefault(x, 0)
+        new_frequency = old_frequency + 1
+        result[x] = new_frequency
+    return result

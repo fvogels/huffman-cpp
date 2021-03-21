@@ -86,6 +86,9 @@ class Node(Generic[T]):
 
 
 class Branch(Node[T]):
+    left : Node[T]
+    right : Node[T]
+
     def __init__(self, left : Node[T], right : Node[T]):
         self.left = left
         self.right = right
@@ -103,6 +106,8 @@ class Branch(Node[T]):
 
 
 class Leaf(Node[T]):
+    datum : T
+
     def __init__(self, datum : T):
         self.datum = datum
 

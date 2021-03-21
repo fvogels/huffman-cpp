@@ -99,10 +99,9 @@ def build_tree(frequencies : dict[T, int]) -> Node[tuple[T, int]]:
     def weight(node : Node[tuple[T, int]]) -> int:
         if isinstance(node, Leaf):
             return node.datum[1]
-        elif isinstance(node, Branch):
-            return weight(node.left) + weight(node.right)
         else:
-            raise NotImplementedError()
+            assert isinstance(node, Branch)
+            return weight(node.left) + weight(node.right)
 
     queue : list[Node[tuple[T, int]]] = [ Leaf((datum, weight)) for datum, weight in frequencies.items() ]
     while len(queue) > 1:
@@ -120,11 +119,10 @@ def build_codebook(tree : Node[T]) -> dict[T, Bits]:
     def build(node : Node[T], prefix : Bits, book : dict[T, Bits]) -> None:
         if isinstance(node, Leaf):
             book[node.datum] = prefix
-        elif isinstance(node, Branch):
+        else:
+            assert isinstance(node, Branch)
             build(node.left, [*prefix, 0], book)
             build(node.right, [*prefix, 1], book)
-        else:
-            raise NotImplementedError()
     result : dict[T, Bits] = {}
     build(tree, [], result)
     return result
@@ -137,12 +135,11 @@ def encode_tree(tree : Node[Bits]) -> Bits:
         if isinstance(tree, Leaf):
             bitcount = len(tree.datum)
             result += [ 1, *bits(bitcount), *tree.datum ]
-        elif isinstance(tree, Branch):
+        else:
+            assert isinstance(tree, Branch)
             result.append(0)
             encode(tree.left)
             encode(tree.right)
-        else:
-            raise NotImplementedError()
     encode(tree)
     return result
 
@@ -183,14 +180,13 @@ def decode_data(bits : Bits, tree : Node[Union[T, U]], eof : U) -> list[T]:
             else:
                 result.append(datum)
                 current_node = tree
-        elif isinstance(current_node, Branch):
+        else:
+            assert isinstance(current_node, Branch)
             if bits[index] == 0:
                 current_node = current_node.left
             else:
                 current_node = current_node.right
             index += 1
-        else:
-            raise NotImplementedError()
     return result
 
 

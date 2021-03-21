@@ -173,9 +173,11 @@ def test_predictions():
         deltas = predict(data, oracle_class())
         restored = list(unpredict(deltas, oracle_class()))
         assert restored == data, f'{restored} != {data}'
-    yield check, [], ZeroOracle
-    yield check, [0], ZeroOracle
-    yield check, [0, 1], ZeroOracle
-    yield check, [0, 1, 2, 3, 4], ZeroOracle
-    yield check, [5, 1, 2, 9, 4], ZeroOracle
-    yield check, [255, 128, 254, 0], ZeroOracle
+
+    for oracle in [ ZeroOracle, RepeatOracle ]:
+        yield check, [], oracle
+        yield check, [0], oracle
+        yield check, [0, 1], oracle
+        yield check, [0, 1, 2, 3, 4], oracle
+        yield check, [5, 1, 2, 9, 4], oracle
+        yield check, [255, 128, 254, 0], oracle

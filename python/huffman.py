@@ -214,25 +214,6 @@ def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
     return result
 
 
-def huffman_encode(data : bytes) -> bytes:
-    freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
-    tree : Node[Datum] = drop_weights(build_tree(freqs))
-    codes : dict[Datum, Bits] = build_codebook(tree)
-    tree_encoding = encode_tree(tree)
-    data_encoding = encode_data(ints_to_datums(data), codes)
-    encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
-    padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
-    result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]
-    return pack(result)
-
-
-def huffman_decode(data : bytes) -> bytes:
-    bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
-    tree : Node[Datum] = decode_tree(bs)
-    result : list[int] = decode_data(bs, tree)
-    return pack(result)
-
-
 class Oracle:
     def tell(self, value : int) -> None:
         raise NotImplementedError()
@@ -247,6 +228,19 @@ class ZeroOracle(Oracle):
 
     def predict(self) -> int:
         return 0
+
+
+class RepeatOracle(Oracle):
+    last : int
+
+    def __init__(self):
+        self.last = 0
+
+    def predict(self) -> int:
+        return self.last
+
+    def tell(self, value) -> None:
+        self.last = value
 
 
 def predict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
@@ -266,3 +260,22 @@ def unpredict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
         actual = (predicted + delta) % 256
         oracle.tell(actual)
         yield actual
+
+
+def huffman_encode(data : bytes) -> bytes:
+    freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
+    tree : Node[Datum] = drop_weights(build_tree(freqs))
+    codes : dict[Datum, Bits] = build_codebook(tree)
+    tree_encoding = encode_tree(tree)
+    data_encoding = encode_data(ints_to_datums(data), codes)
+    encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
+    padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
+    result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]
+    return pack(result)
+
+
+def huffman_decode(data : bytes) -> bytes:
+    bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
+    tree : Node[Datum] = decode_tree(bs)
+    result : list[int] = decode_data(bs, tree)
+    return pack(result)

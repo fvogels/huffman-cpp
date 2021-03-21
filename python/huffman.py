@@ -26,6 +26,12 @@ class Eof:
 
 Datum = Union[int, Eof]
 
+
+def ints_to_datums(ns : Iterable[int]) -> Iterable[Datum]:
+    yield from ns
+    yield Eof()
+
+
 def pad(xs : list[T], length : int, padder : T) -> list[T]:
     padding = [ padder ] * (length - len(xs)) # Check what [x] * -5 does
     return [ *xs, *padding ]
@@ -191,20 +197,17 @@ def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
 
 
 def huffman_encode(data : bytes) -> bytes:
-    def extended_data() -> Iterator[Datum]:
-        yield from data
-        yield Eof()
     def datum_to_bits(datum : Datum) -> Bits:
         if isinstance(datum, Eof):
             return []
         else:
             return bits(datum)
 
-    freqs : dict[Datum, int] = frequencies(extended_data())
+    freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
     tree : Node[Datum] = drop_weights(build_tree(freqs))
     codes : dict[Datum, Bits] = build_codebook(tree)
     tree_encoding = encode_tree(tree.map(datum_to_bits))
-    data_encoding = encode_data(extended_data(), codes)
+    data_encoding = encode_data(ints_to_datums(data), codes)
     encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
     padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
     result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]

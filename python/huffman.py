@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, TypeVar, Union, Literal, Generic, Callable
+from typing import Any, TypeVar, Union, Literal, Generic, Callable, Iterable, Iterator
 from math import ceil
 import struct
 
@@ -10,6 +10,21 @@ U = TypeVar('U')
 Bit = Union[Literal[0], Literal[1]]
 Bits = list[Bit]
 
+class Eof:
+    def __str__(self):
+        return 'EOF'
+
+    def __repr__(self):
+        return 'EOF'
+
+    def __hash__(self):
+        return 0
+
+    def __eq__(self, other : Any) -> bool:
+        return isinstance(other, Eof)
+
+
+Datum = Union[int, Eof]
 
 def pad(xs : list[T], length : int, padder : T) -> list[T]:
     padding = [ padder ] * (length - len(xs)) # Check what [x] * -5 does
@@ -35,7 +50,7 @@ def shift(xs : list[T], n : int) -> list[T]:
     return result
 
 
-def frequencies(xs : list[T]) -> dict[T, int]:
+def frequencies(xs : Iterable[T]) -> dict[T, int]:
     result : dict[T, int] = {}
     for x in xs:
         old_frequency = result.setdefault(x, 0)
@@ -62,6 +77,9 @@ class Branch(Node[T]):
         right = self.right.map(func)
         return Branch(left, right)
 
+    def __repr__(self):
+        return f"B[{self.left}|{self.right}]"
+
 
 class Leaf(Node[T]):
     def __init__(self, datum : T):
@@ -72,6 +90,9 @@ class Leaf(Node[T]):
 
     def map(self, func : Callable[[T], U]) -> Leaf[U]:
         return Leaf(func(self.datum))
+
+    def __repr__(self):
+        return f"L[{repr(self.datum)}]"
 
 
 def build_tree(frequencies : dict[T, int]) -> Node[tuple[T, int]]:
@@ -145,11 +166,11 @@ def unpack(bs : bytes) -> list[int]:
     return [ t[0] for t in struct.iter_unpack('B', bs) ]
 
 
-def encode_data(xs : list[T], book : dict[T, Bits]) -> Bits:
+def encode_data(xs : Iterable[T], book : dict[T, Bits]) -> Bits:
     return [ bit for x in xs for bit in book[x] ]
 
 
-def decode_data(bits : Bits, tree : Node[T], eof : T) -> list[T]:
+def decode_data(bits : Bits, tree : Node[Union[T, U]], eof : U) -> list[T]:
     result : list[T] = []
     index = 0
     current_node = tree
@@ -171,3 +192,37 @@ def decode_data(bits : Bits, tree : Node[T], eof : T) -> list[T]:
         else:
             raise NotImplementedError()
     return result
+
+
+
+def huffman_encode(data : bytes) -> bytes:
+    def extended_data() -> Iterator[Datum]:
+        yield from data
+        yield Eof()
+    def datum_to_bits(datum : Datum) -> Bits:
+        if isinstance(datum, Eof):
+            return []
+        else:
+            return bits(datum)
+
+    freqs : dict[Datum, int] = frequencies(extended_data())
+    tree : Node[Datum] = drop_weights(build_tree(freqs))
+    codes : dict[Datum, Bits] = build_codebook(tree)
+    tree_encoding = encode_tree(tree.map(datum_to_bits))
+    data_encoding = encode_data(extended_data(), codes)
+    encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
+    padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
+    result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]
+    return pack(result)
+
+
+def huffman_decode(data : bytes) -> bytes:
+    def translate(bits : Bits) -> Datum:
+        if len(bits) == 0:
+            return Eof()
+        else:
+            return from_bits(bits)
+    bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
+    tree : Node[Datum] = decode_tree(bs).map(translate)
+    result : list[int] = decode_data(bs, tree, Eof())
+    return pack(result)

@@ -121,7 +121,6 @@ def test_packing():
     yield check, list(range(100))
 
 
-
 def test_encode_data():
     def check(expected, data, book):
         assert expected == encode_data(data, book)
@@ -147,3 +146,16 @@ def test_decode_data():
     yield check, 'b', [0,1,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
     yield check, 'c', [1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
     yield check, 'abc', [0,0,0,1,1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
+
+
+def test_huffman_encoding():
+    def check(data):
+        encoded = huffman_encode(data)
+        decoded = huffman_decode(encoded)
+        assert data == decoded
+    yield check, b''
+    yield check, b'a'
+    yield check, b'abc'
+    yield check, b'aabbbc'
+    yield check, b'aababcabcdabcde'
+    yield check, b'abbccccdddddddd'

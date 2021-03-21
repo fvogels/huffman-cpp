@@ -167,7 +167,7 @@ def encode_data(xs : Iterable[T], book : dict[T, Bits]) -> Bits:
     return [ bit for x in xs for bit in book[x] ]
 
 
-def decode_data(bits : Bits, tree : Node[Union[T, U]], eof : U) -> list[T]:
+def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
     result : list[T] = []
     index = 0
     current_node = tree
@@ -175,7 +175,7 @@ def decode_data(bits : Bits, tree : Node[Union[T, U]], eof : U) -> list[T]:
     while not end_reached:
         if isinstance(current_node, Leaf):
             datum = current_node.datum
-            if datum == eof:
+            if isinstance(datum, Eof):
                 end_reached = True
             else:
                 result.append(datum)
@@ -188,7 +188,6 @@ def decode_data(bits : Bits, tree : Node[Union[T, U]], eof : U) -> list[T]:
                 current_node = current_node.right
             index += 1
     return result
-
 
 
 def huffman_encode(data : bytes) -> bytes:
@@ -220,5 +219,5 @@ def huffman_decode(data : bytes) -> bytes:
             return from_bits(bits)
     bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
     tree : Node[Datum] = decode_tree(bs).map(translate)
-    result : list[int] = decode_data(bs, tree, Eof())
+    result : list[int] = decode_data(bs, tree)
     return pack(result)

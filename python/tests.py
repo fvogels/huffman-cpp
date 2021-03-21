@@ -132,20 +132,19 @@ def test_encode_data():
 
 
 def test_decode_data():
-    def check(expected, data, tree, eof):
-        actual = decode_data(data, tree, eof)
+    def check(expected, data, tree):
+        data = [ *data, Eof() ]
+        actual = decode_data(data, tree)
         assert [*expected] == actual, repr(actual)
     def l(datum):
         return Leaf(datum)
     def b(left, right):
         return Branch(left, right)
-    yield check, '', [0], b(l('a'), l('b')), 'a'
-    yield check, 'a', [0,1], b(l('a'), l('b')), 'b'
-    yield check, 'aa', [0,0,1], b(l('a'), l('b')), 'b'
-    yield check, 'a', [0,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
-    yield check, 'b', [0,1,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
-    yield check, 'c', [1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
-    yield check, 'abc', [0,0,0,1,1,0,1,1], b(b(l('a'),l('b')), b(l('c'),l('d'))), 'd'
+    eof = Eof()
+    yield check, '', [0], b(l(eof), l('b'))
+    yield check, 'a', [0,1], b(l('a'), l(eof))
+    yield check, 'aa', [0,0,1], b(l('a'), l(eof))
+    yield check, 'ab', [0,0,0,1,1], b(b(l('a'), l('b')), l(eof))
 
 
 def test_huffman_encoding():

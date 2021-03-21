@@ -157,8 +157,8 @@ def test_decode_data():
 
 def test_huffman_encoding():
     def check(data):
-        encoded = huffman_encode(data)
-        decoded = huffman_decode(encoded)
+        encoded = huffman_encode(unpack(data))
+        decoded = pack(huffman_decode(encoded))
         assert data == decoded
     yield check, b''
     yield check, b'a'

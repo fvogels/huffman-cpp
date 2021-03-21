@@ -262,7 +262,7 @@ def unpredict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
         yield actual
 
 
-def huffman_encode(data : bytes) -> bytes:
+def huffman_encode(data : Iterable[int]) -> Iterable[int]:
     freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
     tree : Node[Datum] = drop_weights(build_tree(freqs))
     codes : dict[Datum, Bits] = build_codebook(tree)
@@ -271,11 +271,11 @@ def huffman_encode(data : bytes) -> bytes:
     encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
     padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
     result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]
-    return pack(result)
+    return result
 
 
-def huffman_decode(data : bytes) -> bytes:
-    bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
+def huffman_decode(data : Iterable[int]) -> Iterable[int]:
+    bs : Bits = [ bit for byte in data for bit in bits(byte) ]
     tree : Node[Datum] = decode_tree(bs)
     result : list[int] = decode_data(bs, tree)
-    return pack(result)
+    return result

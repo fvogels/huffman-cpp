@@ -55,6 +55,16 @@ def test_shift():
     yield check, [1, 2, 3], [], [1, 2, 3], 3
 
 
+def test_datum_bit_conversion():
+    def check(datum):
+        bits = datum_to_bits(datum)
+        decoded = bits_to_datum(bits)
+        assert datum == decoded
+    yield check, Eof()
+    yield check, 0
+    yield check, 1
+
+
 def test_frequencies():
     def check(expected, xs):
         assert expected == frequencies(xs)
@@ -96,18 +106,16 @@ def test_tree_encoding():
         encoded = encode_tree(tree)
         decoded = decode_tree(encoded)
         assert tree == decoded
-    def l(*bits):
-        return Leaf(list(bits))
+    def l(value):
+        return Leaf(value)
     def b(left, right):
         return Branch(left, right)
     yield check, l(0)
     yield check, l(1)
-    yield check, l(0,0)
-    yield check, l(0,1)
-    yield check, l(1,0,0,1,0,1)
+    yield check, l(5)
     yield check, b(l(0), l(1))
-    yield check, b(l(0), l(1,0))
-    yield check, b(b(l(0), l(1)), l(1,0,1))
+    yield check, b(l(0), l(4))
+    yield check, b(b(l(0), l(1)), l(9))
 
 
 def test_packing():

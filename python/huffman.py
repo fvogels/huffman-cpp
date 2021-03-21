@@ -4,6 +4,20 @@ from math import ceil
 import struct
 
 
+def bits(n : int, size : int = 8) -> Bits:
+    return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
+
+
+def from_bits(bits : Bits) -> int:
+    return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
+
+
+def shift(xs : list[T], n : int) -> list[T]:
+    result = xs[:n]
+    del xs[:n]
+    return result
+
+
 T = TypeVar('T')
 U = TypeVar('U')
 
@@ -27,6 +41,21 @@ class Eof:
 Datum = Union[int, Eof]
 
 
+def datum_to_bits(datum : Datum) -> Bits:
+    if isinstance(datum, Eof):
+        return [ 0 ]
+    else:
+        assert isinstance(datum, int), f'datum {repr(datum)} has type {type(datum)} instead of int'
+        return [ 1, *bits(datum) ]
+
+
+def bits_to_datum(bits : Bits) -> Datum:
+    if bits.pop(0) == 0:
+        return Eof()
+    else:
+        return from_bits(shift(bits, 8))
+
+
 def ints_to_datums(ns : Iterable[int]) -> Iterable[Datum]:
     yield from ns
     yield Eof()
@@ -40,20 +69,6 @@ def pad(xs : list[T], length : int, padder : T) -> list[T]:
 def group(xs : list[T], group_size : int) -> list[list[T]]:
     ngroups = ceil(len(xs) / group_size)
     return [ xs[i * group_size : (i+1) * group_size] for i in range(ngroups) ]
-
-
-def bits(n : int, size : int = 8) -> Bits:
-    return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
-
-
-def from_bits(bits : Bits) -> int:
-    return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
-
-
-def shift(xs : list[T], n : int) -> list[T]:
-    result = xs[:n]
-    del xs[:n]
-    return result
 
 
 def frequencies(xs : Iterable[T]) -> dict[T, int]:
@@ -134,13 +149,12 @@ def build_codebook(tree : Node[T]) -> dict[T, Bits]:
     return result
 
 
-def encode_tree(tree : Node[Bits]) -> Bits:
-    result = []
-    def encode(tree : Node[Bits]) -> None:
+def encode_tree(tree : Node[Datum]) -> Bits:
+    result : Bits = []
+    def encode(tree : Node[Datum]) -> None:
         nonlocal result
         if isinstance(tree, Leaf):
-            bitcount = len(tree.datum)
-            result += [ 1, *bits(bitcount), *tree.datum ]
+            result += [ 1, *datum_to_bits(tree.datum) ]
         else:
             assert isinstance(tree, Branch)
             result.append(0)
@@ -150,15 +164,14 @@ def encode_tree(tree : Node[Bits]) -> Bits:
     return result
 
 
-def decode_tree(bits : Bits) -> Node[Bits]:
+def decode_tree(bits : Bits) -> Node[Datum]:
     if bits.pop(0) == 0:
         left = decode_tree(bits)
         right = decode_tree(bits)
         return Branch(left, right)
     else:
-        bitcount = from_bits(shift(bits, 8))
-        bs = shift(bits, bitcount)
-        return Leaf(bs)
+        datum = bits_to_datum(bits)
+        return Leaf(datum)
 
 
 def pack(code : list[int]) -> bytes:
@@ -197,16 +210,10 @@ def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
 
 
 def huffman_encode(data : bytes) -> bytes:
-    def datum_to_bits(datum : Datum) -> Bits:
-        if isinstance(datum, Eof):
-            return []
-        else:
-            return bits(datum)
-
     freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
     tree : Node[Datum] = drop_weights(build_tree(freqs))
     codes : dict[Datum, Bits] = build_codebook(tree)
-    tree_encoding = encode_tree(tree.map(datum_to_bits))
+    tree_encoding = encode_tree(tree)
     data_encoding = encode_data(ints_to_datums(data), codes)
     encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
     padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
@@ -215,12 +222,7 @@ def huffman_encode(data : bytes) -> bytes:
 
 
 def huffman_decode(data : bytes) -> bytes:
-    def translate(bits : Bits) -> Datum:
-        if len(bits) == 0:
-            return Eof()
-        else:
-            return from_bits(bits)
     bs : Bits = [ bit for byte in unpack(data) for bit in bits(byte) ]
-    tree : Node[Datum] = decode_tree(bs).map(translate)
+    tree : Node[Datum] = decode_tree(bs)
     result : list[int] = decode_data(bs, tree)
     return pack(result)

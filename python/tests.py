@@ -166,3 +166,16 @@ def test_huffman_encoding():
     yield check, b'aabbbc'
     yield check, b'aababcabcdabcde'
     yield check, b'abbccccdddddddd'
+
+
+def test_predictions():
+    def check(data, oracle_class):
+        deltas = predict(data, oracle_class())
+        restored = list(unpredict(deltas, oracle_class()))
+        assert restored == data, f'{restored} != {data}'
+    yield check, [], ZeroOracle
+    yield check, [0], ZeroOracle
+    yield check, [0, 1], ZeroOracle
+    yield check, [0, 1, 2, 3, 4], ZeroOracle
+    yield check, [5, 1, 2, 9, 4], ZeroOracle
+    yield check, [255, 128, 254, 0], ZeroOracle

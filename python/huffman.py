@@ -231,3 +231,38 @@ def huffman_decode(data : bytes) -> bytes:
     tree : Node[Datum] = decode_tree(bs)
     result : list[int] = decode_data(bs, tree)
     return pack(result)
+
+
+class Oracle:
+    def tell(self, value : int) -> None:
+        raise NotImplementedError()
+
+    def predict(self) -> int:
+        raise NotImplementedError()
+
+
+class ZeroOracle(Oracle):
+    def tell(self, value : int) -> None:
+        pass
+
+    def predict(self) -> int:
+        return 0
+
+
+def predict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
+    for x in data:
+        predicted = oracle.predict()
+        oracle.tell(x)
+        delta = x - predicted
+        if delta < 0:
+            delta += 256
+        assert x == (predicted + delta) % 256
+        yield delta
+
+
+def unpredict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
+    for delta in data:
+        predicted = oracle.predict()
+        actual = (predicted + delta) % 256
+        oracle.tell(actual)
+        yield actual

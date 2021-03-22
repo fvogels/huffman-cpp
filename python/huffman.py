@@ -18,6 +18,10 @@ def shift(xs : list[T], n : int) -> list[T]:
     return result
 
 
+def rotate_left(xs : list[T], n : int) -> list[T]:
+    return [ *xs[n:], *xs[:n] ]
+
+
 T = TypeVar('T')
 U = TypeVar('U')
 
@@ -275,8 +279,35 @@ class MarkovOracle(Oracle[T]):
             d[value] = n + 1
         self.__last = value
 
-    def __repr__(self):
-        return repr(self.__table)
+
+class MemoryOracle(Oracle[T]):
+    __table : dict[T, dict[T, int]]
+    __memory : list[T]
+    __memory_size : int
+    __default : T
+
+    def __init__(self, memory_size : int, default : T):
+        self.__table = {}
+        self.__last = default
+        self.__first = True
+        self.__default = default
+
+    def predict(self) -> T:
+        if not self.__first and self.__last in self.__table:
+            d = self.__table[self.__last]
+            result = max(d.keys(), key=lambda x: d[x])
+            return result
+        else:
+            return self.__default
+
+    def tell(self, value : T) -> None:
+        if self.__first:
+            self.__first = False
+        else:
+            d = self.__table.setdefault(self.__last, {})
+            n = d.get(value, 0)
+            d[value] = n + 1
+        self.__last = value
 
 
 def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
@@ -317,10 +348,39 @@ def huffman_decode(data : Iterable[int]) -> Iterable[int]:
     return result
 
 
-# data : Iterable[int] = unpack(b'abcdabcdabcdabcdabcdabcdabcdabcdabcdabcd')
-# oracle = MarkovOracle[int](0)
-# with_prediction = list(predict(data, oracle))
-# print(with_prediction)
-# print(oracle)
-# print(len(list(huffman_encode(data))))
-# print(len(list(huffman_encode(with_prediction))))
+def burrows_wheeler_transform(data : list[Datum]) -> list[Datum]:
+    def key(datum : Datum) -> int:
+        if isinstance(datum, Eof):
+            return -1
+        else:
+            return datum
+    rotations = [ rotate_left(data, i) for i in range(len(data)) ]
+    rotations.sort(key=lambda ds: list(map(key, ds)))
+    return [ rotation[-1] for rotation in rotations ]
+
+
+def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
+    def key(datum : Datum) -> int:
+        if isinstance(datum, Eof):
+            return -1
+        else:
+            return datum
+    table = [ [] for _ in range(len(data)) ]
+    for _ in range(len(data)):
+        for row, datum in zip(table, data):
+            row.insert(0, datum)
+        table.sort(key=lambda ds: list(map(key, ds)))
+    return next(row for row in table if isinstance(row[-1], Eof))
+
+
+with open('huffman.py', 'rb') as file:
+    data : list[int] = unpack(file.read())
+
+# data = burrows_wheeler_transform(data)
+# oracle = ConstantOracle[int](0)
+# oracle = RepeatOracle[int](0)
+oracle = MarkovOracle[int](0)
+with_prediction = list(predict(data, oracle))
+print(with_prediction)
+print(len(list(huffman_encode(data))))
+print(len(list(huffman_encode(with_prediction))))

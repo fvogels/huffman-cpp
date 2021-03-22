@@ -181,3 +181,15 @@ def test_predictions():
         yield check, [0, 1, 2, 3, 4], oracle
         yield check, [5, 1, 2, 9, 4], oracle
         yield check, [255, 128, 254, 0], oracle
+
+
+def test_burrows_wheeler():
+    def check(data):
+        transformed = burrows_wheeler_transform(data)
+        untransformed = burrows_wheeler_untransform(transformed)
+        assert data == untransformed
+    yield check, [ Eof() ]
+    yield check, [ 0, Eof() ]
+    yield check, [ 1, Eof() ]
+    yield check, [ 0, 1, Eof() ]
+    yield check, [ 1, 0, Eof() ]

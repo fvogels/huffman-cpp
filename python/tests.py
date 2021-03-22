@@ -174,7 +174,7 @@ def test_predictions():
         restored = list(unpredict(deltas, oracle_factory()))
         assert restored == data, f'{restored} != {data}'
 
-    for oracle in [ lambda: ConstantOracle(0), lambda: RepeatOracle(0) ]:
+    for oracle in [ lambda: ConstantOracle(0), lambda: RepeatOracle(0), lambda: MarkovOracle(0) ]:
         yield check, [], oracle
         yield check, [0], oracle
         yield check, [0, 1], oracle

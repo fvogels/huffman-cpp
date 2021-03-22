@@ -246,6 +246,38 @@ class RepeatOracle(Oracle[T]):
         self.last = value
 
 
+class MarkovOracle(Oracle[T]):
+    __table : dict[T, dict[T, int]]
+    __last : T
+    __first : bool
+    __default : T
+
+    def __init__(self, default : T):
+        self.__table = {}
+        self.__last = default
+        self.__first = True
+        self.__default = default
+
+    def predict(self) -> T:
+        if not self.__first and self.__last in self.__table:
+            d = self.__table[self.__last]
+            result = max(d.keys(), key=lambda x: d[x])
+            return result
+        else:
+            return self.__default
+
+    def tell(self, value : T) -> None:
+        if self.__first:
+            self.__first = False
+        else:
+            d = self.__table.setdefault(self.__last, {})
+            n = d.get(value, 0)
+            d[value] = n + 1
+        self.__last = value
+
+    def __repr__(self):
+        return repr(self.__table)
+
 
 def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
     for x in data:
@@ -285,7 +317,10 @@ def huffman_decode(data : Iterable[int]) -> Iterable[int]:
     return result
 
 
-data : Iterable[int] = unpack(b'aaaaaaaaaabbbbbbbbbb')
-with_prediction = predict(data, RepeatOracle[int](0))
-print(len(list(huffman_encode(data))))
-print(len(list(huffman_encode(with_prediction))))
+# data : Iterable[int] = unpack(b'abcdabcdabcdabcdabcdabcdabcdabcdabcdabcd')
+# oracle = MarkovOracle[int](0)
+# with_prediction = list(predict(data, oracle))
+# print(with_prediction)
+# print(oracle)
+# print(len(list(huffman_encode(data))))
+# print(len(list(huffman_encode(with_prediction))))

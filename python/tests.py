@@ -169,12 +169,12 @@ def test_huffman_encoding():
 
 
 def test_predictions():
-    def check(data, oracle_class):
-        deltas = predict(data, oracle_class())
-        restored = list(unpredict(deltas, oracle_class()))
+    def check(data, oracle_factory):
+        deltas = predict(data, oracle_factory())
+        restored = list(unpredict(deltas, oracle_factory()))
         assert restored == data, f'{restored} != {data}'
 
-    for oracle in [ ZeroOracle, RepeatOracle ]:
+    for oracle in [ lambda: ConstantOracle(0), lambda: RepeatOracle(0) ]:
         yield check, [], oracle
         yield check, [0], oracle
         yield check, [0, 1], oracle

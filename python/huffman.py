@@ -214,36 +214,40 @@ def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
     return result
 
 
-class Oracle:
-    def tell(self, value : int) -> None:
+class Oracle(Generic[T]):
+    def tell(self, value : T) -> None:
         raise NotImplementedError()
 
-    def predict(self) -> int:
+    def predict(self) -> T:
         raise NotImplementedError()
 
 
-class ZeroOracle(Oracle):
-    def tell(self, value : int) -> None:
+class ConstantOracle(Oracle[T]):
+    def __init__(self, constant : T):
+        self.__constant = constant
+
+    def tell(self, value : T) -> None:
         pass
 
-    def predict(self) -> int:
-        return 0
+    def predict(self) -> T:
+        return self.__constant
 
 
-class RepeatOracle(Oracle):
-    last : int
+class RepeatOracle(Oracle[T]):
+    last : T
 
-    def __init__(self):
-        self.last = 0
+    def __init__(self, initial : T):
+        self.last = initial
 
-    def predict(self) -> int:
+    def predict(self) -> T:
         return self.last
 
-    def tell(self, value) -> None:
+    def tell(self, value : T) -> None:
         self.last = value
 
 
-def predict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
+
+def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
     for x in data:
         predicted = oracle.predict()
         oracle.tell(x)
@@ -254,7 +258,7 @@ def predict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
         yield delta
 
 
-def unpredict(data : Iterable[int], oracle : Oracle) -> Iterable[int]:
+def unpredict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
     for delta in data:
         predicted = oracle.predict()
         actual = (predicted + delta) % 256
@@ -279,3 +283,9 @@ def huffman_decode(data : Iterable[int]) -> Iterable[int]:
     tree : Node[Datum] = decode_tree(bs)
     result : list[int] = decode_data(bs, tree)
     return result
+
+
+data : Iterable[int] = unpack(b'aaaaaaaaaabbbbbbbbbb')
+with_prediction = predict(data, RepeatOracle[int](0))
+print(len(list(huffman_encode(data))))
+print(len(list(huffman_encode(with_prediction))))

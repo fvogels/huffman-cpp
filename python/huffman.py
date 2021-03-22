@@ -365,7 +365,7 @@ def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
             return -1
         else:
             return datum
-    table = [ [] for _ in range(len(data)) ]
+    table : list[list[Datum]] = [ [] for _ in range(len(data)) ]
     for _ in range(len(data)):
         for row, datum in zip(table, data):
             row.insert(0, datum)

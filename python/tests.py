@@ -174,13 +174,23 @@ def test_predictions():
         restored = list(unpredict(deltas, oracle_factory()))
         assert restored == data, f'{restored} != {data}'
 
-    for oracle in [ lambda: ConstantOracle(0), lambda: RepeatOracle(0), lambda: MarkovOracle(0) ]:
+    oracles = [
+        lambda: ConstantOracle(0),
+        lambda: RepeatOracle(0),
+        lambda: MarkovOracle(0),
+        lambda: MemoryOracle(1, 0),
+        lambda: MemoryOracle(2, 0),
+        lambda: MemoryOracle(3, 0),
+    ]
+
+    for oracle in oracles:
         yield check, [], oracle
         yield check, [0], oracle
         yield check, [0, 1], oracle
         yield check, [0, 1, 2, 3, 4], oracle
         yield check, [5, 1, 2, 9, 4], oracle
         yield check, [255, 128, 254, 0], oracle
+        yield check, [1, 1, 1, 1, 1, 1, 1, 1], oracle
 
 
 def test_burrows_wheeler():

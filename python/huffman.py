@@ -22,6 +22,15 @@ def rotate_left(xs : list[T], n : int) -> list[T]:
     return [ *xs[n:], *xs[:n] ]
 
 
+def last(xs : list[T], n : int) -> list[T]:
+    if len(xs) <= n:
+        return xs[:]
+    else:
+        result = xs[len(xs) - n:]
+        assert len(result) == n
+        return result
+
+
 T = TypeVar('T')
 U = TypeVar('U')
 
@@ -265,8 +274,7 @@ class MarkovOracle(Oracle[T]):
     def predict(self) -> T:
         if not self.__first and self.__last in self.__table:
             d = self.__table[self.__last]
-            result = max(d.keys(), key=lambda x: d[x])
-            return result
+            return max(d.keys(), key=lambda x: d[x])
         else:
             return self.__default
 
@@ -281,33 +289,41 @@ class MarkovOracle(Oracle[T]):
 
 
 class MemoryOracle(Oracle[T]):
-    __table : dict[T, dict[T, int]]
+    __table : dict[tuple, dict[T, int]]
     __memory : list[T]
     __memory_size : int
     __default : T
 
     def __init__(self, memory_size : int, default : T):
         self.__table = {}
-        self.__last = default
-        self.__first = True
+        self.__memory = []
+        self.__memory_size = memory_size
         self.__default = default
 
     def predict(self) -> T:
-        if not self.__first and self.__last in self.__table:
-            d = self.__table[self.__last]
-            result = max(d.keys(), key=lambda x: d[x])
-            return result
-        else:
-            return self.__default
+        memory : tuple = tuple(self.__memory)
+        while len(memory) > 0:
+            if memory in self.__table:
+                d = self.__table[memory]
+                return max(d.keys(), key=lambda x: d[x])
+            else:
+                memory = memory[1:]
+        return self.__default
 
     def tell(self, value : T) -> None:
-        if self.__first:
-            self.__first = False
-        else:
-            d = self.__table.setdefault(self.__last, {})
+        def inc(memory : tuple):
+            d = self.__table.setdefault(memory, {})
             n = d.get(value, 0)
             d[value] = n + 1
-        self.__last = value
+        memory = tuple(self.__memory)
+        while len(memory) > 0:
+            inc(memory)
+            memory = memory[1:]
+        self.__memory.append(value)
+        self.__memory = last(self.__memory, self.__memory_size)
+
+    def __repr__(self):
+        return repr(self.__table)
 
 
 def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
@@ -376,11 +392,16 @@ def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
 with open('huffman.py', 'rb') as file:
     data : list[int] = unpack(file.read())
 
+# data : list[int] = [1,2,3,4,5] * 1000
+
 # data = burrows_wheeler_transform(data)
 # oracle = ConstantOracle[int](0)
 # oracle = RepeatOracle[int](0)
-oracle = MarkovOracle[int](0)
+# oracle = MarkovOracle[int](0)
+oracle = MemoryOracle[int](10, 0)
 with_prediction = list(predict(data, oracle))
-print(with_prediction)
+# print(with_prediction)
+# print(oracle)
+print(len(list(data)))
 print(len(list(huffman_encode(data))))
 print(len(list(huffman_encode(with_prediction))))

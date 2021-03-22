@@ -392,10 +392,10 @@ def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
 
 
 class Encoding(Generic[T,U]):
-    def encode(xs : Iterable[T]) -> Iterable[U]:
+    def encode(self, xs : Iterable[T]) -> Iterable[U]:
         raise NotImplementedError()
 
-    def decode(xs : Iterable[U]) -> Iterable[T]:
+    def decode(self, xs : Iterable[U]) -> Iterable[T]:
         raise NotImplementedError()
 
 

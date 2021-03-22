@@ -203,3 +203,16 @@ def test_burrows_wheeler():
     yield check, [ 1, Eof() ]
     yield check, [ 0, 1, Eof() ]
     yield check, [ 1, 0, Eof() ]
+
+
+def test_datum_encoding():
+    encoding = DatumEncoding()
+    def check(data):
+        encoded = encoding.encode(data)
+        decoded = list(encoding.decode(encoded))
+        assert data == decoded, f'{data} != {decoded}'
+    yield check, []
+    yield check, [0]
+    yield check, [5]
+    yield check, [2, 9]
+    yield check, [5, 2, 9, 100]

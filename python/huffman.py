@@ -334,6 +334,7 @@ def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
         if delta < 0:
             delta += 256
         assert x == (predicted + delta) % 256
+        assert 0 <= x <= 255
         yield delta
 
 
@@ -341,9 +342,9 @@ def unpredict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
     for delta in data:
         predicted = oracle.predict()
         actual = (predicted + delta) % 256
+        assert 0 <= actual <= 255
         oracle.tell(actual)
         yield actual
-
 
 def huffman_encode(data : Iterable[int]) -> Iterable[int]:
     freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
@@ -389,6 +390,30 @@ def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
     return next(row for row in table if isinstance(row[-1], Eof))
 
 
+
+class Encoding(Generic[T,U]):
+    def encode(xs : Iterable[T]) -> Iterable[U]:
+        raise NotImplementedError()
+
+    def decode(xs : Iterable[U]) -> Iterable[T]:
+        raise NotImplementedError()
+
+
+class DatumEncoding(Encoding[int, Datum]):
+    def encode(self, xs : Iterable[int]) -> Iterable[Datum]:
+        yield from xs
+        yield Eof()
+
+    def decode(self, xs : Iterable[Datum]) -> Iterable[int]:
+        end_reached = False
+        for x in xs:
+            if isinstance(x, Eof):
+                assert not end_reached
+                end_reached = True
+            else:
+                yield x
+
+
 with open('huffman.py', 'rb') as file:
     data : list[int] = unpack(file.read())
 
@@ -398,7 +423,7 @@ with open('huffman.py', 'rb') as file:
 # oracle = ConstantOracle[int](0)
 # oracle = RepeatOracle[int](0)
 # oracle = MarkovOracle[int](0)
-oracle = MemoryOracle[int](10, 0)
+oracle = MemoryOracle[int](2, 0)
 with_prediction = list(predict(data, oracle))
 # print(with_prediction)
 # print(oracle)

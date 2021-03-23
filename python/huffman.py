@@ -6,6 +6,7 @@ import struct
 
 T = TypeVar('T')
 U = TypeVar('U')
+V = TypeVar('V')
 
 
 class FrequencyTable(Generic[T]):
@@ -353,6 +354,21 @@ class Encoding(Generic[T,U]):
     def decode(self, xs : Iterable[U]) -> Iterable[T]:
         raise NotImplementedError()
 
+    def __or__(self, other : Encoding[U,V]) -> Encoding[T,V]:
+        return EncodingCombinator(self, other)
+
+
+class EncodingCombinator(Encoding[T, V]):
+    def __init__(self, left : Encoding[T, U], right : Encoding[U, V]):
+        self.__left = left
+        self.__right = right
+
+    def encode(self, xs : Iterable[T]) -> Iterable[V]:
+        return self.__right.encode(self.__left.encode(xs))
+
+    def decode(self, xs : Iterable[V]) -> Iterable[T]:
+        return self.__left.decode(self.__right.decode(xs))
+
 
 class DatumEncoding(Encoding[int, Datum]):
     def encode(self, xs : Iterable[int]) -> Iterable[Datum]:
@@ -367,7 +383,6 @@ class DatumEncoding(Encoding[int, Datum]):
                 end_reached = True
             else:
                 yield x
-
 
 class PredictionEncoding(Encoding[int, int]):
     def __init__(self, oracle_factory : Callable[[], Oracle]):
@@ -486,7 +501,3 @@ class MoveToFrontEncoding(Encoding[int, int]):
 # print(len(list(data)))
 # print(len(list(huffman_encode(data))))
 # print(len(list(huffman_encode(with_prediction))))
-
-
-frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([1,1,1,1,1])
-build_tree(frequencies)

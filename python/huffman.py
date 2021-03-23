@@ -448,6 +448,28 @@ class HuffmanEncoding(Encoding[Datum, Bit]):
         return decode_data(iterator, tree)
 
 
+class MoveToFrontEncoding(Encoding[int, int]):
+    def encode(self, data : Iterable[int]) -> Iterable[int]:
+        table = list(range(2**8))
+        for x in data:
+            assert 0 <= x <= 255
+            index = table.index(x)
+            yield index
+            del table[index]
+            table.insert(0, x)
+
+    def decode(self, data : Iterable[int]) -> Iterable[int]:
+        table = list(range(2**8))
+        for x in data:
+            assert 0 <= x <= 255
+            value = table[x]
+            yield value
+            del table[x]
+            table.insert(0, value)
+
+
+# Introduce type Byte, is_byte
+
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())
 

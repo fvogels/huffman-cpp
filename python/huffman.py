@@ -4,6 +4,41 @@ from math import ceil
 import struct
 
 
+T = TypeVar('T')
+U = TypeVar('U')
+
+
+class FrequencyTable(Generic[T]):
+    __table : dict[T, int]
+
+    @staticmethod
+    def from_iterable(values : Iterable[T]) -> FrequencyTable[T]:
+        result = FrequencyTable[T]()
+        for value in values:
+            result.increment(value)
+        return result
+
+    def __init__(self):
+        self.__table = {}
+
+    def __getitem__(self, value : T) -> int:
+        return self.__table.get(value, 0)
+
+    def increment(self, value : T) -> None:
+        self.__table[value] = self[value] + 1
+
+    @property
+    def values(self) -> Iterable[T]:
+        return self.__table.keys()
+
+    @property
+    def items(self) -> Iterable[tuple[T, int]]:
+        return self.__table.items()
+
+    def __len__(self) -> int:
+        return len(self.__table)
+
+
 def bits(n : int, size : int = 8) -> Bits:
     return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
 
@@ -18,6 +53,10 @@ def shift(xs : list[T], n : int) -> list[T]:
     return result
 
 
+def take(xs : Iterator[T], n : int) -> list[T]:
+    return [ next(xs) for _ in range(n) ]
+
+
 def rotate_left(xs : list[T], n : int) -> list[T]:
     return [ *xs[n:], *xs[:n] ]
 
@@ -30,9 +69,6 @@ def last(xs : list[T], n : int) -> list[T]:
         assert len(result) == n
         return result
 
-
-T = TypeVar('T')
-U = TypeVar('U')
 
 Bit = Union[Literal[0], Literal[1]]
 Bits = list[Bit]
@@ -54,19 +90,20 @@ class Eof:
 Datum = Union[int, Eof]
 
 
-def datum_to_bits(datum : Datum) -> Bits:
+def datum_to_bits(datum : Datum) -> Iterable[Bit]:
     if isinstance(datum, Eof):
-        return [ 0 ]
+        yield 0
     else:
         assert isinstance(datum, int), f'datum {repr(datum)} has type {type(datum)} instead of int'
-        return [ 1, *bits(datum) ]
+        yield 1
+        yield from bits(datum)
 
 
-def bits_to_datum(bits : Bits) -> Datum:
-    if bits.pop(0) == 0:
+def bits_to_datum(bits : Iterator[Bit]) -> Datum:
+    if next(bits) == 0:
         return Eof()
     else:
-        return from_bits(shift(bits, 8))
+        return from_bits(take(bits, 8))
 
 
 def ints_to_datums(ns : Iterable[int]) -> Iterable[Datum]:
@@ -82,15 +119,6 @@ def pad(xs : list[T], length : int, padder : T) -> list[T]:
 def group(xs : list[T], group_size : int) -> list[list[T]]:
     ngroups = ceil(len(xs) / group_size)
     return [ xs[i * group_size : (i+1) * group_size] for i in range(ngroups) ]
-
-
-def frequencies(xs : Iterable[T]) -> dict[T, int]:
-    result : dict[T, int] = {}
-    for x in xs:
-        old_frequency = result.setdefault(x, 0)
-        new_frequency = old_frequency + 1
-        result[x] = new_frequency
-    return result
 
 
 class Node(Generic[T]):
@@ -134,7 +162,7 @@ class Leaf(Node[T]):
         return f"L[{repr(self.datum)}]"
 
 
-def build_tree(frequencies : dict[T, int]) -> Node[tuple[T, int]]:
+def build_tree(frequencies : FrequencyTable[T]) -> Node[T]:
     def weight(node : Node[tuple[T, int]]) -> int:
         if isinstance(node, Leaf):
             return node.datum[1]
@@ -142,16 +170,14 @@ def build_tree(frequencies : dict[T, int]) -> Node[tuple[T, int]]:
             assert isinstance(node, Branch)
             return weight(node.left) + weight(node.right)
 
-    queue : list[Node[tuple[T, int]]] = [ Leaf((datum, weight)) for datum, weight in frequencies.items() ]
+    assert len(frequencies) > 0
+    queue : list[Node[tuple[T, int]]] = [ Leaf((datum, weight)) for datum, weight in frequencies.items ]
     while len(queue) > 1:
         queue.sort(key=weight)
         branch = Branch(queue.pop(0), queue.pop(0))
         queue.append(branch)
-    return queue[0]
-
-
-def drop_weights(tree : Node[tuple[T, int]]) -> Node[T]:
-    return tree.map(lambda pair: pair[0])
+    root = queue[0]
+    return root.map(lambda p: p[0])
 
 
 def build_codebook(tree : Node[T]) -> dict[T, Bits]:
@@ -167,23 +193,21 @@ def build_codebook(tree : Node[T]) -> dict[T, Bits]:
     return result
 
 
-def encode_tree(tree : Node[Datum]) -> Bits:
-    result : Bits = []
-    def encode(tree : Node[Datum]) -> None:
-        nonlocal result
+def encode_tree(tree : Node[Datum]) -> Iterable[Bit]:
+    def encode(tree : Node[Datum]) -> Iterable[Bit]:
         if isinstance(tree, Leaf):
-            result += [ 1, *datum_to_bits(tree.datum) ]
+            yield 1
+            yield from datum_to_bits(tree.datum)
         else:
             assert isinstance(tree, Branch)
-            result.append(0)
-            encode(tree.left)
-            encode(tree.right)
-    encode(tree)
-    return result
+            yield 0
+            yield from encode(tree.left)
+            yield from encode(tree.right)
+    yield from encode(tree)
 
 
-def decode_tree(bits : Bits) -> Node[Datum]:
-    if bits.pop(0) == 0:
+def decode_tree(bits : Iterator[Bit]) -> Node[Datum]:
+    if next(bits) == 0:
         left = decode_tree(bits)
         right = decode_tree(bits)
         return Branch(left, right)
@@ -204,9 +228,7 @@ def encode_data(xs : Iterable[T], book : dict[T, Bits]) -> Bits:
     return [ bit for x in xs for bit in book[x] ]
 
 
-def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
-    result : list[T] = []
-    index = 0
+def decode_data(bits : Iterator[Bit], tree : Node[Union[Datum]]) -> Iterable[Datum]:
     current_node = tree
     end_reached = False
     while not end_reached:
@@ -215,16 +237,14 @@ def decode_data(bits : Bits, tree : Node[Union[T, Eof]]) -> list[T]:
             if isinstance(datum, Eof):
                 end_reached = True
             else:
-                result.append(datum)
                 current_node = tree
+            yield datum
         else:
             assert isinstance(current_node, Branch)
-            if bits[index] == 0:
+            if next(bits) == 0:
                 current_node = current_node.left
             else:
                 current_node = current_node.right
-            index += 1
-    return result
 
 
 class Oracle(Generic[T]):
@@ -346,22 +366,18 @@ def unpredict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
         oracle.tell(actual)
         yield actual
 
-def huffman_encode(data : Iterable[int]) -> Iterable[int]:
-    freqs : dict[Datum, int] = frequencies(ints_to_datums(data))
-    tree : Node[Datum] = drop_weights(build_tree(freqs))
+
+def huffman_encode(data : Iterable[Datum]) -> Iterable[Bit]:
+    frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
+    tree : Node[Datum] = build_tree(frequencies)
     codes : dict[Datum, Bits] = build_codebook(tree)
-    tree_encoding = encode_tree(tree)
-    data_encoding = encode_data(ints_to_datums(data), codes)
-    encoding_bits : Bits = [ *tree_encoding, *data_encoding ]
-    padded_bits : Bits = pad(encoding_bits, ceil(len(encoding_bits) / 8) * 8, 0)
-    result : list[int] = [ from_bits(g) for g in group(padded_bits, 8) ]
-    return result
+    yield from encode_tree(tree)
+    yield from encode_data(data, codes)
 
 
-def huffman_decode(data : Iterable[int]) -> Iterable[int]:
-    bs : Bits = [ bit for byte in data for bit in bits(byte) ]
-    tree : Node[Datum] = decode_tree(bs)
-    result : list[int] = decode_data(bs, tree)
+def huffman_decode(bits : Iterator[Bit]) -> Iterable[Datum]:
+    tree : Node[Datum] = decode_tree(bits)
+    result : Iterable[Datum] = decode_data(bits, tree)
     return result
 
 
@@ -390,7 +406,6 @@ def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
     return next(row for row in table if isinstance(row[-1], Eof))
 
 
-
 class Encoding(Generic[T,U]):
     def encode(self, xs : Iterable[T]) -> Iterable[U]:
         raise NotImplementedError()
@@ -414,19 +429,23 @@ class DatumEncoding(Encoding[int, Datum]):
                 yield x
 
 
-with open('huffman.py', 'rb') as file:
-    data : list[int] = unpack(file.read())
+# with open('huffman.py', 'rb') as file:
+#     data : list[int] = unpack(file.read())
 
-# data : list[int] = [1,2,3,4,5] * 1000
+# # data : list[int] = [1,2,3,4,5] * 1000
 
-# data = burrows_wheeler_transform(data)
-# oracle = ConstantOracle[int](0)
-# oracle = RepeatOracle[int](0)
-# oracle = MarkovOracle[int](0)
-oracle = MemoryOracle[int](2, 0)
-with_prediction = list(predict(data, oracle))
-# print(with_prediction)
-# print(oracle)
-print(len(list(data)))
-print(len(list(huffman_encode(data))))
-print(len(list(huffman_encode(with_prediction))))
+# # data = burrows_wheeler_transform(data)
+# # oracle = ConstantOracle[int](0)
+# # oracle = RepeatOracle[int](0)
+# # oracle = MarkovOracle[int](0)
+# oracle = MemoryOracle[int](2, 0)
+# with_prediction = list(predict(data, oracle))
+# # print(with_prediction)
+# # print(oracle)
+# print(len(list(data)))
+# print(len(list(huffman_encode(data))))
+# print(len(list(huffman_encode(with_prediction))))
+
+
+frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([1,1,1,1,1])
+build_tree(frequencies)

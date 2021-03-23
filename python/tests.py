@@ -65,32 +65,17 @@ def test_datum_bit_conversion():
     yield check, 1
 
 
-def test_frequencies():
-    def check(expected, xs):
-        assert expected == frequencies(xs)
-    yield check, {}, []
-    yield check, {1: 1}, [1]
-    yield check, {1: 2}, [1, 1]
-    yield check, {2: 2}, [2, 2]
-    yield check, {1: 1, 2: 1}, [1, 2]
-
-
 def test_build_tree():
-    def check(expected, freqs):
-        assert expected == build_tree(freqs)
-    yield check, Leaf(('a', 1)), { 'a': 1 }
-    yield check, Leaf(('a', 2)), { 'a': 2 }
-    yield check, Branch( Leaf(('a', 1)), Leaf(('b', 2)) ), { 'a': 1, 'b': 2 }
-    yield check, Branch( Leaf(('b', 1)), Leaf(('a', 2)) ), { 'a': 2, 'b': 1 }
+    def check(expected, d):
+        frequencies = FrequencyTable()
+        for value, n in d.items():
+            for _ in range(n):
+                frequencies.increment(value)
 
-
-def test_drop_weights():
-    def check(expected, tree):
-        assert expected == drop_weights(tree)
-    yield check, Leaf('a'), Leaf(('a', 1))
-    yield check, Leaf('a'), Leaf(('a', 2))
-    yield check, Branch( Leaf('a'), Leaf('b') ), Branch( Leaf(('a', 1)), Leaf(('b', 2)) )
-    yield check, Branch( Leaf('b'), Leaf('a') ), Branch( Leaf(('b', 1)), Leaf(('a', 2)) )
+        assert expected == build_tree(frequencies)
+    yield check, Leaf('a'), { 'a': 1 }
+    yield check, Branch( Leaf('a'), Leaf('b') ), { 'a': 1, 'b': 2 }
+    yield check, Branch( Leaf('b'), Leaf('a') ), { 'a': 2, 'b': 1 }
 
 
 def test_build_codebook():
@@ -141,9 +126,9 @@ def test_encode_data():
 
 def test_decode_data():
     def check(expected, data, tree):
-        data = [ *data, Eof() ]
-        actual = decode_data(data, tree)
-        assert [*expected] == actual, repr(actual)
+        data = iter([ *data, Eof() ])
+        actual = list(decode_data(data, tree))
+        assert [*expected, Eof()] == actual, repr(actual)
     def l(datum):
         return Leaf(datum)
     def b(left, right):
@@ -157,15 +142,16 @@ def test_decode_data():
 
 def test_huffman_encoding():
     def check(data):
-        encoded = huffman_encode(unpack(data))
-        decoded = pack(huffman_decode(encoded))
-        assert data == decoded
-    yield check, b''
-    yield check, b'a'
-    yield check, b'abc'
-    yield check, b'aabbbc'
-    yield check, b'aababcabcdabcde'
-    yield check, b'abbccccdddddddd'
+        data = [*data.encode('ascii'), Eof()]
+        encoded = huffman_encode(data)
+        decoded = list(huffman_decode(encoded))
+        assert data == decoded, f'data={data}, decoded={decoded}'
+    yield check, ''
+    yield check, 'a'
+    yield check, 'abc'
+    yield check, 'aabbbc'
+    yield check, 'aababcabcdabcde'
+    yield check, 'abbccccdddddddd'
 
 
 def test_predictions():

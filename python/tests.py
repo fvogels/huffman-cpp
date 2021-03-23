@@ -235,3 +235,18 @@ def test_encoder_combination():
     yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), [5, 1, 3, 2, 6, 5, 8]
     yield check, MoveToFrontEncoding(), DatumEncoding(), [5, 1, 3, 2, 6, 5, 8]
     yield check, DatumEncoding(), BurrowsWheeler(), [5, 1, 3, 2, 6, 5, 8]
+
+
+def test_bit_grouper():
+    def check(bits):
+        encoding = BitGrouperEncoding()
+        encoded = encoding.encode(bits)
+        decoded = list(encoding.decode(encoded))[0:len(bits)]
+        assert bits == decoded, f'bits={bits}, decoded={decoded}'
+
+    yield check, []
+    yield check, [0]
+    yield check, [1]
+    yield check, [1, 1]
+    yield check, [1, 0, 1, 0, 1, 1, 1, 0]
+    yield check, [0] * 8 * 10

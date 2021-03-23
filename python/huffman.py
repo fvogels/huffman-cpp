@@ -485,6 +485,28 @@ class MoveToFrontEncoding(Encoding[int, int]):
             table.insert(0, value)
 
 
+class BitGrouperEncoding(Encoding[Bit, Byte]):
+    def encode(self, bits : Iterable[Bit]) -> Iterable[Byte]:
+        bitcount = 0
+        acc = 0
+        for bit in bits:
+            acc = acc * 2 + bit
+            bitcount += 1
+            if bitcount == 8:
+                yield acc
+                acc = 0
+                bitcount = 0
+        while bitcount < 8:
+            acc *= 2
+            bitcount += 1
+        yield acc
+
+    def decode(self, bytes : Iterable[Byte]) -> Iterable[Bit]:
+        for byte in bytes:
+            for bit in bits(byte):
+                yield bit
+
+
 # Introduce type Byte, is_byte
 
 # with open('huffman.py', 'rb') as file:

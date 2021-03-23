@@ -182,14 +182,16 @@ def test_predictions():
 
 def test_burrows_wheeler():
     def check(data):
-        transformed = burrows_wheeler_transform(data)
-        untransformed = burrows_wheeler_untransform(transformed)
+        encoding = BurrowsWheeler()
+        transformed = encoding.encode(data)
+        untransformed = list(encoding.decode(transformed))
         assert data == untransformed
     yield check, [ Eof() ]
     yield check, [ 0, Eof() ]
     yield check, [ 1, Eof() ]
     yield check, [ 0, 1, Eof() ]
     yield check, [ 1, 0, Eof() ]
+    yield check, [ 1, 0, 5, 100, 8, 52, Eof() ]
 
 
 def test_datum_encoding():

@@ -381,31 +381,6 @@ def huffman_decode(bits : Iterator[Bit]) -> Iterable[Datum]:
     return result
 
 
-def burrows_wheeler_transform(data : list[Datum]) -> list[Datum]:
-    def key(datum : Datum) -> int:
-        if isinstance(datum, Eof):
-            return -1
-        else:
-            return datum
-    rotations = [ rotate_left(data, i) for i in range(len(data)) ]
-    rotations.sort(key=lambda ds: list(map(key, ds)))
-    return [ rotation[-1] for rotation in rotations ]
-
-
-def burrows_wheeler_untransform(data : list[Datum]) -> list[Datum]:
-    def key(datum : Datum) -> int:
-        if isinstance(datum, Eof):
-            return -1
-        else:
-            return datum
-    table : list[list[Datum]] = [ [] for _ in range(len(data)) ]
-    for _ in range(len(data)):
-        for row, datum in zip(table, data):
-            row.insert(0, datum)
-        table.sort(key=lambda ds: list(map(key, ds)))
-    return next(row for row in table if isinstance(row[-1], Eof))
-
-
 class Encoding(Generic[T,U]):
     def encode(self, xs : Iterable[T]) -> Iterable[U]:
         raise NotImplementedError()
@@ -465,6 +440,32 @@ class PredictionEncoding(Encoding[int, int]):
         assert 0 <= result <= 255
         return result
 
+
+class BurrowsWheeler(Encoding[Datum, Datum]):
+    def encode(self, data : Iterable[Datum]) -> Iterable[Datum]:
+        def key(datum : Datum) -> int:
+            if isinstance(datum, Eof):
+                return -1
+            else:
+                return datum
+        xs = list(data)
+        rotations = [ rotate_left(xs, i) for i in range(len(xs)) ]
+        rotations.sort(key=lambda ds: list(map(key, ds)))
+        return (rotation[-1] for rotation in rotations)
+
+    def decode(self, data : Iterable[Datum]) -> Iterable[Datum]:
+        def key(datum : Datum) -> int:
+            if isinstance(datum, Eof):
+                return -1
+            else:
+                return datum
+        xs = list(data)
+        table : list[list[Datum]] = [ [] for _ in range(len(xs)) ]
+        for _ in range(len(xs)):
+            for row, datum in zip(table, xs):
+                row.insert(0, datum)
+            table.sort(key=lambda ds: list(map(key, ds)))
+        return next(row for row in table if isinstance(row[-1], Eof))
 
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())

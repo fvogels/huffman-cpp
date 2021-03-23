@@ -8,6 +8,8 @@ T = TypeVar('T')
 U = TypeVar('U')
 V = TypeVar('V')
 
+Bit = Union[Literal[0], Literal[1]]
+
 
 class FrequencyTable(Generic[T]):
     __table : dict[T, int]
@@ -40,11 +42,11 @@ class FrequencyTable(Generic[T]):
         return len(self.__table)
 
 
-def bits(n : int, size : int = 8) -> Bits:
+def bits(n : int, size : int = 8) -> list[Bit]:
     return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
 
 
-def from_bits(bits : Bits) -> int:
+def from_bits(bits : Iterable[Bit]) -> int:
     return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
 
 
@@ -70,9 +72,6 @@ def last(xs : list[T], n : int) -> list[T]:
         assert len(result) == n
         return result
 
-
-Bit = Union[Literal[0], Literal[1]]
-Bits = list[Bit]
 
 class Eof:
     def __str__(self):
@@ -181,15 +180,15 @@ def build_tree(frequencies : FrequencyTable[T]) -> Node[T]:
     return root.map(lambda p: p[0])
 
 
-def build_codebook(tree : Node[T]) -> dict[T, Bits]:
-    def build(node : Node[T], prefix : Bits, book : dict[T, Bits]) -> None:
+def build_codebook(tree : Node[T]) -> dict[T, list[Bit]]:
+    def build(node : Node[T], prefix : list[Bit], book : dict[T, list[Bit]]) -> None:
         if isinstance(node, Leaf):
             book[node.datum] = prefix
         else:
             assert isinstance(node, Branch)
             build(node.left, [*prefix, 0], book)
             build(node.right, [*prefix, 1], book)
-    result : dict[T, Bits] = {}
+    result : dict[T, list[Bit]] = {}
     build(tree, [], result)
     return result
 
@@ -225,7 +224,7 @@ def unpack(bs : bytes) -> list[int]:
     return [ t[0] for t in struct.iter_unpack('B', bs) ]
 
 
-def encode_data(xs : Iterable[T], book : dict[T, Bits]) -> Bits:
+def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> list[Bit]:
     return [ bit for x in xs for bit in book[x] ]
 
 
@@ -453,7 +452,7 @@ class HuffmanEncoding(Encoding[Datum, Bit]):
     def encode(self, data : Iterable[Datum]) -> Iterable[Bit]:
         frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
         tree : Node[Datum] = build_tree(frequencies)
-        codes : dict[Datum, Bits] = build_codebook(tree)
+        codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from encode_tree(tree)
         yield from encode_data(data, codes)
 

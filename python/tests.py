@@ -221,6 +221,7 @@ def test_move_to_front():
     yield check, [5, 2, 9, 100]
     yield check, [8, 7, 5, 4, 3, 2, 1, 5, 7, 8, 9, 5, 6]
 
+
 def test_encoder_combination():
     def check(e1, e2, data):
         e = e1 | e2
@@ -234,4 +235,3 @@ def test_encoder_combination():
     yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), [5, 1, 3, 2, 6, 5, 8]
     yield check, MoveToFrontEncoding(), DatumEncoding(), [5, 1, 3, 2, 6, 5, 8]
     yield check, DatumEncoding(), BurrowsWheeler(), [5, 1, 3, 2, 6, 5, 8]
-

@@ -346,27 +346,6 @@ class MemoryOracle(Oracle[T]):
         return repr(self.__table)
 
 
-def predict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
-    for x in data:
-        predicted = oracle.predict()
-        oracle.tell(x)
-        delta = x - predicted
-        if delta < 0:
-            delta += 256
-        assert x == (predicted + delta) % 256
-        assert 0 <= x <= 255
-        yield delta
-
-
-def unpredict(data : Iterable[int], oracle : Oracle[int]) -> Iterable[int]:
-    for delta in data:
-        predicted = oracle.predict()
-        actual = (predicted + delta) % 256
-        assert 0 <= actual <= 255
-        oracle.tell(actual)
-        yield actual
-
-
 def huffman_encode(data : Iterable[Datum]) -> Iterable[Bit]:
     frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
     tree : Node[Datum] = build_tree(frequencies)

@@ -9,7 +9,10 @@ U = TypeVar('U')
 V = TypeVar('V')
 
 Bit = Union[Literal[0], Literal[1]]
+Byte = int
 
+def is_byte(n : int) -> bool:
+    return 0 <= n <= 255
 
 class FrequencyTable(Generic[T]):
     __table : dict[T, int]
@@ -398,10 +401,10 @@ class PredictionEncoding(Encoding[int, int]):
             yield correction
 
     def __compute_correction(self, prediction : int, actual : int) -> int:
-        assert 0 <= prediction <= 255
-        assert 0 <= actual <= 255
+        assert is_byte(prediction)
+        assert is_byte(actual)
         result = (actual - prediction) % 256
-        assert 0 <= result <= 255
+        assert is_byte(result)
         return result
 
     def decode(self, corrections : Iterable[int]) -> Iterable[int]:
@@ -414,10 +417,10 @@ class PredictionEncoding(Encoding[int, int]):
             yield actual
 
     def __apply_correction(self, prediction : int, correction : int) -> int:
-        assert 0 <= prediction <= 255
-        assert 0 <= correction <= 255
+        assert is_byte(prediction)
+        assert is_byte(correction)
         result = (prediction + correction) % 256
-        assert 0 <= result <= 255
+        assert is_byte(result)
         return result
 
 
@@ -466,7 +469,7 @@ class MoveToFrontEncoding(Encoding[int, int]):
     def encode(self, data : Iterable[int]) -> Iterable[int]:
         table = list(range(2**8))
         for x in data:
-            assert 0 <= x <= 255
+            assert is_byte(x)
             index = table.index(x)
             yield index
             del table[index]
@@ -475,7 +478,7 @@ class MoveToFrontEncoding(Encoding[int, int]):
     def decode(self, data : Iterable[int]) -> Iterable[int]:
         table = list(range(2**8))
         for x in data:
-            assert 0 <= x <= 255
+            assert is_byte(x)
             value = table[x]
             yield value
             del table[x]

@@ -45,16 +45,6 @@ def test_from_bits():
     yield check, 7, [1, 1, 1]
 
 
-def test_shift():
-    def check(expected_result, expected_list, xs, n):
-        assert expected_result == shift(xs, n)
-        assert expected_list == xs
-    yield check, [], [1, 2, 3], [1, 2, 3], 0
-    yield check, [1], [2, 3], [1, 2, 3], 1
-    yield check, [1, 2], [3], [1, 2, 3], 2
-    yield check, [1, 2, 3], [], [1, 2, 3], 3
-
-
 def test_datum_bit_conversion():
     def check(datum):
         bits = datum_to_bits(datum)

@@ -19,6 +19,7 @@ class FrequencyTable(Generic[T]):
 
     @staticmethod
     def from_iterable(values : Iterable[T]) -> FrequencyTable[T]:
+        assert values is not None
         result = FrequencyTable[T]()
         for value in values:
             result.increment(value)
@@ -46,28 +47,28 @@ class FrequencyTable(Generic[T]):
 
 
 def bits(n : int, size : int = 8) -> list[Bit]:
+    assert size > 0
     return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
 
 
 def from_bits(bits : Iterable[Bit]) -> int:
+    assert bits is not None
     return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
 
 
-def shift(xs : list[T], n : int) -> list[T]:
-    result = xs[:n]
-    del xs[:n]
-    return result
-
-
 def take(xs : Iterator[T], n : int) -> list[T]:
+    assert xs is not None
+    assert n >= 0
     return [ next(xs) for _ in range(n) ]
 
 
 def rotate_left(xs : list[T], n : int) -> list[T]:
+    assert n >= 0
     return [ *xs[n:], *xs[:n] ]
 
 
 def last(xs : list[T], n : int) -> list[T]:
+    assert n >= 0
     if len(xs) <= n:
         return xs[:]
     else:

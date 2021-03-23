@@ -90,12 +90,13 @@ class Eof:
     def __eq__(self, other : Any) -> bool:
         return isinstance(other, Eof)
 
+EOF = Eof()
 
 Datum = Union[int, Eof]
 
 
 def datum_to_bits(datum : Datum) -> Iterable[Bit]:
-    if isinstance(datum, Eof):
+    if datum is EOF:
         yield 0
     else:
         assert isinstance(datum, int), f'datum {repr(datum)} has type {type(datum)} instead of int'
@@ -105,14 +106,14 @@ def datum_to_bits(datum : Datum) -> Iterable[Bit]:
 
 def bits_to_datum(bits : Iterator[Bit]) -> Datum:
     if next(bits) == 0:
-        return Eof()
+        return EOF
     else:
         return from_bits(take(bits, 8))
 
 
 def ints_to_datums(ns : Iterable[int]) -> Iterable[Datum]:
     yield from ns
-    yield Eof()
+    yield EOF
 
 
 def pad(xs : list[T], length : int, padder : T) -> list[T]:
@@ -238,7 +239,7 @@ def decode_data(bits : Iterator[Bit], tree : Node[Union[Datum]]) -> Iterable[Dat
     while not end_reached:
         if isinstance(current_node, Leaf):
             datum = current_node.datum
-            if isinstance(datum, Eof):
+            if datum is EOF:
                 end_reached = True
             else:
                 current_node = tree
@@ -395,15 +396,16 @@ class EncodingInverter(Encoding[U, T]):
 class DatumEncoding(Encoding[int, Datum]):
     def encode(self, xs : Iterable[int]) -> Iterable[Datum]:
         yield from xs
-        yield Eof()
+        yield EOF
 
     def decode(self, xs : Iterable[Datum]) -> Iterable[int]:
         end_reached = False
         for x in xs:
-            if isinstance(x, Eof):
+            if x is EOF:
                 assert not end_reached
                 end_reached = True
             else:
+                assert isinstance(x, int)
                 yield x
 
 class PredictionEncoding(Encoding[Byte, Byte]):
@@ -447,9 +449,10 @@ class PredictionEncoding(Encoding[Byte, Byte]):
 class BurrowsWheeler(Encoding[Datum, Datum]):
     def encode(self, data : Iterable[Datum]) -> Iterable[Datum]:
         def key(datum : Datum) -> int:
-            if isinstance(datum, Eof):
+            if datum is EOF:
                 return -1
             else:
+                assert isinstance(datum, int), f'datum {datum} should be int'
                 return datum
         xs = list(data)
         rotations = [ rotate_left(xs, i) for i in range(len(xs)) ]
@@ -458,9 +461,10 @@ class BurrowsWheeler(Encoding[Datum, Datum]):
 
     def decode(self, data : Iterable[Datum]) -> Iterable[Datum]:
         def key(datum : Datum) -> int:
-            if isinstance(datum, Eof):
+            if datum is EOF:
                 return -1
             else:
+                assert isinstance(datum, int)
                 return datum
         xs = list(data)
         table : list[list[Datum]] = [ [] for _ in range(len(xs)) ]
@@ -468,7 +472,7 @@ class BurrowsWheeler(Encoding[Datum, Datum]):
             for row, datum in zip(table, xs):
                 row.insert(0, datum)
             table.sort(key=lambda ds: list(map(key, ds)))
-        return next(row for row in table if isinstance(row[-1], Eof))
+        return next(row for row in table if row[-1] is EOF)
 
 
 class HuffmanEncoding(Encoding[Datum, Bit]):

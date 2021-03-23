@@ -50,7 +50,7 @@ def test_datum_bit_conversion():
         bits = datum_to_bits(datum)
         decoded = bits_to_datum(bits)
         assert datum == decoded
-    yield check, Eof()
+    yield check, EOF
     yield check, 0
     yield check, 1
 
@@ -116,14 +116,14 @@ def test_encode_data():
 
 def test_decode_data():
     def check(expected, data, tree):
-        data = iter([ *data, Eof() ])
+        data = iter([ *data, EOF ])
         actual = list(decode_data(data, tree))
-        assert [*expected, Eof()] == actual, repr(actual)
+        assert [*expected, EOF] == actual, repr(actual)
     def l(datum):
         return Leaf(datum)
     def b(left, right):
         return Branch(left, right)
-    eof = Eof()
+    eof = EOF
     yield check, '', [0], b(l(eof), l('b'))
     yield check, 'a', [0,1], b(l('a'), l(eof))
     yield check, 'aa', [0,0,1], b(l('a'), l(eof))
@@ -133,7 +133,7 @@ def test_decode_data():
 def test_huffman_encoding():
     def check(data):
         encoding = HuffmanEncoding()
-        data = [ *data.encode('ascii'), Eof() ]
+        data = [ *data.encode('ascii'), EOF ]
         encoded = encoding.encode(data)
         decoded = list(encoding.decode(encoded))
         assert data == decoded, f'data={data}, decoded={decoded}'
@@ -177,12 +177,12 @@ def test_burrows_wheeler():
         transformed = encoding.encode(data)
         untransformed = list(encoding.decode(transformed))
         assert data == untransformed
-    yield check, [ Eof() ]
-    yield check, [ 0, Eof() ]
-    yield check, [ 1, Eof() ]
-    yield check, [ 0, 1, Eof() ]
-    yield check, [ 1, 0, Eof() ]
-    yield check, [ 1, 0, 5, 100, 8, 52, Eof() ]
+    yield check, [ EOF ]
+    yield check, [ 0, EOF ]
+    yield check, [ 1, EOF ]
+    yield check, [ 0, 1, EOF ]
+    yield check, [ 1, 0, EOF ]
+    yield check, [ 1, 0, 5, 100, 8, 52, EOF ]
 
 
 def test_datum_encoding():

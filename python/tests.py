@@ -250,3 +250,19 @@ def test_bit_grouper():
     yield check, [1, 1]
     yield check, [1, 0, 1, 0, 1, 1, 1, 0]
     yield check, [0] * 8 * 10
+
+
+def test_encoding_inverter():
+    def check(encoding, data):
+        e = encoding | ~encoding
+        encoded = e.encode(data)
+        decoded = list(e.decode(encoded))
+        assert data == decoded
+
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), []
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 1, 1, 1, 1]
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 2, 1, 3, 1, 4, 1, 5]
+    yield check, MoveToFrontEncoding(), []
+    yield check, MoveToFrontEncoding(), [0]
+    yield check, MoveToFrontEncoding(), [0, 0, 0, 0, 0]
+    yield check, MoveToFrontEncoding(), [1, 1, 1, 1, 1]

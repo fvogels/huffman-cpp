@@ -359,6 +359,9 @@ class Encoding(Generic[T,U]):
     def __or__(self, other : Encoding[U,V]) -> Encoding[T,V]:
         return EncodingCombinator(self, other)
 
+    def __invert__(self) -> Encoding[U, T]:
+        return EncodingInverter(self)
+
 
 class EncodingCombinator(Encoding[T, V]):
     def __init__(self, left : Encoding[T, U], right : Encoding[U, V]):
@@ -370,6 +373,19 @@ class EncodingCombinator(Encoding[T, V]):
 
     def decode(self, xs : Iterable[V]) -> Iterable[T]:
         return self.__left.decode(self.__right.decode(xs))
+
+
+class EncodingInverter(Encoding[U, T]):
+    __encoding : Encoding[T, U]
+
+    def __init__(self, encoding : Encoding[T, U]):
+        self.__encoding = encoding
+
+    def encode(self, xs : Iterable[U]) -> Iterable[T]:
+        return self.__encoding.decode(xs)
+
+    def decode(self, xs : Iterable[T]) -> Iterable[U]:
+        return self.__encoding.encode(xs)
 
 
 class DatumEncoding(Encoding[int, Datum]):
@@ -386,12 +402,12 @@ class DatumEncoding(Encoding[int, Datum]):
             else:
                 yield x
 
-class PredictionEncoding(Encoding[int, int]):
+class PredictionEncoding(Encoding[Byte, Byte]):
     def __init__(self, oracle_factory : Callable[[], Oracle]):
         assert oracle_factory is not None
         self.__oracle_factory = oracle_factory
 
-    def encode(self, data : Iterable[int]) -> Iterable[int]:
+    def encode(self, data : Iterable[Byte]) -> Iterable[Byte]:
         assert data is not None
         oracle = self.__oracle_factory()
         for actual in data:
@@ -400,14 +416,14 @@ class PredictionEncoding(Encoding[int, int]):
             correction = self.__compute_correction(prediction, actual)
             yield correction
 
-    def __compute_correction(self, prediction : int, actual : int) -> int:
+    def __compute_correction(self, prediction : Byte, actual : Byte) -> Byte:
         assert is_byte(prediction)
         assert is_byte(actual)
         result = (actual - prediction) % 256
         assert is_byte(result)
         return result
 
-    def decode(self, corrections : Iterable[int]) -> Iterable[int]:
+    def decode(self, corrections : Iterable[Byte]) -> Iterable[Byte]:
         assert corrections is not None
         oracle = self.__oracle_factory()
         for correction in corrections:
@@ -416,7 +432,7 @@ class PredictionEncoding(Encoding[int, int]):
             oracle.tell(actual)
             yield actual
 
-    def __apply_correction(self, prediction : int, correction : int) -> int:
+    def __apply_correction(self, prediction : Byte, correction : Byte) -> Byte:
         assert is_byte(prediction)
         assert is_byte(correction)
         result = (prediction + correction) % 256
@@ -465,8 +481,8 @@ class HuffmanEncoding(Encoding[Datum, Bit]):
         return decode_data(iterator, tree)
 
 
-class MoveToFrontEncoding(Encoding[int, int]):
-    def encode(self, data : Iterable[int]) -> Iterable[int]:
+class MoveToFrontEncoding(Encoding[Byte, Byte]):
+    def encode(self, data : Iterable[Byte]) -> Iterable[Byte]:
         table = list(range(2**8))
         for x in data:
             assert is_byte(x)
@@ -475,7 +491,7 @@ class MoveToFrontEncoding(Encoding[int, int]):
             del table[index]
             table.insert(0, x)
 
-    def decode(self, data : Iterable[int]) -> Iterable[int]:
+    def decode(self, data : Iterable[Byte]) -> Iterable[Byte]:
         table = list(range(2**8))
         for x in data:
             assert is_byte(x)
@@ -506,8 +522,6 @@ class BitGrouperEncoding(Encoding[Bit, Byte]):
             for bit in bits(byte):
                 yield bit
 
-
-# Introduce type Byte, is_byte
 
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())

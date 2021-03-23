@@ -363,7 +363,10 @@ class Encoding(Generic[T,U]):
         return EncodingInverter(self)
 
 
-class EncodingCombinator(Encoding[T, V]):
+class EncodingCombinator(Generic[T, U, V], Encoding[T, V]):
+    __left : Encoding[T, U]
+    __right : Encoding[U, V]
+
     def __init__(self, left : Encoding[T, U], right : Encoding[U, V]):
         self.__left = left
         self.__right = right

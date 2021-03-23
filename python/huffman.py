@@ -428,6 +428,43 @@ class DatumEncoding(Encoding[int, Datum]):
             else:
                 yield x
 
+class PredictionEncoding(Encoding[int, int]):
+    def __init__(self, oracle_factory : Callable[[], Oracle]):
+        assert oracle_factory is not None
+        self.__oracle_factory = oracle_factory
+
+    def encode(self, data : Iterable[int]) -> Iterable[int]:
+        assert data is not None
+        oracle = self.__oracle_factory()
+        for actual in data:
+            prediction = oracle.predict()
+            oracle.tell(actual)
+            correction = self.__compute_correction(prediction, actual)
+            yield correction
+
+    def __compute_correction(self, prediction : int, actual : int) -> int:
+        assert 0 <= prediction <= 255
+        assert 0 <= actual <= 255
+        result = (actual - prediction) % 256
+        assert 0 <= result <= 255
+        return result
+
+    def decode(self, corrections : Iterable[int]) -> Iterable[int]:
+        assert corrections is not None
+        oracle = self.__oracle_factory()
+        for correction in corrections:
+            prediction = oracle.predict()
+            actual = self.__apply_correction(prediction, correction)
+            oracle.tell(actual)
+            yield actual
+
+    def __apply_correction(self, prediction : int, correction : int) -> int:
+        assert 0 <= prediction <= 255
+        assert 0 <= correction <= 255
+        result = (prediction + correction) % 256
+        assert 0 <= result <= 255
+        return result
+
 
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())

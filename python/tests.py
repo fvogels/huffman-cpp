@@ -156,8 +156,9 @@ def test_huffman_encoding():
 
 def test_predictions():
     def check(data, oracle_factory):
-        deltas = predict(data, oracle_factory())
-        restored = list(unpredict(deltas, oracle_factory()))
+        encoding = PredictionEncoding(oracle_factory)
+        encoded = encoding.encode(data)
+        restored = list(encoding.decode(encoded))
         assert restored == data, f'{restored} != {data}'
 
     oracles = [

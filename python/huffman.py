@@ -346,20 +346,6 @@ class MemoryOracle(Oracle[T]):
         return repr(self.__table)
 
 
-def huffman_encode(data : Iterable[Datum]) -> Iterable[Bit]:
-    frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
-    tree : Node[Datum] = build_tree(frequencies)
-    codes : dict[Datum, Bits] = build_codebook(tree)
-    yield from encode_tree(tree)
-    yield from encode_data(data, codes)
-
-
-def huffman_decode(bits : Iterator[Bit]) -> Iterable[Datum]:
-    tree : Node[Datum] = decode_tree(bits)
-    result : Iterable[Datum] = decode_data(bits, tree)
-    return result
-
-
 class Encoding(Generic[T,U]):
     def encode(self, xs : Iterable[T]) -> Iterable[U]:
         raise NotImplementedError()
@@ -381,6 +367,7 @@ class DatumEncoding(Encoding[int, Datum]):
                 end_reached = True
             else:
                 yield x
+
 
 class PredictionEncoding(Encoding[int, int]):
     def __init__(self, oracle_factory : Callable[[], Oracle]):
@@ -445,6 +432,21 @@ class BurrowsWheeler(Encoding[Datum, Datum]):
                 row.insert(0, datum)
             table.sort(key=lambda ds: list(map(key, ds)))
         return next(row for row in table if isinstance(row[-1], Eof))
+
+
+class HuffmanEncoding(Encoding[Datum, Bit]):
+    def encode(self, data : Iterable[Datum]) -> Iterable[Bit]:
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
+        tree : Node[Datum] = build_tree(frequencies)
+        codes : dict[Datum, Bits] = build_codebook(tree)
+        yield from encode_tree(tree)
+        yield from encode_data(data, codes)
+
+    def decode(self, bits : Iterable[Bit]) -> Iterable[Datum]:
+        iterator = iter(bits)
+        tree : Node[Datum] = decode_tree(iterator)
+        return decode_data(iterator, tree)
+
 
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())

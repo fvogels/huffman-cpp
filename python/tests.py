@@ -142,9 +142,10 @@ def test_decode_data():
 
 def test_huffman_encoding():
     def check(data):
-        data = [*data.encode('ascii'), Eof()]
-        encoded = huffman_encode(data)
-        decoded = list(huffman_decode(encoded))
+        encoding = HuffmanEncoding()
+        data = [ *data.encode('ascii'), Eof() ]
+        encoded = encoding.encode(data)
+        decoded = list(encoding.decode(encoded))
         assert data == decoded, f'data={data}, decoded={decoded}'
     yield check, ''
     yield check, 'a'

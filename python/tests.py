@@ -106,7 +106,7 @@ def test_packing():
 
 def test_encode_data():
     def check(expected, data, book):
-        assert expected == encode_data(data, book)
+        assert expected == list(encode_data(data, book))
     yield check, [0], 'a', { 'a': [0] }
     yield check, [0, 0], 'aa', { 'a': [0] }
     yield check, [0, 1], 'ab', { 'a': [0], 'b': [1] }
@@ -143,6 +143,7 @@ def test_huffman_encoding():
     yield check, 'aabbbc'
     yield check, 'aababcabcdabcde'
     yield check, 'abbccccdddddddd'
+    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio' * 1000
 
 
 def test_predictions():
@@ -213,18 +214,23 @@ def test_move_to_front():
 
 
 def test_encoder_combination():
-    def check(e1, e2, data):
-        e = e1 | e2
-        encoded = e.encode(data)
-        decoded = list(e.decode(encoded))
-        assert data == decoded
+    def check(encoding, data):
+        encoded = encoding.encode(data)
+        decoded = list(encoding.decode(encoded))
+        assert data == decoded, f'data={data}, decoded={decoded}'
 
-    yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), []
-    yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), [1]
-    yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), [1, 2]
-    yield check, MoveToFrontEncoding(), MoveToFrontEncoding(), [5, 1, 3, 2, 6, 5, 8]
-    yield check, MoveToFrontEncoding(), DatumEncoding(), [5, 1, 3, 2, 6, 5, 8]
-    yield check, DatumEncoding(), BurrowsWheeler(), [5, 1, 3, 2, 6, 5, 8]
+    encodings = [
+        MoveToFrontEncoding() | MoveToFrontEncoding(),
+        MoveToFrontEncoding() | DatumEncoding(),
+        DatumEncoding() | BurrowsWheeler(),
+
+    ]
+    for encoding in encodings:
+        yield check, encoding, []
+        yield check, encoding, [1]
+        yield check, encoding, [1, 2]
+        yield check, encoding, [5, 1, 3, 2, 6, 5, 8]
+        yield check, encoding, [1,2,3] * 10
 
 
 def test_bit_grouper():

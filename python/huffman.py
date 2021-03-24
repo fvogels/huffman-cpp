@@ -229,8 +229,8 @@ def unpack(bs : bytes) -> list[int]:
     return [ t[0] for t in struct.iter_unpack('B', bs) ]
 
 
-def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> list[Bit]:
-    return [ bit for x in xs for bit in book[x] ]
+def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> Iterable[Bit]:
+    return (bit for x in xs for bit in book[x])
 
 
 def decode_data(bits : Iterator[Bit], tree : Node[Union[Datum]]) -> Iterable[Datum]:
@@ -477,11 +477,12 @@ class BurrowsWheeler(Encoding[Datum, Datum]):
 
 class HuffmanEncoding(Encoding[Datum, Bit]):
     def encode(self, data : Iterable[Datum]) -> Iterable[Bit]:
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data)
+        xs = list(data)
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(xs)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from encode_tree(tree)
-        yield from encode_data(data, codes)
+        yield from encode_data(xs, codes)
 
     def decode(self, bits : Iterable[Bit]) -> Iterable[Datum]:
         iterator = iter(bits)
@@ -514,6 +515,7 @@ class BitGrouperEncoding(Encoding[Bit, Byte]):
         bitcount = 0
         acc = 0
         for bit in bits:
+            assert bit == 0 or bit == 1
             acc = acc * 2 + bit
             bitcount += 1
             if bitcount == 8:
@@ -531,19 +533,26 @@ class BitGrouperEncoding(Encoding[Bit, Byte]):
                 yield bit
 
 
+
 # with open('huffman.py', 'rb') as file:
 #     data : list[int] = unpack(file.read())
 
-# # data : list[int] = [1,2,3,4,5] * 1000
+data : list[int] = [1,2,3,4,5]*10
 
 # # data = burrows_wheeler_transform(data)
-# # oracle = ConstantOracle[int](0)
-# # oracle = RepeatOracle[int](0)
-# # oracle = MarkovOracle[int](0)
-# oracle = MemoryOracle[int](2, 0)
-# with_prediction = list(predict(data, oracle))
-# # print(with_prediction)
-# # print(oracle)
-# print(len(list(data)))
-# print(len(list(huffman_encode(data))))
-# print(len(list(huffman_encode(with_prediction))))
+# oracle = ConstantOracle[int](0)
+# oracle = RepeatOracle[int](0)
+# oracle = MarkovOracle[int](0)
+oracle = MemoryOracle[int](2, 0)
+
+# encoding = PredictionEncoding(lambda: MemoryOracle(10, 0)) | DatumEncoding() | HuffmanEncoding() | BitGrouperEncoding()
+# encoding = MoveToFrontEncoding() | DatumEncoding() | HuffmanEncoding() | BitGrouperEncoding()
+encoding = DatumEncoding() | HuffmanEncoding() # | BitGrouperEncoding()
+
+# print(with_prediction)
+# print(oracle)
+print(len(list(data)))
+encoded = list(encoding.encode(data))
+print(len(encoded))
+decoded = list(encoding.decode(encoded))
+print(decoded)

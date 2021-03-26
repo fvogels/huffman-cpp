@@ -45,6 +45,12 @@ class FrequencyTable(Generic[T]):
     def __len__(self) -> int:
         return len(self.__table)
 
+    def __str__(self) -> str:
+        return str(self.__table)
+
+    def __repr__(self) -> str:
+        return repr(self.__table)
+
 
 def bits_needed(nvalues : int) -> int:
     return ceil(log2(nvalues))
@@ -494,6 +500,56 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         return Data(decoded, self.__nvalues)
 
 
+class AdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        assert nvalues > 1
+        self.__nvalues = nvalues
+
+    def encode(self, data : Data) -> Iterable[Bit]:
+        not_yet_transmitted = data.nvalues
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([ not_yet_transmitted ])
+        bn = bits_needed(self.__nvalues)
+
+        for datum in data.values:
+            tree : Node[Datum] = build_tree(frequencies)
+            codes : dict[Datum, list[Bit]] = build_codebook(tree)
+            if datum in codes:
+                yield from codes[datum]
+            else:
+                yield from codes[not_yet_transmitted]
+                yield from bits(datum, bn)
+            frequencies.increment(datum)
+
+    def decode(self, encoded : Iterable[Bit]) -> Data:
+        bits = iter(encoded)
+        def dec():
+            not_yet_transmitted = self.__nvalues
+            bn = bits_needed(self.__nvalues)
+            frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([ not_yet_transmitted ])
+            current_tree = build_tree(frequencies)
+            end_reached = False
+
+            while not end_reached:
+                if isinstance(current_tree, Leaf):
+                    datum = current_tree.datum
+                    if datum == not_yet_transmitted:
+                        datum = from_bits(take(bits, bn))
+                    yield datum
+                    frequencies.increment(datum)
+                    current_tree = build_tree(frequencies)
+                else:
+                    assert isinstance(current_tree, Branch)
+                    if (bit := next(bits, None)) != None:
+                        current_tree = current_tree.left if bit == 0 else current_tree.right
+                    else:
+                        end_reached = True
+
+        # TODO Remove list
+        return Data(list(dec()), self.__nvalues)
+
+
 class MoveToFrontEncoding(Encoding[Data, Data]):
     def encode(self, data : Data) -> Data:
         def enc() -> Iterable[Datum]:
@@ -567,3 +623,10 @@ class EofEncoding(Encoding[Data, Data]):
             while (datum := next(values)) != eof:
                 yield datum
         return Data(dec(), self.__nvalues)
+
+
+encoding = AdaptiveHuffmanEncoding(4)
+data = Data([1,1,1], 4)
+encoded = list(encoding.encode(data))
+decoded = list(encoding.decode(encoded).values)
+print(decoded)

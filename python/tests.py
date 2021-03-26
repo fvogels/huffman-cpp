@@ -223,19 +223,21 @@ def test_move_to_front():
 def test_encoder_combination():
     def check(encoding, data):
         encoded = encoding.encode(data)
-        decoded = encoding.decode(encoded)
-        assert ns == decoded, f'data={data}, decoded={decoded}'
+        decoded = list(encoding.decode(encoded))
+        assert data == decoded, f'data={data}, decoded={decoded}'
 
     encodings = [
-        MoveToFrontEncoding() | MoveToFrontEncoding(),
-        MoveToFrontEncoding() | BurrowsWheeler(),
+        DataEncoding(256) | MoveToFrontEncoding(),
+        DataEncoding(256) | MoveToFrontEncoding() | MoveToFrontEncoding(),
+        DataEncoding(256) | MoveToFrontEncoding() | BurrowsWheeler(),
+        DataEncoding(256) | BurrowsWheeler() | MoveToFrontEncoding(),
+        DataEncoding(256) | HuffmanEncoding(256),
+        DataEncoding(256) | EofEncoding(256) | HuffmanEncoding(257),
     ]
     for encoding in encodings:
-        yield check, encoding, []
-        yield check, encoding, [1]
-        yield check, encoding, [1, 2]
+        yield check, encoding, [1, 2, 3, 4]
         yield check, encoding, [5, 1, 3, 2, 6, 5, 8]
-        yield check, encoding, [1,2,3] * 10
+        yield check, encoding, [1, 2, 3] * 10
 
 
 def test_bit_grouper():
@@ -253,6 +255,21 @@ def test_bit_grouper():
         yield check, [1, 0, 1, 0, 1, 1, 1, 0], group_size
         yield check, [0] * 8 * 10, group_size
 
+
+def test_eof_encoding():
+    def check(ns, nvalues):
+        data = Data(ns, nvalues)
+        encoding = EofEncoding(nvalues)
+        encoded = encoding.encode(data)
+        decoded = list(encoding.decode(encoded).values)
+        assert ns == decoded, f'ns={ns}, decoded={decoded}'
+
+    yield check, [], 4
+    yield check, [0], 4
+    yield check, [1], 4
+    yield check, [1, 1], 4
+    yield check, [1, 2, 3, 4, 3, 2, 1], 16
+    yield check, list(range(100)), 100
 
 # def test_encoding_inverter():
 #     def check(encoding, data):

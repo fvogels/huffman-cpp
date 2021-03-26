@@ -480,11 +480,12 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
 
     def encode(self, data : Data) -> Iterable[Bit]:
         assert data.nvalues == self.__nvalues
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data.values)
+        values = list(data.values)
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from self.__tree_encoding.encode(tree)
-        yield from encode_data(data.values, codes)
+        yield from encode_data(values, codes)
 
     def decode(self, bits : Iterable[Bit]) -> Data:
         iterator = iter(bits)
@@ -545,3 +546,24 @@ class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
         for byte in data.values:
             for bit in bits(byte, self.__nbits):
                 yield bit
+
+
+class EofEncoding(Encoding[Data, Data]):
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        self.__nvalues = nvalues
+
+    def encode(self, data : Data) -> Data:
+        assert data.nvalues == self.__nvalues
+        eof = data.nvalues
+        return Data(append(data.values, eof), data.nvalues + 1)
+
+    def decode(self, data : Data) -> Data:
+        assert data.nvalues == self.__nvalues + 1
+        eof = self.__nvalues
+        def dec():
+            values = data.values
+            while (datum := next(values)) != eof:
+                yield datum
+        return Data(dec(), self.__nvalues)

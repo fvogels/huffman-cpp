@@ -1,6 +1,17 @@
 from huffman import *
 
 
+def test_bits_needed():
+    def check(expected, n):
+        actual = bits_needed(n)
+        assert expected == actual
+    yield check, 1, 2
+    yield check, 2, 3
+    yield check, 2, 4
+    yield check, 3, 5
+    yield check, 8, 2**8
+
+
 def test_padding():
     def check(expected, xs, length, padder):
         assert expected == pad(xs, length, padder)
@@ -45,16 +56,6 @@ def test_from_bits():
     yield check, 7, [1, 1, 1]
 
 
-def test_datum_bit_conversion():
-    def check(datum):
-        bits = datum_to_bits(datum)
-        decoded = bits_to_datum(bits)
-        assert datum == decoded
-    yield check, EOF
-    yield check, 0
-    yield check, 1
-
-
 def test_build_tree():
     def check(expected, d):
         frequencies = FrequencyTable()
@@ -78,8 +79,9 @@ def test_build_codebook():
 
 def test_tree_encoding():
     def check(tree):
-        encoded = encode_tree(tree)
-        decoded = decode_tree(encoded)
+        encoding = TreeEncoding(4)
+        encoded = encoding.encode(tree)
+        decoded = encoding.decode(encoded)
         assert tree == decoded
     def l(value):
         return Leaf(value)
@@ -88,6 +90,7 @@ def test_tree_encoding():
     yield check, l(0)
     yield check, l(1)
     yield check, l(5)
+    yield check, l(15)
     yield check, b(l(0), l(1))
     yield check, b(l(0), l(4))
     yield check, b(b(l(0), l(1)), l(9))
@@ -116,29 +119,32 @@ def test_encode_data():
 
 def test_decode_data():
     def check(expected, data, tree):
-        data = iter([ *data, EOF ])
-        actual = list(decode_data(data, tree))
-        assert [*expected, EOF] == actual, repr(actual)
-    def l(datum):
-        return Leaf(datum)
-    def b(left, right):
+        expected = [*expected]
+        actual = list(decode_data(iter(data), tree))
+        assert expected == actual, f'actual={repr(actual)}, expected={expected}'
+    def B(left, right):
         return Branch(left, right)
-    eof = EOF
-    yield check, '', [0], b(l(eof), l('b'))
-    yield check, 'a', [0,1], b(l('a'), l(eof))
-    yield check, 'aa', [0,0,1], b(l('a'), l(eof))
-    yield check, 'ab', [0,0,0,1,1], b(b(l('a'), l('b')), l(eof))
+
+    a = Leaf('a')
+    b = Leaf('b')
+    c = Leaf('c')
+
+    yield check, 'a', [0], B(a, b)
+    yield check, 'aa', [0, 0], B(a, b)
+    yield check, 'ab', [0, 1], B(a, b)
+    yield check, 'a', [0, 0], B(B(a, b), c)
+    yield check, 'b', [0, 1], B(B(a, b), c)
+    yield check, 'c', [1], B(B(a, b), c)
+    yield check, 'abc', [0,0,0,1,1], B(B(a, b), c)
 
 
 def test_huffman_encoding():
     def check(data):
-        encoding = HuffmanEncoding()
-        data = [ *data.encode('ascii'), EOF ]
+        encoding = HuffmanEncoding(256)
+        data = Data(data.encode('ascii'), 256)
         encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
+        decoded = encoding.decode(encoded)
         assert data == decoded, f'data={data}, decoded={decoded}'
-    yield check, ''
-    yield check, 'a'
     yield check, 'abc'
     yield check, 'aabbbc'
     yield check, 'aababcabcdabcde'
@@ -147,11 +153,12 @@ def test_huffman_encoding():
 
 
 def test_predictions():
-    def check(data, oracle_factory):
+    def check(ns, oracle_factory):
+        data = Data(ns, max(ns) + 1)
         encoding = PredictionEncoding(oracle_factory)
         encoded = encoding.encode(data)
-        restored = list(encoding.decode(encoded))
-        assert restored == data, f'{restored} != {data}'
+        restored = list(encoding.decode(encoded).values)
+        assert restored == ns, f'{restored} != {ns}'
 
     oracles = [
         lambda: ConstantOracle(0),
@@ -163,7 +170,6 @@ def test_predictions():
     ]
 
     for oracle in oracles:
-        yield check, [], oracle
         yield check, [0], oracle
         yield check, [0, 1], oracle
         yield check, [0, 1, 2, 3, 4], oracle
@@ -173,38 +179,39 @@ def test_predictions():
 
 
 def test_burrows_wheeler():
-    def check(data):
+    def check(ns):
+        data = Data(ns, max(ns) + 1)
         encoding = BurrowsWheeler()
         transformed = encoding.encode(data)
-        untransformed = list(encoding.decode(transformed))
-        assert data == untransformed
-    yield check, [ EOF ]
-    yield check, [ 0, EOF ]
-    yield check, [ 1, EOF ]
-    yield check, [ 0, 1, EOF ]
-    yield check, [ 1, 0, EOF ]
-    yield check, [ 1, 0, 5, 100, 8, 52, EOF ]
+        untransformed = list(encoding.decode(transformed).values)
+        assert ns == untransformed
+    yield check, [ 0 ]
+    yield check, [ 1 ]
+    yield check, [ 0, 1 ]
+    yield check, [ 1, 0 ]
+    yield check, [ 1, 0, 5, 100, 8, 52 ]
 
 
-def test_datum_encoding():
-    encoding = DatumEncoding()
-    def check(data):
-        encoded = encoding.encode(data)
+def test_data_encoding():
+    def check(ns, nvalues):
+        encoding = DataEncoding(nvalues)
+        encoded = encoding.encode(ns)
         decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'{data} != {decoded}'
-    yield check, []
-    yield check, [0]
-    yield check, [5]
-    yield check, [2, 9]
-    yield check, [5, 2, 9, 100]
+        assert ns == decoded, f'{data} != {decoded}'
+    yield check, [], 2
+    yield check, [0], 2
+    yield check, [5], 10
+    yield check, [2, 9], 10
+    yield check, [5, 2, 9, 100], 256
 
 
 def test_move_to_front():
     encoding = MoveToFrontEncoding()
-    def check(data):
+    def check(ns):
+        data = Data(ns, 256)
         encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'{data} != {decoded}'
+        decoded = list(encoding.decode(encoded).values)
+        assert ns == decoded, f'{ns} != {decoded}'
     yield check, []
     yield check, [0]
     yield check, [5]
@@ -216,14 +223,12 @@ def test_move_to_front():
 def test_encoder_combination():
     def check(encoding, data):
         encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'data={data}, decoded={decoded}'
+        decoded = encoding.decode(encoded)
+        assert ns == decoded, f'data={data}, decoded={decoded}'
 
     encodings = [
         MoveToFrontEncoding() | MoveToFrontEncoding(),
-        MoveToFrontEncoding() | DatumEncoding(),
-        DatumEncoding() | BurrowsWheeler(),
-
+        MoveToFrontEncoding() | BurrowsWheeler(),
     ]
     for encoding in encodings:
         yield check, encoding, []
@@ -234,31 +239,32 @@ def test_encoder_combination():
 
 
 def test_bit_grouper():
-    def check(bits):
-        encoding = BitGrouperEncoding()
+    def check(bits, group_size):
+        encoding = BitGrouperEncoding(group_size)
         encoded = encoding.encode(bits)
         decoded = list(encoding.decode(encoded))[0:len(bits)]
         assert bits == decoded, f'bits={bits}, decoded={decoded}'
 
-    yield check, []
-    yield check, [0]
-    yield check, [1]
-    yield check, [1, 1]
-    yield check, [1, 0, 1, 0, 1, 1, 1, 0]
-    yield check, [0] * 8 * 10
+    for group_size in [2, 4, 8, 12, 16]:
+        yield check, [], group_size
+        yield check, [0], group_size
+        yield check, [1], group_size
+        yield check, [1, 1], group_size
+        yield check, [1, 0, 1, 0, 1, 1, 1, 0], group_size
+        yield check, [0] * 8 * 10, group_size
 
 
-def test_encoding_inverter():
-    def check(encoding, data):
-        e = encoding | ~encoding
-        encoded = e.encode(data)
-        decoded = list(e.decode(encoded))
-        assert data == decoded
+# def test_encoding_inverter():
+#     def check(encoding, data):
+#         e = encoding | ~encoding
+#         encoded = e.encode(data)
+#         decoded = list(e.decode(encoded))
+#         assert data == decoded
 
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), []
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 1, 1, 1, 1]
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 2, 1, 3, 1, 4, 1, 5]
-    yield check, MoveToFrontEncoding(), []
-    yield check, MoveToFrontEncoding(), [0]
-    yield check, MoveToFrontEncoding(), [0, 0, 0, 0, 0]
-    yield check, MoveToFrontEncoding(), [1, 1, 1, 1, 1]
+#     yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), []
+#     yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 1, 1, 1, 1]
+#     yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 2, 1, 3, 1, 4, 1, 5]
+#     yield check, MoveToFrontEncoding(), []
+#     yield check, MoveToFrontEncoding(), [0]
+#     yield check, MoveToFrontEncoding(), [0, 0, 0, 0, 0]
+#     yield check, MoveToFrontEncoding(), [1, 1, 1, 1, 1]

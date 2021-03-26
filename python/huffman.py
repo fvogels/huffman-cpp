@@ -1,7 +1,10 @@
 from __future__ import annotations
 from typing import Any, TypeVar, Union, Literal, Generic, Callable, Iterable, Iterator
-from math import ceil
+from math import ceil, log2
+from abc import *
 import struct
+
+
 
 
 T = TypeVar('T')
@@ -9,10 +12,7 @@ U = TypeVar('U')
 V = TypeVar('V')
 
 Bit = Union[Literal[0], Literal[1]]
-Byte = int
 
-def is_byte(n : int) -> bool:
-    return 0 <= n <= 255
 
 class FrequencyTable(Generic[T]):
     __table : dict[T, int]
@@ -46,6 +46,10 @@ class FrequencyTable(Generic[T]):
         return len(self.__table)
 
 
+def bits_needed(nvalues : int) -> int:
+    return ceil(log2(nvalues))
+
+
 def bits(n : int, size : int = 8) -> list[Bit]:
     assert size > 0
     return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
@@ -76,44 +80,9 @@ def last(xs : list[T], n : int) -> list[T]:
         assert len(result) == n
         return result
 
-
-class Eof:
-    def __str__(self):
-        return 'EOF'
-
-    def __repr__(self):
-        return 'EOF'
-
-    def __hash__(self):
-        return 0
-
-    def __eq__(self, other : Any) -> bool:
-        return isinstance(other, Eof)
-
-EOF = Eof()
-
-Datum = Union[int, Eof]
-
-
-def datum_to_bits(datum : Datum) -> Iterable[Bit]:
-    if datum is EOF:
-        yield 0
-    else:
-        assert isinstance(datum, int), f'datum {repr(datum)} has type {type(datum)} instead of int'
-        yield 1
-        yield from bits(datum)
-
-
-def bits_to_datum(bits : Iterator[Bit]) -> Datum:
-    if next(bits) == 0:
-        return EOF
-    else:
-        return from_bits(take(bits, 8))
-
-
-def ints_to_datums(ns : Iterable[int]) -> Iterable[Datum]:
-    yield from ns
-    yield EOF
+def group(xs : list[T], group_size : int) -> list[list[T]]:
+    ngroups = ceil(len(xs) / group_size)
+    return [ xs[i * group_size : (i+1) * group_size] for i in range(ngroups) ]
 
 
 def pad(xs : list[T], length : int, padder : T) -> list[T]:
@@ -121,23 +90,66 @@ def pad(xs : list[T], length : int, padder : T) -> list[T]:
     return [ *xs, *padding ]
 
 
-def group(xs : list[T], group_size : int) -> list[list[T]]:
-    ngroups = ceil(len(xs) / group_size)
-    return [ xs[i * group_size : (i+1) * group_size] for i in range(ngroups) ]
+def append(xs : Iterable[T], x : T) -> Iterable[T]:
+    yield from xs
+    yield x
+
+Datum = int
+
+class Data:
+    __values : Iterable[Datum]
+    __nvalues : int
+
+    def __init__(self, values : Iterable[Datum], nvalues : int):
+        self.__values = values
+        self.__nvalues = nvalues
+
+    @property
+    def values(self) -> Iterable[Datum]:
+        for n in self.__values:
+            assert 0 <= n < self.__nvalues, f'n={n}, nvalues={self.__nvalues}'
+            yield n
+
+    @property
+    def nvalues(self) -> int:
+        return self.__nvalues
+
+    def __eq__(self, other : Any) -> bool:
+        return list(self.values) == list(other.values) and self.nvalues == other.nvalues
+
+    def __repr__(self) -> str:
+        return repr(list(self.values))
 
 
 class Node(Generic[T]):
+    @abstractmethod
     def map(self, func : Callable[[T], U]) -> Node[U]:
-        raise NotImplementedError()
+        ...
+
+    @abstractmethod
+    def __eq__(self, other : Any) -> bool:
+        ...
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        ...
 
 
 class Branch(Node[T]):
-    left : Node[T]
-    right : Node[T]
+    __left : Node[T]
+    __right : Node[T]
 
     def __init__(self, left : Node[T], right : Node[T]):
-        self.left = left
-        self.right = right
+        self.__left = left
+        self.__right = right
+
+    @property
+    def left(self) -> Node[T]:
+        return self.__left
+
+    @property
+    def right(self) -> Node[T]:
+        return self.__right
 
     def __eq__(self, other : Any) -> bool:
         return isinstance(other, Branch) and self.left == other.left and self.right == other.right
@@ -147,7 +159,7 @@ class Branch(Node[T]):
         right = self.right.map(func)
         return Branch(left, right)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"B[{self.left}|{self.right}]"
 
 
@@ -163,8 +175,34 @@ class Leaf(Node[T]):
     def map(self, func : Callable[[T], U]) -> Leaf[U]:
         return Leaf(func(self.datum))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"L[{repr(self.datum)}]"
+
+
+class TreeEncoding:
+    __bits_per_datum : int
+
+    def __init__(self, bits_per_datum : int):
+        self.__bits_per_datum = bits_per_datum
+
+    def encode(self, tree : Node[Datum]) -> Iterable[Bit]:
+        if isinstance(tree, Leaf):
+            yield 1
+            yield from bits(tree.datum, self.__bits_per_datum)
+        else:
+            assert isinstance(tree, Branch)
+            yield 0
+            yield from self.encode(tree.left)
+            yield from self.encode(tree.right)
+
+    def decode(self, bits : Iterator[Bit]) -> Node[Datum]:
+        if next(bits) == 0:
+            left = self.decode(bits)
+            right = self.decode(bits)
+            return Branch(left, right)
+        else:
+            datum = from_bits(take(bits, self.__bits_per_datum))
+            return Leaf(datum)
 
 
 def build_tree(frequencies : FrequencyTable[T]) -> Node[T]:
@@ -198,29 +236,6 @@ def build_codebook(tree : Node[T]) -> dict[T, list[Bit]]:
     return result
 
 
-def encode_tree(tree : Node[Datum]) -> Iterable[Bit]:
-    def encode(tree : Node[Datum]) -> Iterable[Bit]:
-        if isinstance(tree, Leaf):
-            yield 1
-            yield from datum_to_bits(tree.datum)
-        else:
-            assert isinstance(tree, Branch)
-            yield 0
-            yield from encode(tree.left)
-            yield from encode(tree.right)
-    yield from encode(tree)
-
-
-def decode_tree(bits : Iterator[Bit]) -> Node[Datum]:
-    if next(bits) == 0:
-        left = decode_tree(bits)
-        right = decode_tree(bits)
-        return Branch(left, right)
-    else:
-        datum = bits_to_datum(bits)
-        return Leaf(datum)
-
-
 def pack(code : list[int]) -> bytes:
     return struct.pack('B' * len(code), *code)
 
@@ -233,23 +248,16 @@ def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> Iterable[Bit]:
     return (bit for x in xs for bit in book[x])
 
 
-def decode_data(bits : Iterator[Bit], tree : Node[Union[Datum]]) -> Iterable[Datum]:
-    current_node = tree
-    end_reached = False
-    while not end_reached:
+def decode_data(bits : Iterator[Bit], root : Node[Datum]) -> Iterable[Datum]:
+    assert isinstance(root, Branch)
+    current_node : Node[Datum] = root
+    while (bit := next(bits, None)) != None:
+        assert isinstance(current_node, Branch)
+        current_node = current_node.left if bit == 0 else current_node.right
         if isinstance(current_node, Leaf):
             datum = current_node.datum
-            if datum is EOF:
-                end_reached = True
-            else:
-                current_node = tree
+            current_node = root
             yield datum
-        else:
-            assert isinstance(current_node, Branch)
-            if next(bits) == 0:
-                current_node = current_node.left
-            else:
-                current_node = current_node.right
 
 
 class Oracle(Generic[T]):
@@ -352,10 +360,10 @@ class MemoryOracle(Oracle[T]):
 
 
 class Encoding(Generic[T,U]):
-    def encode(self, xs : Iterable[T]) -> Iterable[U]:
+    def encode(self, x : T) -> U:
         raise NotImplementedError()
 
-    def decode(self, xs : Iterable[U]) -> Iterable[T]:
+    def decode(self, x : U) -> T:
         raise NotImplementedError()
 
     def __or__(self, other : Encoding[U,V]) -> Encoding[T,V]:
@@ -373,11 +381,11 @@ class EncodingCombinator(Generic[T, U, V], Encoding[T, V]):
         self.__left = left
         self.__right = right
 
-    def encode(self, xs : Iterable[T]) -> Iterable[V]:
-        return self.__right.encode(self.__left.encode(xs))
+    def encode(self, x : T) -> V:
+        return self.__right.encode(self.__left.encode(x))
 
-    def decode(self, xs : Iterable[V]) -> Iterable[T]:
-        return self.__left.decode(self.__right.decode(xs))
+    def decode(self, x : V) -> T:
+        return self.__left.decode(self.__right.decode(x))
 
 
 class EncodingInverter(Encoding[U, T]):
@@ -386,173 +394,154 @@ class EncodingInverter(Encoding[U, T]):
     def __init__(self, encoding : Encoding[T, U]):
         self.__encoding = encoding
 
-    def encode(self, xs : Iterable[U]) -> Iterable[T]:
-        return self.__encoding.decode(xs)
+    def encode(self, x : U) -> T:
+        return self.__encoding.decode(x)
 
-    def decode(self, xs : Iterable[T]) -> Iterable[U]:
-        return self.__encoding.encode(xs)
+    def decode(self, x : T) -> U:
+        return self.__encoding.encode(x)
 
 
-class DatumEncoding(Encoding[int, Datum]):
-    def encode(self, xs : Iterable[int]) -> Iterable[Datum]:
-        yield from xs
-        yield EOF
+class DataEncoding(Encoding[Iterable[int], Data]):
+    __nvalues : int
 
-    def decode(self, xs : Iterable[Datum]) -> Iterable[int]:
-        end_reached = False
-        for x in xs:
-            if x is EOF:
-                assert not end_reached
-                end_reached = True
-            else:
-                assert isinstance(x, int)
-                yield x
+    def __init__(self, nvalues : int):
+        assert 0 < nvalues
+        self.__nvalues = nvalues
 
-class PredictionEncoding(Encoding[Byte, Byte]):
+    def encode(self, ns : Iterable[int]) -> Data:
+        return Data(ns, self.__nvalues)
+
+    def decode(self, data : Data) -> Iterable[int]:
+        return data.values
+
+
+class PredictionEncoding(Encoding[Data, Data]):
     def __init__(self, oracle_factory : Callable[[], Oracle]):
         assert oracle_factory is not None
         self.__oracle_factory = oracle_factory
 
-    def encode(self, data : Iterable[Byte]) -> Iterable[Byte]:
+    def encode(self, data : Data) -> Data:
         assert data is not None
-        oracle = self.__oracle_factory()
-        for actual in data:
-            prediction = oracle.predict()
-            oracle.tell(actual)
-            correction = self.__compute_correction(prediction, actual)
-            yield correction
+        def enc() -> Iterable[Datum]:
+            oracle = self.__oracle_factory()
+            for actual in data.values:
+                prediction = oracle.predict()
+                oracle.tell(actual)
+                correction = self.__compute_correction(prediction, actual, data.nvalues)
+                yield correction
+        return Data(enc(), data.nvalues)
 
-    def __compute_correction(self, prediction : Byte, actual : Byte) -> Byte:
-        assert is_byte(prediction)
-        assert is_byte(actual)
-        result = (actual - prediction) % 256
-        assert is_byte(result)
+    def __compute_correction(self, prediction : Datum, actual : Datum, nvalues : int) -> Datum:
+        result = (actual - prediction) % nvalues
         return result
 
-    def decode(self, corrections : Iterable[Byte]) -> Iterable[Byte]:
+    def decode(self, corrections : Data) -> Data:
         assert corrections is not None
-        oracle = self.__oracle_factory()
-        for correction in corrections:
-            prediction = oracle.predict()
-            actual = self.__apply_correction(prediction, correction)
-            oracle.tell(actual)
-            yield actual
+        def dec() -> Iterable[Datum]:
+            oracle = self.__oracle_factory()
+            for correction in corrections.values:
+                prediction = oracle.predict()
+                actual = self.__apply_correction(prediction, correction, corrections.nvalues)
+                oracle.tell(actual)
+                yield actual
+        return Data(dec(), corrections.nvalues)
 
-    def __apply_correction(self, prediction : Byte, correction : Byte) -> Byte:
-        assert is_byte(prediction)
-        assert is_byte(correction)
-        result = (prediction + correction) % 256
-        assert is_byte(result)
+    def __apply_correction(self, prediction : Datum, correction : Datum, nvalues : int) -> Datum:
+        result = (prediction + correction) % nvalues
         return result
 
 
-class BurrowsWheeler(Encoding[Datum, Datum]):
-    def encode(self, data : Iterable[Datum]) -> Iterable[Datum]:
-        def key(datum : Datum) -> int:
-            if datum is EOF:
-                return -1
-            else:
-                assert isinstance(datum, int), f'datum {datum} should be int'
-                return datum
-        xs = list(data)
+class BurrowsWheeler(Encoding[Data, Data]):
+    def encode(self, data : Data) -> Data:
+        xs = [ *data.values, data.nvalues ]
         rotations = [ rotate_left(xs, i) for i in range(len(xs)) ]
-        rotations.sort(key=lambda ds: list(map(key, ds)))
-        return (rotation[-1] for rotation in rotations)
+        rotations.sort()
+        return Data((rotation[-1] for rotation in rotations), data.nvalues + 1)
 
-    def decode(self, data : Iterable[Datum]) -> Iterable[Datum]:
-        def key(datum : Datum) -> int:
-            if datum is EOF:
-                return -1
-            else:
-                assert isinstance(datum, int)
-                return datum
-        xs = list(data)
+    def decode(self, data : Data) -> Data:
+        xs = list(data.values)
         table : list[list[Datum]] = [ [] for _ in range(len(xs)) ]
         for _ in range(len(xs)):
             for row, datum in zip(table, xs):
                 row.insert(0, datum)
-            table.sort(key=lambda ds: list(map(key, ds)))
-        return next(row for row in table if row[-1] is EOF)
+            table.sort()
+        result = next(row for row in table if row[-1] is data.nvalues-1)[:-1]
+        return Data(result, data.nvalues - 1)
 
 
-class HuffmanEncoding(Encoding[Datum, Bit]):
-    def encode(self, data : Iterable[Datum]) -> Iterable[Bit]:
-        xs = list(data)
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(xs)
+class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
+    __tree_encoding : TreeEncoding
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        assert 0 < nvalues
+        self.__nvalues = nvalues
+        self.__tree_encoding = TreeEncoding(bits_needed(nvalues))
+
+    def encode(self, data : Data) -> Iterable[Bit]:
+        assert data.nvalues == self.__nvalues
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(data.values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
-        yield from encode_tree(tree)
-        yield from encode_data(xs, codes)
+        yield from self.__tree_encoding.encode(tree)
+        yield from encode_data(data.values, codes)
 
-    def decode(self, bits : Iterable[Bit]) -> Iterable[Datum]:
+    def decode(self, bits : Iterable[Bit]) -> Data:
         iterator = iter(bits)
-        tree : Node[Datum] = decode_tree(iterator)
-        return decode_data(iterator, tree)
+        tree : Node[Datum] = self.__tree_encoding.decode(iterator)
+        decoded = decode_data(iterator, tree)
+        return Data(decoded, self.__nvalues)
 
 
-class MoveToFrontEncoding(Encoding[Byte, Byte]):
-    def encode(self, data : Iterable[Byte]) -> Iterable[Byte]:
-        table = list(range(2**8))
-        for x in data:
-            assert is_byte(x)
-            index = table.index(x)
-            yield index
-            del table[index]
-            table.insert(0, x)
+class MoveToFrontEncoding(Encoding[Data, Data]):
+    def encode(self, data : Data) -> Data:
+        def enc() -> Iterable[Datum]:
+            table = list(range(data.nvalues))
+            for x in data.values:
+                index = table.index(x)
+                yield index
+                del table[index]
+                table.insert(0, x)
+        return Data(enc(), data.nvalues)
 
-    def decode(self, data : Iterable[Byte]) -> Iterable[Byte]:
-        table = list(range(2**8))
-        for x in data:
-            assert is_byte(x)
-            value = table[x]
-            yield value
-            del table[x]
-            table.insert(0, value)
+    def decode(self, data : Data) -> Data:
+        def dec():
+            table = list(range(data.nvalues))
+            for x in data.values:
+                value = table[x]
+                yield value
+                del table[x]
+                table.insert(0, value)
+        return Data(dec(), data.nvalues)
 
 
-class BitGrouperEncoding(Encoding[Bit, Byte]):
-    def encode(self, bits : Iterable[Bit]) -> Iterable[Byte]:
-        bitcount = 0
-        acc = 0
-        for bit in bits:
-            assert bit == 0 or bit == 1
-            acc = acc * 2 + bit
-            bitcount += 1
-            if bitcount == 8:
-                yield acc
-                acc = 0
-                bitcount = 0
-        while bitcount < 8:
-            acc *= 2
-            bitcount += 1
-        yield acc
+class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
+    __nbits : int
 
-    def decode(self, bytes : Iterable[Byte]) -> Iterable[Bit]:
-        for byte in bytes:
-            for bit in bits(byte):
+    def __init__(self, nbits : int):
+        assert nbits > 0
+        self.__nbits = nbits
+
+    def encode(self, bits : Iterable[Bit]) -> Data:
+        def enc():
+            bitcount = 0
+            acc = 0
+            for bit in bits:
+                assert bit == 0 or bit == 1
+                acc = acc * 2 + bit
+                bitcount += 1
+                if bitcount == self.__nbits:
+                    yield acc
+                    acc = 0
+                    bitcount = 0
+            while bitcount < self.__nbits:
+                acc *= 2
+                bitcount += 1
+            yield acc
+        return Data(enc(), 2 ** self.__nbits)
+
+    def decode(self, data : Data) -> Iterable[Bit]:
+        assert bits_needed(data.nvalues) == self.__nbits
+        for byte in data.values:
+            for bit in bits(byte, self.__nbits):
                 yield bit
-
-
-
-# with open('huffman.py', 'rb') as file:
-#     data : list[int] = unpack(file.read())
-
-data : list[int] = [1,2,3,4,5]*10
-
-# # data = burrows_wheeler_transform(data)
-# oracle = ConstantOracle[int](0)
-# oracle = RepeatOracle[int](0)
-# oracle = MarkovOracle[int](0)
-oracle = MemoryOracle[int](2, 0)
-
-# encoding = PredictionEncoding(lambda: MemoryOracle(10, 0)) | DatumEncoding() | HuffmanEncoding() | BitGrouperEncoding()
-# encoding = MoveToFrontEncoding() | DatumEncoding() | HuffmanEncoding() | BitGrouperEncoding()
-encoding = DatumEncoding() | HuffmanEncoding() # | BitGrouperEncoding()
-
-# print(with_prediction)
-# print(oracle)
-print(len(list(data)))
-encoded = list(encoding.encode(data))
-print(len(encoded))
-decoded = list(encoding.decode(encoded))
-print(decoded)

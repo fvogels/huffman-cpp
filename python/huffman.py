@@ -64,6 +64,10 @@ class FrequencyTable(Generic[T]):
     def __repr__(self) -> str:
         return repr(self.__table)
 
+    @property
+    def most_frequent(self) -> T:
+        return max(self.values, key=lambda value: self[value])
+
 
 def bits_needed(nvalues : int) -> int:
     return ceil(log2(nvalues))
@@ -312,7 +316,7 @@ class RepeatOracle(Oracle[T]):
 
 
 class MarkovOracle(Oracle[T]):
-    __table : dict[T, dict[T, int]]
+    __table : dict[T, FrequencyTable[T]]
     __last : T
     __first : bool
     __default : T
@@ -325,8 +329,7 @@ class MarkovOracle(Oracle[T]):
 
     def predict(self) -> T:
         if not self.__first and self.__last in self.__table:
-            d = self.__table[self.__last]
-            return max(d.keys(), key=lambda x: d[x])
+            return self.__table[self.__last].most_frequent
         else:
             return self.__default
 
@@ -334,9 +337,7 @@ class MarkovOracle(Oracle[T]):
         if self.__first:
             self.__first = False
         else:
-            d = self.__table.setdefault(self.__last, {})
-            n = d.get(value, 0)
-            d[value] = n + 1
+            self.__table.setdefault(self.__last, FrequencyTable[T]()).increment(value)
         self.__last = value
 
 

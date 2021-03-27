@@ -500,7 +500,7 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         return Data(decoded, self.__nvalues)
 
 
-class AdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
+class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     __nvalues : int
 
     def __init__(self, nvalues : int):
@@ -545,10 +545,39 @@ class AdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
                         current_tree = current_tree.left if bit == 0 else current_tree.right
                     else:
                         end_reached = True
+        return Data(dec(), self.__nvalues)
 
-        # TODO Remove list
-        return Data(list(dec()), self.__nvalues)
 
+class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        assert nvalues > 1
+        self.__nvalues = nvalues
+
+    def encode(self, data : Data) -> Iterable[Bit]:
+        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(range(self.__nvalues))
+
+        for datum in data.values:
+            tree : Node[Datum] = build_tree(frequencies)
+            codes : dict[Datum, list[Bit]] = build_codebook(tree)
+            yield from codes[datum]
+            frequencies.increment(datum)
+
+    def decode(self, bits : Iterable[Bit]) -> Data:
+        def dec():
+            frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(range(self.__nvalues))
+            current_node = build_tree(frequencies)
+            end_reached = False
+
+            for bit in bits:
+                assert isinstance(current_node, Branch)
+                current_node = current_node.left if bit == 0 else current_node.right
+                if isinstance(current_node, Leaf):
+                    yield current_node.datum
+                    frequencies.increment(current_node.datum)
+                    current_node = build_tree(frequencies)
+        return Data(dec(), self.__nvalues)
 
 class MoveToFrontEncoding(Encoding[Data, Data]):
     def encode(self, data : Data) -> Data:
@@ -624,9 +653,3 @@ class EofEncoding(Encoding[Data, Data]):
                 yield datum
         return Data(dec(), self.__nvalues)
 
-
-encoding = AdaptiveHuffmanEncoding(4)
-data = Data([1,1,1], 4)
-encoded = list(encoding.encode(data))
-decoded = list(encoding.decode(encoded).values)
-print(decoded)

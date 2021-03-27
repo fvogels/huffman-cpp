@@ -272,9 +272,9 @@ def test_eof_encoding():
     yield check, list(range(100)), 100
 
 
-def test_huffman_encoding():
+def test_adaptive_huffman_encoding_with_growing_tree():
     def check(data):
-        encoding = AdaptiveHuffmanEncoding(256)
+        encoding = GrowingTreeAdaptiveHuffmanEncoding(256)
         data = Data(data.encode('ascii'), 256)
         encoded = encoding.encode(data)
         decoded = encoding.decode(encoded)
@@ -285,6 +285,19 @@ def test_huffman_encoding():
     yield check, 'abbccccdddddddd'
     yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio' * 10
 
+
+def test_adaptive_huffman_encoding_with_full_tree():
+    def check(data):
+        encoding = FullTreeAdaptiveHuffmanEncoding(256)
+        data = Data(data.encode('ascii'), 256)
+        encoded = encoding.encode(data)
+        decoded = encoding.decode(encoded)
+        assert data == decoded, f'data={data}, decoded={decoded}'
+    yield check, 'abc'
+    yield check, 'aabbbc'
+    yield check, 'aababcabcdabcde'
+    yield check, 'abbccccdddddddd'
+    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio' * 10
 
 # def test_encoding_inverter():
 #     def check(encoding, data):

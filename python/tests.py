@@ -297,7 +297,8 @@ def test_adaptive_huffman_encoding_with_full_tree():
     yield check, 'aabbbc'
     yield check, 'aababcabcdabcde'
     yield check, 'abbccccdddddddd'
-    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio' * 10
+    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio'
+
 
 # def test_encoding_inverter():
 #     def check(encoding, data):

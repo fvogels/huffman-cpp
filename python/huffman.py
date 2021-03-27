@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Any, TypeVar, Union, Literal, Generic, Callable, Iterable, Iterator
+from typing import Any, TypeVar, Union, Literal, Generic
 from math import ceil, log2
+from collections.abc import Iterable, Iterator, Callable
 from abc import *
 import struct
 
@@ -18,11 +19,19 @@ class FrequencyTable(Generic[T]):
     __table : dict[T, int]
 
     @staticmethod
-    def from_iterable(values : Iterable[T]) -> FrequencyTable[T]:
+    def count_from_iterable(values : Iterable[T]) -> FrequencyTable[T]:
         assert values is not None
         result = FrequencyTable[T]()
         for value in values:
             result.increment(value)
+        return result
+
+    @staticmethod
+    def with_domain(values : Iterable[T]) -> FrequencyTable[T]:
+        assert values is not None
+        result = FrequencyTable[T]()
+        for value in values:
+            result.add_to_domain(value)
         return result
 
     def __init__(self):
@@ -30,6 +39,10 @@ class FrequencyTable(Generic[T]):
 
     def __getitem__(self, value : T) -> int:
         return self.__table.get(value, 0)
+
+    def add_to_domain(self, value : T) -> None:
+        if value not in self.__table:
+            self.__table[value] = 0
 
     def increment(self, value : T) -> None:
         self.__table[value] = self[value] + 1
@@ -487,7 +500,7 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     def encode(self, data : Data) -> Iterable[Bit]:
         assert data.nvalues == self.__nvalues
         values = list(data.values)
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(values)
+        frequencies : FrequencyTable[Datum] = FrequencyTable.count_from_iterable(values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from self.__tree_encoding.encode(tree)
@@ -509,7 +522,7 @@ class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
 
     def encode(self, data : Data) -> Iterable[Bit]:
         not_yet_transmitted = data.nvalues
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([ not_yet_transmitted ])
+        frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain([ not_yet_transmitted ])
         bn = bits_needed(self.__nvalues)
 
         for datum in data.values:
@@ -527,7 +540,7 @@ class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         def dec():
             not_yet_transmitted = self.__nvalues
             bn = bits_needed(self.__nvalues)
-            frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable([ not_yet_transmitted ])
+            frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain([ not_yet_transmitted ])
             current_tree = build_tree(frequencies)
             end_reached = False
 
@@ -556,7 +569,7 @@ class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         self.__nvalues = nvalues
 
     def encode(self, data : Data) -> Iterable[Bit]:
-        frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(range(self.__nvalues))
+        frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain(range(self.__nvalues))
 
         for datum in data.values:
             tree : Node[Datum] = build_tree(frequencies)
@@ -566,7 +579,7 @@ class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
 
     def decode(self, bits : Iterable[Bit]) -> Data:
         def dec():
-            frequencies : FrequencyTable[Datum] = FrequencyTable.from_iterable(range(self.__nvalues))
+            frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain(range(self.__nvalues))
             current_node = build_tree(frequencies)
             end_reached = False
 
@@ -652,4 +665,3 @@ class EofEncoding(Encoding[Data, Data]):
             while (datum := next(values)) != eof:
                 yield datum
         return Data(dec(), self.__nvalues)
-

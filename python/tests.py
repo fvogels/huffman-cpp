@@ -97,14 +97,14 @@ def test_tree_encoding():
 
 
 def test_packing():
-    def check(bs):
-        packed = pack(bs)
-        unpacked = unpack(packed)
-        assert bs == unpacked, repr(unpacked)
-    yield check, [0]
-    yield check, [1]
-    yield check, [255]
-    yield check, list(range(100))
+    def check(bytes):
+        encoding = PackEncoding()
+        packed = encoding.encode(bytes)
+        unpacked = encoding.decode(packed)
+        assert bytes == unpacked, repr(unpacked)
+    yield check, b""
+    yield check, b"\0"
+    yield check, b"\0\1"
 
 
 def test_encode_data():

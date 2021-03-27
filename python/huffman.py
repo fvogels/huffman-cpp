@@ -259,14 +259,6 @@ def build_codebook(tree : Node[T]) -> dict[T, list[Bit]]:
     return result
 
 
-def pack(code : list[int]) -> bytes:
-    return struct.pack('B' * len(code), *code)
-
-
-def unpack(bs : bytes) -> list[int]:
-    return [ t[0] for t in struct.iter_unpack('B', bs) ]
-
-
 def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> Iterable[Bit]:
     return (bit for x in xs for bit in book[x])
 
@@ -342,7 +334,7 @@ class MarkovOracle(Oracle[T]):
 
 
 class MemoryOracle(Oracle[T]):
-    __table : dict[tuple, dict[T, int]]
+    __table : dict[tuple, FrequencyTable[T]]
     __memory : list[T]
     __memory_size : int
     __default : T
@@ -357,20 +349,15 @@ class MemoryOracle(Oracle[T]):
         memory : tuple = tuple(self.__memory)
         while len(memory) > 0:
             if memory in self.__table:
-                d = self.__table[memory]
-                return max(d.keys(), key=lambda x: d[x])
+                return self.__table[memory].most_frequent
             else:
                 memory = memory[1:]
         return self.__default
 
     def tell(self, value : T) -> None:
-        def inc(memory : tuple):
-            d = self.__table.setdefault(memory, {})
-            n = d.get(value, 0)
-            d[value] = n + 1
         memory = tuple(self.__memory)
         while len(memory) > 0:
-            inc(memory)
+            self.__table.setdefault(memory, FrequencyTable[T]()).increment(value)
             memory = memory[1:]
         self.__memory.append(value)
         self.__memory = last(self.__memory, self.__memory_size)
@@ -666,3 +653,12 @@ class EofEncoding(Encoding[Data, Data]):
             while (datum := next(values)) != eof:
                 yield datum
         return Data(dec(), self.__nvalues)
+
+
+class PackEncoding(Encoding[bytes, Iterable[int]]):
+    def encode(self, bs : bytes) -> Iterable[int]:
+        return [ t[0] for t in struct.iter_unpack('B', bs) ]
+
+    def decode(self, ns : Iterable[int]) -> bytes:
+        data = list(ns)
+        return struct.pack('B' * len(data), *data)

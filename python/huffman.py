@@ -5,65 +5,14 @@ from collections.abc import Iterable, Iterator, Callable
 from abc import *
 import struct
 from freqtable import FrequencyTable
-
+from util import Bit, bits, from_bits, bits_needed, take, rotate_left, append
+from oracles import Oracle, ConstantOracle, RepeatOracle, MarkovOracle, MemoryOracle
 
 
 T = TypeVar('T')
 U = TypeVar('U')
 V = TypeVar('V')
 
-Bit = Union[Literal[0], Literal[1]]
-
-
-
-
-def bits_needed(nvalues : int) -> int:
-    return ceil(log2(nvalues))
-
-
-def bits(n : int, size : int = 8) -> list[Bit]:
-    assert size > 0
-    return [ 1 if c == '1' else 0 for c in bin(n)[2:].rjust(size, '0') ]
-
-
-def from_bits(bits : Iterable[Bit]) -> int:
-    assert bits is not None
-    return int(''.join( '1' if b == 1 else '0' for b in bits ), 2)
-
-
-def take(xs : Iterator[T], n : int) -> list[T]:
-    assert xs is not None
-    assert n >= 0
-    return [ next(xs) for _ in range(n) ]
-
-
-def rotate_left(xs : list[T], n : int) -> list[T]:
-    assert n >= 0
-    return [ *xs[n:], *xs[:n] ]
-
-
-def last(xs : list[T], n : int) -> list[T]:
-    assert n >= 0
-    if len(xs) <= n:
-        return xs[:]
-    else:
-        result = xs[len(xs) - n:]
-        assert len(result) == n
-        return result
-
-def group(xs : list[T], group_size : int) -> list[list[T]]:
-    ngroups = ceil(len(xs) / group_size)
-    return [ xs[i * group_size : (i+1) * group_size] for i in range(ngroups) ]
-
-
-def pad(xs : list[T], length : int, padder : T) -> list[T]:
-    padding = [ padder ] * (length - len(xs)) # Check what [x] * -5 does
-    return [ *xs, *padding ]
-
-
-def append(xs : Iterable[T], x : T) -> Iterable[T]:
-    yield from xs
-    yield x
 
 Datum = int
 
@@ -223,95 +172,6 @@ def decode_data(bits : Iterator[Bit], root : Node[Datum]) -> Iterable[Datum]:
             yield datum
 
 
-class Oracle(Generic[T]):
-    def tell(self, value : T) -> None:
-        raise NotImplementedError()
-
-    def predict(self) -> T:
-        raise NotImplementedError()
-
-
-class ConstantOracle(Oracle[T]):
-    def __init__(self, constant : T):
-        self.__constant = constant
-
-    def tell(self, value : T) -> None:
-        pass
-
-    def predict(self) -> T:
-        return self.__constant
-
-
-class RepeatOracle(Oracle[T]):
-    last : T
-
-    def __init__(self, initial : T):
-        self.last = initial
-
-    def predict(self) -> T:
-        return self.last
-
-    def tell(self, value : T) -> None:
-        self.last = value
-
-
-class MarkovOracle(Oracle[T]):
-    __table : dict[T, FrequencyTable[T]]
-    __last : T
-    __first : bool
-    __default : T
-
-    def __init__(self, default : T):
-        self.__table = {}
-        self.__last = default
-        self.__first = True
-        self.__default = default
-
-    def predict(self) -> T:
-        if not self.__first and self.__last in self.__table:
-            return self.__table[self.__last].most_frequent
-        else:
-            return self.__default
-
-    def tell(self, value : T) -> None:
-        if self.__first:
-            self.__first = False
-        else:
-            self.__table.setdefault(self.__last, FrequencyTable[T]()).increment(value)
-        self.__last = value
-
-
-class MemoryOracle(Oracle[T]):
-    __table : dict[tuple, FrequencyTable[T]]
-    __memory : list[T]
-    __memory_size : int
-    __default : T
-
-    def __init__(self, memory_size : int, default : T):
-        self.__table = {}
-        self.__memory = []
-        self.__memory_size = memory_size
-        self.__default = default
-
-    def predict(self) -> T:
-        memory : tuple = tuple(self.__memory)
-        while len(memory) > 0:
-            if memory in self.__table:
-                return self.__table[memory].most_frequent
-            else:
-                memory = memory[1:]
-        return self.__default
-
-    def tell(self, value : T) -> None:
-        memory = tuple(self.__memory)
-        while len(memory) > 0:
-            self.__table.setdefault(memory, FrequencyTable[T]()).increment(value)
-            memory = memory[1:]
-        self.__memory.append(value)
-        self.__memory = last(self.__memory, self.__memory_size)
-
-    def __repr__(self):
-        return repr(self.__table)
 
 
 class Encoding(Generic[T,U]):

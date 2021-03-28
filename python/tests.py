@@ -1,4 +1,6 @@
 from huffman import *
+from util import *
+from oracles import *
 
 
 def test_bits_needed():

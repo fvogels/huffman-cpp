@@ -98,13 +98,15 @@ def test_tree_encoding():
 
 def test_packing():
     def check(bytes):
-        encoding = PackEncoding()
+        encoding = UnpackEncoding()
         packed = encoding.encode(bytes)
         unpacked = encoding.decode(packed)
         assert bytes == unpacked, repr(unpacked)
     yield check, b""
     yield check, b"\0"
     yield check, b"\0\1"
+    yield check, b"\0\1\255"
+    yield check, b"abcde456789"
 
 
 def test_encode_data():
@@ -233,6 +235,7 @@ def test_encoder_combination():
         DataEncoding(256) | BurrowsWheeler() | MoveToFrontEncoding(),
         DataEncoding(256) | HuffmanEncoding(256),
         DataEncoding(256) | EofEncoding(256) | HuffmanEncoding(257),
+        DataEncoding(256) | EofEncoding(256) | HuffmanEncoding(257) | BitGrouperEncoding(8) | ~DataEncoding(256)
     ]
     for encoding in encodings:
         yield check, encoding, [1, 2, 3, 4]

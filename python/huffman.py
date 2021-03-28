@@ -655,10 +655,63 @@ class EofEncoding(Encoding[Data, Data]):
         return Data(dec(), self.__nvalues)
 
 
-class PackEncoding(Encoding[bytes, Iterable[int]]):
+class UnpackEncoding(Encoding[bytes, Iterable[int]]):
     def encode(self, bs : bytes) -> Iterable[int]:
         return [ t[0] for t in struct.iter_unpack('B', bs) ]
 
     def decode(self, ns : Iterable[int]) -> bytes:
         data = list(ns)
         return struct.pack('B' * len(data), *data)
+
+
+def test():
+    encodings = [
+        (
+            'GT-Adaptive',
+            GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'Repeat GT-Adaptive',
+            PredictionEncoding(lambda: RepeatOracle(0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'Markov GT-Adaptive',
+            PredictionEncoding(lambda: MarkovOracle(0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'M1 GT-Adaptive',
+            PredictionEncoding(lambda: MemoryOracle(1, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'M2 GT-Adaptive',
+            PredictionEncoding(lambda: MemoryOracle(2, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'M5 GT-Adaptive',
+            PredictionEncoding(lambda: MemoryOracle(5, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        ),
+        (
+            'FT-Adaptive',
+            FullTreeAdaptiveHuffmanEncoding(257)
+        ),
+    ]
+
+    inputs = [
+        b'\0' * 100,
+        b'abcdef' * 100,
+        b'Fruit flies like a banana'
+    ]
+
+    for index, data in enumerate(inputs):
+        original_size = len(data)
+        print(f'Input #{index + 1}')
+        print(f'Original size: {original_size}')
+        for description, encoding in encodings:
+            encoded = (UnpackEncoding() | DataEncoding(256) | EofEncoding(256) | encoding | BitGrouperEncoding(8) | ~DataEncoding(256) | ~UnpackEncoding()).encode(data)
+            compressed_size = len(encoded)
+            percentage = round((compressed_size / original_size - 1) * 100, 0)
+            print(f'{description} -> {compressed_size} ({percentage}%)')
+        print()
+
+
+test()

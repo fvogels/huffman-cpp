@@ -15,30 +15,7 @@ V = TypeVar('V')
 
 
 Datum = int
-
-class Data:
-    __values : Iterable[Datum]
-    __nvalues : int
-
-    def __init__(self, values : Iterable[Datum], nvalues : int):
-        self.__values = values
-        self.__nvalues = nvalues
-
-    @property
-    def values(self) -> Iterable[Datum]:
-        for n in self.__values:
-            assert 0 <= n < self.__nvalues, f'n={n}, nvalues={self.__nvalues}'
-            yield n
-
-    @property
-    def nvalues(self) -> int:
-        return self.__nvalues
-
-    def __eq__(self, other : Any) -> bool:
-        return list(self.values) == list(other.values) and self.nvalues == other.nvalues
-
-    def __repr__(self) -> str:
-        return repr(list(self.values))
+Data = Iterable[Datum]
 
 
 class Node(Generic[T]):
@@ -75,8 +52,8 @@ class Branch(Node[T]):
         return isinstance(other, Branch) and self.left == other.left and self.right == other.right
 
     def map(self, func : Callable[[T], U]) -> Branch[U]:
-        left = self.left.map(func)
-        right = self.right.map(func)
+        left : Node[U] = self.left.map(func)
+        right : Node[U] = self.right.map(func)
         return Branch(left, right)
 
     def __repr__(self) -> str:
@@ -181,11 +158,12 @@ class Encoding(Generic[T,U]):
     def decode(self, x : U) -> T:
         raise NotImplementedError()
 
-    def __or__(self, other : Encoding[U,V]) -> Encoding[T,V]:
+    def __or__(self, other : Encoding[U, V]) -> Encoding[T, V]:
         return EncodingCombinator(self, other)
 
     def __invert__(self) -> Encoding[U, T]:
         return EncodingInverter(self)
+
 
 
 class EncodingCombinator(Generic[T, U, V], Encoding[T, V]):
@@ -216,72 +194,70 @@ class EncodingInverter(Encoding[U, T]):
         return self.__encoding.encode(x)
 
 
-class DataEncoding(Encoding[Iterable[int], Data]):
+class PredictionEncoding(Encoding[Data, Data]):
     __nvalues : int
 
-    def __init__(self, nvalues : int):
-        assert 0 < nvalues
-        self.__nvalues = nvalues
-
-    def encode(self, ns : Iterable[int]) -> Data:
-        return Data(ns, self.__nvalues)
-
-    def decode(self, data : Data) -> Iterable[int]:
-        return data.values
-
-
-class PredictionEncoding(Encoding[Data, Data]):
-    def __init__(self, oracle_factory : Callable[[], Oracle]):
+    def __init__(self, oracle_factory : Callable[[], Oracle], nvalues : int):
         assert oracle_factory is not None
+        assert nvalues > 0
         self.__oracle_factory = oracle_factory
+        self.__nvalues = nvalues
 
     def encode(self, data : Data) -> Data:
         assert data is not None
-        def enc() -> Iterable[Datum]:
-            oracle = self.__oracle_factory()
-            for actual in data.values:
-                prediction = oracle.predict()
-                oracle.tell(actual)
-                correction = self.__compute_correction(prediction, actual, data.nvalues)
-                yield correction
-        return Data(enc(), data.nvalues)
+        oracle = self.__oracle_factory()
+        for actual in data:
+            assert 0 <= actual < self.__nvalues, f'actual={actual}, nvalues={self.__nvalues}'
+            prediction = oracle.predict()
+            oracle.tell(actual)
+            correction = self.__compute_correction(prediction, actual)
+            assert 0 <= correction < self.__nvalues
+            yield correction
 
-    def __compute_correction(self, prediction : Datum, actual : Datum, nvalues : int) -> Datum:
-        result = (actual - prediction) % nvalues
+    def __compute_correction(self, prediction : Datum, actual : Datum) -> Datum:
+        result = (actual - prediction) % self.__nvalues
         return result
 
     def decode(self, corrections : Data) -> Data:
         assert corrections is not None
-        def dec() -> Iterable[Datum]:
-            oracle = self.__oracle_factory()
-            for correction in corrections.values:
-                prediction = oracle.predict()
-                actual = self.__apply_correction(prediction, correction, corrections.nvalues)
-                oracle.tell(actual)
-                yield actual
-        return Data(dec(), corrections.nvalues)
+        oracle = self.__oracle_factory()
+        for correction in corrections:
+            assert 0 <= correction < self.__nvalues
+            prediction = oracle.predict()
+            actual = self.__apply_correction(prediction, correction)
+            oracle.tell(actual)
+            assert 0 <= actual < self.__nvalues
+            yield actual
 
-    def __apply_correction(self, prediction : Datum, correction : Datum, nvalues : int) -> Datum:
-        result = (prediction + correction) % nvalues
+    def __apply_correction(self, prediction : Datum, correction : Datum) -> Datum:
+        result = (prediction + correction) % self.__nvalues
         return result
 
 
 class BurrowsWheeler(Encoding[Data, Data]):
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        assert nvalues > 0
+        self.__nvalues = nvalues
+
     def encode(self, data : Data) -> Data:
-        xs = [ *data.values, data.nvalues ]
+        xs = [ *data, self.__nvalues ]
         rotations = [ rotate_left(xs, i) for i in range(len(xs)) ]
         rotations.sort()
-        return Data((rotation[-1] for rotation in rotations), data.nvalues + 1)
+        return (rotation[-1] for rotation in rotations)
 
     def decode(self, data : Data) -> Data:
-        xs = list(data.values)
+        xs = list(data)
+        assert all(0 <= x < self.__nvalues+1 for x in xs)
         table : list[list[Datum]] = [ [] for _ in range(len(xs)) ]
         for _ in range(len(xs)):
             for row, datum in zip(table, xs):
                 row.insert(0, datum)
             table.sort()
-        result = next(row for row in table if row[-1] is data.nvalues-1)[:-1]
-        return Data(result, data.nvalues - 1)
+        result : Data = next(row for row in table if row[-1] == self.__nvalues)[:-1]
+        assert all(0 <= x < self.__nvalues for x in result)
+        return result
 
 
 class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
@@ -294,8 +270,7 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         self.__tree_encoding = TreeEncoding(bits_needed(nvalues))
 
     def encode(self, data : Data) -> Iterable[Bit]:
-        assert data.nvalues == self.__nvalues
-        values = list(data.values)
+        values = list(data)
         frequencies : FrequencyTable[Datum] = FrequencyTable.count_from_iterable(values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
@@ -306,7 +281,7 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         iterator = iter(bits)
         tree : Node[Datum] = self.__tree_encoding.decode(iterator)
         decoded = decode_data(iterator, tree)
-        return Data(decoded, self.__nvalues)
+        return decoded
 
 
 class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
@@ -317,11 +292,11 @@ class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
         self.__nvalues = nvalues
 
     def encode(self, data : Data) -> Iterable[Bit]:
-        not_yet_transmitted = data.nvalues
+        not_yet_transmitted = self.__nvalues
         frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain([ not_yet_transmitted ])
         bn = bits_needed(self.__nvalues)
 
-        for datum in data.values:
+        for datum in data:
             tree : Node[Datum] = build_tree(frequencies)
             codes : dict[Datum, list[Bit]] = build_codebook(tree)
             if datum in codes:
@@ -333,28 +308,26 @@ class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
 
     def decode(self, encoded : Iterable[Bit]) -> Data:
         bits = iter(encoded)
-        def dec():
-            not_yet_transmitted = self.__nvalues
-            bn = bits_needed(self.__nvalues)
-            frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain([ not_yet_transmitted ])
-            current_tree = build_tree(frequencies)
-            end_reached = False
+        not_yet_transmitted = self.__nvalues
+        bn = bits_needed(self.__nvalues)
+        frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain([ not_yet_transmitted ])
+        current_tree = build_tree(frequencies)
+        end_reached = False
 
-            while not end_reached:
-                if isinstance(current_tree, Leaf):
-                    datum = current_tree.datum
-                    if datum == not_yet_transmitted:
-                        datum = from_bits(take(bits, bn))
-                    yield datum
-                    frequencies.increment(datum)
-                    current_tree = build_tree(frequencies)
+        while not end_reached:
+            if isinstance(current_tree, Leaf):
+                datum = current_tree.datum
+                if datum == not_yet_transmitted:
+                    datum = from_bits(take(bits, bn))
+                yield datum
+                frequencies.increment(datum)
+                current_tree = build_tree(frequencies)
+            else:
+                assert isinstance(current_tree, Branch)
+                if (bit := next(bits, None)) != None:
+                    current_tree = current_tree.left if bit == 0 else current_tree.right
                 else:
-                    assert isinstance(current_tree, Branch)
-                    if (bit := next(bits, None)) != None:
-                        current_tree = current_tree.left if bit == 0 else current_tree.right
-                    else:
-                        end_reached = True
-        return Data(dec(), self.__nvalues)
+                    end_reached = True
 
 
 class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
@@ -367,47 +340,52 @@ class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     def encode(self, data : Data) -> Iterable[Bit]:
         frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain(range(self.__nvalues))
 
-        for datum in data.values:
+        for datum in data:
+            assert 0 <= datum < self.__nvalues
             tree : Node[Datum] = build_tree(frequencies)
             codes : dict[Datum, list[Bit]] = build_codebook(tree)
             yield from codes[datum]
             frequencies.increment(datum)
 
     def decode(self, bits : Iterable[Bit]) -> Data:
-        def dec():
-            frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain(range(self.__nvalues))
-            current_node = build_tree(frequencies)
-            end_reached = False
+        frequencies : FrequencyTable[Datum] = FrequencyTable.with_domain(range(self.__nvalues))
+        current_node = build_tree(frequencies)
+        end_reached = False
 
-            for bit in bits:
-                assert isinstance(current_node, Branch)
-                current_node = current_node.left if bit == 0 else current_node.right
-                if isinstance(current_node, Leaf):
-                    yield current_node.datum
-                    frequencies.increment(current_node.datum)
-                    current_node = build_tree(frequencies)
-        return Data(dec(), self.__nvalues)
+        for bit in bits:
+            assert isinstance(current_node, Branch)
+            current_node = current_node.left if bit == 0 else current_node.right
+            if isinstance(current_node, Leaf):
+                yield current_node.datum
+                frequencies.increment(current_node.datum)
+                current_node = build_tree(frequencies)
+
 
 class MoveToFrontEncoding(Encoding[Data, Data]):
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        self.__nvalues = nvalues
+
     def encode(self, data : Data) -> Data:
-        def enc() -> Iterable[Datum]:
-            table = list(range(data.nvalues))
-            for x in data.values:
-                index = table.index(x)
-                yield index
-                del table[index]
-                table.insert(0, x)
-        return Data(enc(), data.nvalues)
+        table = list(range(self.__nvalues))
+        for datum in data:
+            assert 0 <= datum < self.__nvalues, f'datum={datum}, nvalues={self.__nvalues}'
+            index = table.index(datum)
+            assert 0 <= index < self.__nvalues
+            yield index
+            del table[index]
+            table.insert(0, datum)
 
     def decode(self, data : Data) -> Data:
-        def dec():
-            table = list(range(data.nvalues))
-            for x in data.values:
-                value = table[x]
-                yield value
-                del table[x]
-                table.insert(0, value)
-        return Data(dec(), data.nvalues)
+        table = list(range(self.__nvalues))
+        for x in data:
+            assert 0 <= x < self.__nvalues
+            value = table[x]
+            assert 0 <= value <= self.__nvalues
+            yield value
+            del table[x]
+            table.insert(0, value)
 
 
 class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
@@ -418,26 +396,23 @@ class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
         self.__nbits = nbits
 
     def encode(self, bits : Iterable[Bit]) -> Data:
-        def enc():
-            bitcount = 0
-            acc = 0
-            for bit in bits:
-                assert bit == 0 or bit == 1
-                acc = acc * 2 + bit
-                bitcount += 1
-                if bitcount == self.__nbits:
-                    yield acc
-                    acc = 0
-                    bitcount = 0
-            while bitcount < self.__nbits:
-                acc *= 2
-                bitcount += 1
-            yield acc
-        return Data(enc(), 2 ** self.__nbits)
+        bitcount = 0
+        acc = 0
+        for bit in bits:
+            assert bit == 0 or bit == 1
+            acc = acc * 2 + bit
+            bitcount += 1
+            if bitcount == self.__nbits:
+                yield acc
+                acc = 0
+                bitcount = 0
+        while bitcount < self.__nbits:
+            acc *= 2
+            bitcount += 1
+        yield acc
 
     def decode(self, data : Data) -> Iterable[Bit]:
-        assert bits_needed(data.nvalues) == self.__nbits
-        for byte in data.values:
+        for byte in data:
             for bit in bits(byte, self.__nbits):
                 yield bit
 
@@ -449,30 +424,26 @@ class EofEncoding(Encoding[Data, Data]):
         self.__nvalues = nvalues
 
     def encode(self, data : Data) -> Data:
-        assert data.nvalues == self.__nvalues
-        eof = data.nvalues
-        return Data(append(data.values, eof), data.nvalues + 1)
+        eof = self.__nvalues
+        return append(data, eof)
 
     def decode(self, data : Data) -> Data:
-        assert data.nvalues == self.__nvalues + 1
         eof = self.__nvalues
-        def dec():
-            values = data.values
-            while (datum := next(values)) != eof:
-                yield datum
-        return Data(dec(), self.__nvalues)
+        values = iter(data)
+        while (datum := next(values)) != eof:
+            yield datum
 
 
-class UnpackEncoding(Encoding[bytes, Iterable[int]]):
-    def encode(self, bs : bytes) -> Iterable[int]:
+class UnpackEncoding(Encoding[bytes, Data]):
+    def encode(self, bs : bytes) -> Data:
         return [ t[0] for t in struct.iter_unpack('B', bs) ]
 
-    def decode(self, ns : Iterable[int]) -> bytes:
+    def decode(self, ns : Data) -> bytes:
         data = list(ns)
         return struct.pack('B' * len(data), *data)
 
 
-def test():
+def main():
     encodings = [
         (
             'GT-Adaptive',
@@ -480,23 +451,23 @@ def test():
         ),
         (
             'Repeat GT-Adaptive',
-            PredictionEncoding(lambda: RepeatOracle(0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+            PredictionEncoding(lambda: RepeatOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
         ),
         (
             'Markov GT-Adaptive',
-            PredictionEncoding(lambda: MarkovOracle(0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+            PredictionEncoding(lambda: MarkovOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
         ),
         (
             'M1 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(1, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+            PredictionEncoding(lambda: MemoryOracle(1, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
         ),
         (
             'M2 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(2, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+            PredictionEncoding(lambda: MemoryOracle(2, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
         ),
         (
             'M5 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(5, 0)) | GrowingTreeAdaptiveHuffmanEncoding(257)
+            PredictionEncoding(lambda: MemoryOracle(5, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
         ),
         (
             'FT-Adaptive',
@@ -515,11 +486,11 @@ def test():
         print(f'Input #{index + 1}')
         print(f'Original size: {original_size}')
         for description, encoding in encodings:
-            encoded = (UnpackEncoding() | DataEncoding(256) | EofEncoding(256) | encoding | BitGrouperEncoding(8) | ~DataEncoding(256) | ~UnpackEncoding()).encode(data)
+            encoded = (UnpackEncoding() | EofEncoding(256) | encoding | BitGrouperEncoding(8) | ~UnpackEncoding()).encode(data)
             compressed_size = len(encoded)
             percentage = round((compressed_size / original_size - 1) * 100, 0)
             print(f'{description} -> {compressed_size} ({percentage}%)')
         print()
 
 
-# test()
+main()

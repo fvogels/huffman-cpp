@@ -74,12 +74,12 @@ namespace
         NODE* next;
     };
 
-    class MoveToFrontEncoding2 : public encoding::Encoding<Data, Data>
+    class FastMoveToFrontEncoding : public encoding::Encoding<Data, Data>
     {
         u64 domain_size;
 
     public:
-        MoveToFrontEncoding2(u64 domain_size) : domain_size(domain_size)
+        FastMoveToFrontEncoding(u64 domain_size) : domain_size(domain_size)
         {
             // NOP
         }
@@ -161,7 +161,7 @@ std::shared_ptr<encoding::Encoding<Data, Data>> encoding::move_to_front_encoding
     return std::make_shared<MoveToFrontEncoding>(domain_size);
 }
 
-std::shared_ptr<encoding::Encoding<Data, Data>> encoding::move_to_front_encoding2(u64 domain_size)
+std::shared_ptr<encoding::Encoding<Data, Data>> encoding::move_to_front_encoding_fast(u64 domain_size)
 {
-    return std::make_shared<MoveToFrontEncoding2>(domain_size);
+    return std::make_shared<FastMoveToFrontEncoding>(domain_size);
 }

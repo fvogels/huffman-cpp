@@ -23,7 +23,7 @@ namespace
 
     void check2(const Data& data)
     {
-        auto encoding = encoding::move_to_front_encoding2(256);
+        auto encoding = encoding::move_to_front_encoding_fast(256);
         auto encoded_data = encoding->encode(data);
         auto decoded_data = encoding->decode(encoded_data);
 

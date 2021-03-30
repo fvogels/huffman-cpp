@@ -33,6 +33,9 @@
     <ClInclude Include="encoding\encodings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="data-structures\frequency-table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\data-structures\frequency-table-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

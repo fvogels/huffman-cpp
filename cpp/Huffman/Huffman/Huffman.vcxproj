@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="catch.hpp" />
+    <ClInclude Include="data-structures\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\move-to-front.h" />
     <ClInclude Include="defs.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="app.cpp" />
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\move-to-front.cpp" />
+    <ClCompile Include="tests\data-structures\frequency-table-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\tests.cpp" />

@@ -1,0 +1,39 @@
+#ifdef TEST_BUILD
+
+#include "binary/binutil.h"
+#include "io/buffer.h"
+#include "defs.h"
+#include "catch.hpp"
+
+
+namespace
+{
+    void check(u64 n, unsigned nbits)
+    {
+        io::Buffer<Datum> buffer;
+        auto output = buffer.create_output_stream();
+        auto input = buffer.create_input_stream();
+        binary::write_bits(n, nbits, *output);
+        auto result = binary::read_bits(nbits, *input);
+
+        REQUIRE(n == result);
+    }
+}
+
+#define TEST(n, nbits) TEST_CASE("Converting " #n " to binary and back (" #nbits " bits)") { check(n, nbits); }
+
+
+TEST(0, 1)
+TEST(1, 1)
+TEST(0, 8)
+TEST(1, 8)
+TEST(2, 8)
+TEST(3, 8)
+TEST(135, 8)
+TEST(255, 8)
+TEST(255, 16)
+TEST(256, 16)
+TEST(4876, 16)
+TEST(23468, 16)
+
+#endif

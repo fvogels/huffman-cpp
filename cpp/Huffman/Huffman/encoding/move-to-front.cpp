@@ -8,7 +8,7 @@
 
 namespace
 {
-    class MoveToFrontEncoding : public encoding::Encoding<Data, Data>
+    class MoveToFrontEncoding : public encoding::Encoding<Datum, Datum>
     {
         u64 domain_size;
 
@@ -18,15 +18,14 @@ namespace
             // NOP
         }
 
-        virtual Data encode(const Data& input) const
+        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
         {
-            Data output;
-
             std::deque<Datum> table;
             add_range<Datum>(table, 0, this->domain_size);
 
-            for (auto& datum : input)
+            while ( !input.end_reached() )
             {
+                auto datum = input.read();
                 unsigned index = 0;
                 auto it = table.begin();
 
@@ -38,33 +37,24 @@ namespace
 
                 table.erase(it);
                 table.push_front(datum);
-                output.push_back(index);
+                output.write(index);
             }
-
-            assert(output.size() == input.size());
-
-            return output;
         }
 
-        virtual Data decode(const Data& indices) const
+        virtual void decode(io::InputStream<Datum>& indices, io::OutputStream<Datum>& result) const override
         {
-            Data result;
-
             std::deque<Datum> table;
             add_range<Datum>(table, 0, this->domain_size);
 
-            for (auto& index : indices)
+            while (!indices.end_reached())
             {
+                auto index = indices.read();
                 auto datum = table[index];
 
                 table.erase(table.begin() + index);
                 table.push_front(datum);
-                result.push_back(datum);
+                result.write(datum);
             }
-
-            assert(indices.size() == result.size());
-
-            return result;
         }
     };
 
@@ -74,7 +64,7 @@ namespace
         NODE* next;
     };
 
-    class FastMoveToFrontEncoding : public encoding::Encoding<Data, Data>
+    class FastMoveToFrontEncoding : public encoding::Encoding<Datum, Datum>
     {
         u64 domain_size;
 
@@ -84,13 +74,13 @@ namespace
             // NOP
         }
 
-        virtual Data encode(const Data& input) const
+        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
         {
-            Data output;
             auto table = this->create_initial_table();
 
-            for (auto& datum : input)
+            while (!input.end_reached())
             {
+                auto datum = input.read();
                 u64 i = 0;
                 NODE* last = &table[0];
                 NODE* p = table[0].next;
@@ -102,24 +92,20 @@ namespace
                     p = p->next;
                 }
 
-                output.push_back(i);
+                output.write(i);
                 last->next = p->next;
                 p->next = table[0].next;
                 table[0].next = p;
             }
-
-            assert(output.size() == input.size());
-
-            return output;
         }
 
-        virtual Data decode(const Data& indices) const
+        virtual void decode(io::InputStream<Datum>& indices, io::OutputStream<Datum>& result) const override
         {
-            Data result;
             auto table = this->create_initial_table();
 
-            for (auto& index : indices)
+            while (!indices.end_reached())
             {
+                auto index = indices.read();
                 NODE* last = &table[0];
                 NODE* p = table[0].next;
 
@@ -129,15 +115,11 @@ namespace
                     p = p->next;
                 }
 
-                result.push_back(p->datum);
+                result.write(p->datum);
                 last->next = p->next;
                 p->next = table[0].next;
                 table[0].next = p;
             }
-
-            assert(indices.size() == result.size());
-
-            return result;
         }
 
     private:
@@ -156,12 +138,12 @@ namespace
     };
 }
 
-std::shared_ptr<encoding::Encoding<Data, Data>> encoding::move_to_front_encoding(u64 domain_size)
+std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::move_to_front_encoding(u64 domain_size)
 {
-    return std::make_shared<MoveToFrontEncoding>(domain_size);
+    return std::make_unique<MoveToFrontEncoding>(domain_size);
 }
 
-std::shared_ptr<encoding::Encoding<Data, Data>> encoding::move_to_front_encoding_fast(u64 domain_size)
+std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::move_to_front_encoding_fast(u64 domain_size)
 {
-    return std::make_shared<FastMoveToFrontEncoding>(domain_size);
+    return std::make_unique<FastMoveToFrontEncoding>(domain_size);
 }

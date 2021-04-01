@@ -7,8 +7,8 @@
 
 namespace encoding
 {
-    std::shared_ptr<Encoding<Data, Data>> move_to_front_encoding(uint64_t domain_size);
-    std::shared_ptr<Encoding<Data, Data>> move_to_front_encoding_fast(uint64_t domain_size);
+    std::unique_ptr<Encoding<Datum, Datum>> move_to_front_encoding(uint64_t domain_size);
+    std::unique_ptr<Encoding<Datum, Datum>> move_to_front_encoding_fast(uint64_t domain_size);
 }
 
 #endif

@@ -58,55 +58,68 @@ namespace data
         }
     };
 
-    template<>
-    class FrequencyTable<u64>
+    //template<>
+    //class FrequencyTable<u64>
+    //{
+    //private:
+    //    std::unique_ptr<u64[]> frequencies;
+    //    std::unique_ptr<bool[]> domain;
+    //    u64 domain_size;
+
+    //public:
+    //    FrequencyTable(u64 domain_size) : frequencies(std::make_unique<u64[]>(domain_size)), domain(std::make_unique<bool[]>(domain_size)), domain_size(domain_size)
+    //    {
+    //        for (u64 i = 0; i != domain_size; ++i)
+    //        {
+    //            frequencies[i] = 0;
+    //            domain[i] = false;
+    //        }
+    //    }
+
+    //    u64 operator[](u64 value) const
+    //    {
+    //        return this->frequencies[value];
+    //    }
+
+    //    void increment(u64 value)
+    //    {
+    //        this->domain[value] = true;
+    //        this->frequencies[value]++;
+    //    }
+
+    //    void add_to_domain(u64 value)
+    //    {
+    //        this->domain[value] = true;
+    //    }
+
+    //    std::vector<u64> values() const
+    //    {
+    //        std::vector<u64> result;
+
+    //        for (u64 i = 0; i != this->domain_size; ++i)
+    //        {
+    //            if (this->domain[i])
+    //            {
+    //                result.push_back(i);
+    //            }
+    //        }
+
+    //        return result;
+    //    }
+    //};
+
+    template<typename T>
+    data::FrequencyTable<T> count_frequencies(const std::vector<T>& xs)
     {
-    private:
-        std::unique_ptr<u64[]> frequencies;
-        std::unique_ptr<bool[]> domain;
-        u64 domain_size;
+        data::FrequencyTable<T> result;
 
-    public:
-        FrequencyTable(u64 domain_size) : frequencies(std::make_unique<u64[]>(domain_size)), domain(std::make_unique<bool[]>(domain_size)), domain_size(domain_size)
+        for (auto& x : xs)
         {
-            for (u64 i = 0; i != domain_size; ++i)
-            {
-                frequencies[i] = 0;
-                domain[i] = false;
-            }
+            result.increment(x);
         }
 
-        u64 operator[](u64 value) const
-        {
-            return this->frequencies[value];
-        }
-
-        void increment(u64 value)
-        {
-            this->domain[value] = true;
-            this->frequencies[value]++;
-        }
-
-        void add_to_domain(u64 value)
-        {
-            this->domain[value] = true;
-        }
-
-        std::vector<u64> values() const
-        {
-            std::vector<u64> result;
-
-            for (u64 i = 0; i != this->domain_size; ++i)
-            {
-                if (this->domain[i])
-                {
-                    result.push_back(i);
-                }
-            }
-
-            return result;
-        }
-    };
+        return result;
+    }
 }
 
 #endif

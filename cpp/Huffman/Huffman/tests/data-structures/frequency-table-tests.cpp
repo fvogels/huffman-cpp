@@ -14,11 +14,11 @@ namespace
         return data::FrequencyTable<T>();
     }
 
-    template<>
-    data::FrequencyTable<u64> create_empty_table<u64>()
-    {
-        return data::FrequencyTable<u64>(256);
-    }
+    //template<>
+    //data::FrequencyTable<u64> create_empty_table<u64>()
+    //{
+    //    return data::FrequencyTable<u64>(256);
+    //}
 }
 
 

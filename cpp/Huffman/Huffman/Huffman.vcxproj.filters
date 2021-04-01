@@ -36,6 +36,30 @@
     <ClInclude Include="data-structures\frequency-table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="data-structures\binary-tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\huffman\huffman-encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binary\binutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\huffman\tree-encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\input-stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\output-stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\io-util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -57,6 +81,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\data-structures\frequency-table-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="binary\binutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\binary\binutil-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\huffman\tree-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\huffman\huffman-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

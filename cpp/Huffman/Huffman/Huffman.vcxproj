@@ -27,19 +27,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="binary\binutil.h" />
     <ClInclude Include="catch.hpp" />
+    <ClInclude Include="data-structures\binary-tree.h" />
     <ClInclude Include="data-structures\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
+    <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\move-to-front.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="encoding\encoding.h" />
     <ClInclude Include="encoding\encodings.h" />
+    <ClInclude Include="encoding\huffman\huffman-encoding.h" />
+    <ClInclude Include="io\buffer.h" />
+    <ClInclude Include="io\input-stream.h" />
+    <ClInclude Include="io\io-util.h" />
+    <ClInclude Include="io\output-stream.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="binary\binutil.cpp" />
     <ClCompile Include="easylogging++.cc" />
+    <ClCompile Include="encoding\huffman\huffman-encoding.cpp" />
+    <ClCompile Include="encoding\huffman\tree-encoding.cpp" />
     <ClCompile Include="encoding\move-to-front.cpp" />
+    <ClCompile Include="tests\binary\binutil-tests.cpp" />
     <ClCompile Include="tests\data-structures\frequency-table-tests.cpp" />
+    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp" />
+    <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\tests.cpp" />

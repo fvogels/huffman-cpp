@@ -138,12 +138,12 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::move_to_front_encoding(u64 domain_size)
+encoding::Encoding<Datum, Datum> encoding::move_to_front_encoding(u64 domain_size)
 {
-    return std::make_unique<MoveToFrontEncoding>(domain_size);
+    return encoding::Encoding<Datum, Datum>(std::make_unique<MoveToFrontEncoding>(domain_size));
 }
 
-std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::move_to_front_encoding_fast(u64 domain_size)
+encoding::Encoding<Datum, Datum> encoding::move_to_front_encoding_fast(u64 domain_size)
 {
-    return std::make_unique<FastMoveToFrontEncoding>(domain_size);
+    return encoding::Encoding<Datum, Datum>(std::make_unique<FastMoveToFrontEncoding>(domain_size));
 }

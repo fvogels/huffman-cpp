@@ -217,7 +217,7 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::create_huffman_encoder(unsigned domain_size)
+encoding::Encoding<Datum, Datum> encoding::create_huffman_encoder(unsigned domain_size)
 {
-    return std::make_unique<HuffmanEncoding>(domain_size);
+    return encoding::Encoding<Datum, Datum>(std::make_unique<HuffmanEncoding>(domain_size));
 }

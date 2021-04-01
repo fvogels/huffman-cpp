@@ -10,7 +10,7 @@
 
 namespace
 {
-    void check(const std::vector<Datum>& data, std::function<std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>>()> factory)
+    void check(const std::vector<Datum>& data, std::function<encoding::Encoding<Datum, Datum>()> factory)
     {
         auto encoding = factory();
         io::Buffer<Datum> buffer1(data);

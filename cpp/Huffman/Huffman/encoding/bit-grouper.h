@@ -7,7 +7,7 @@
 
 namespace encoding
 {
-    std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> create_bit_grouper(unsigned group_size);
+    encoding::Encoding<Datum, Datum> create_bit_grouper(unsigned group_size);
 }
 
 #endif

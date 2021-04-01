@@ -7,8 +7,8 @@
 
 namespace encoding
 {
-    std::unique_ptr<EncodingImplementation<Datum, Datum>> move_to_front_encoding(uint64_t domain_size);
-    std::unique_ptr<EncodingImplementation<Datum, Datum>> move_to_front_encoding_fast(uint64_t domain_size);
+    encoding::Encoding<Datum, Datum> move_to_front_encoding(u64 domain_size);
+    encoding::Encoding<Datum, Datum> move_to_front_encoding_fast(u64 domain_size);
 }
 
 #endif

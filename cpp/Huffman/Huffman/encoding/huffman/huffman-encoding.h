@@ -8,7 +8,7 @@
 
 namespace encoding
 {
-    std::unique_ptr<encoding::Encoding<Datum, Datum>> create_huffman_encoder(unsigned domain_size);
+    std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> create_huffman_encoder(unsigned domain_size);
 }
 
 #endif

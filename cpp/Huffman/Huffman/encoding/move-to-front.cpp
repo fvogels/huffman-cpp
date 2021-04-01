@@ -8,7 +8,7 @@
 
 namespace
 {
-    class MoveToFrontEncoding : public encoding::Encoding<Datum, Datum>
+    class MoveToFrontEncoding : public encoding::EncodingImplementation<Datum, Datum>
     {
         u64 domain_size;
 
@@ -64,7 +64,7 @@ namespace
         NODE* next;
     };
 
-    class FastMoveToFrontEncoding : public encoding::Encoding<Datum, Datum>
+    class FastMoveToFrontEncoding : public encoding::EncodingImplementation<Datum, Datum>
     {
         u64 domain_size;
 
@@ -138,12 +138,12 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::move_to_front_encoding(u64 domain_size)
+std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::move_to_front_encoding(u64 domain_size)
 {
     return std::make_unique<MoveToFrontEncoding>(domain_size);
 }
 
-std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::move_to_front_encoding_fast(u64 domain_size)
+std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::move_to_front_encoding_fast(u64 domain_size)
 {
     return std::make_unique<FastMoveToFrontEncoding>(domain_size);
 }

@@ -18,7 +18,7 @@ namespace
     typedef data::Leaf<wpair>     wleaf;
     typedef data::Branch<wpair>   wbranch;
 
-    class HuffmanEncoding : public encoding::Encoding<Datum, Datum>
+    class HuffmanEncoding : public encoding::EncodingImplementation<Datum, Datum>
     {
         u64 m_domain_size;
         unsigned m_bits_per_datum;
@@ -217,7 +217,7 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::create_huffman_encoder(unsigned domain_size)
+std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::create_huffman_encoder(unsigned domain_size)
 {
     return std::make_unique<HuffmanEncoding>(domain_size);
 }

@@ -10,7 +10,7 @@
 
 namespace
 {
-    void check(const std::vector<Datum>& data, std::function<std::unique_ptr<encoding::Encoding<Datum, Datum>>()> factory)
+    void check(const std::vector<Datum>& data, std::function<std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>>()> factory)
     {
         auto encoding = factory();
         io::Buffer<Datum> buffer1(data);
@@ -32,20 +32,16 @@ namespace
 
     void check_slow(const std::vector<Datum>& data)
     {
-        std::function<std::unique_ptr<encoding::Encoding<Datum, Datum>>()> factory = []() {
+        check(data, []() {
             return encoding::move_to_front_encoding(256);
-        };
-
-        check(data, factory);
+        });
     }
 
     void check_fast(const std::vector<Datum>& data)
     {
-        std::function<std::unique_ptr<encoding::Encoding<Datum, Datum>>()> factory = []() -> std::unique_ptr<encoding::Encoding<Datum, Datum>> {
+        check(data, []() {
             return encoding::move_to_front_encoding_fast(256);
-        };
-
-        check(data, factory);
+        });
     }
 }
 

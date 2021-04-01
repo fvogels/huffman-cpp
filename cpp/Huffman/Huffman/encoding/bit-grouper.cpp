@@ -4,7 +4,7 @@
 
 namespace
 {
-    class BitGrouper : public encoding::Encoding<Datum, Datum>
+    class BitGrouper : public encoding::EncodingImplementation<Datum, Datum>
     {
     private:
         unsigned m_group_size;
@@ -38,7 +38,7 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::Encoding<Datum, Datum>> encoding::create_bit_grouper(unsigned group_size)
+std::unique_ptr<encoding::EncodingImplementation<Datum, Datum>> encoding::create_bit_grouper(unsigned group_size)
 {
     return std::make_unique<BitGrouper>(group_size);
 }

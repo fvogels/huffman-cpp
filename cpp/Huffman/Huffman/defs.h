@@ -6,9 +6,9 @@
 #include <vector>
 #include <deque>
 
+
 typedef uint64_t               u64;
 typedef uint64_t               Datum;
-typedef io::InputStream<Datum> Data;
 
 template<typename T>
 void add_range(std::deque<T>& vector, const T& start, const T& end)

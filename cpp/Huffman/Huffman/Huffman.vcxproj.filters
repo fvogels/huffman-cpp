@@ -60,6 +60,9 @@
     <ClInclude Include="io\io-util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding\bit-grouper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -99,6 +102,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\huffman-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\bit-grouper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

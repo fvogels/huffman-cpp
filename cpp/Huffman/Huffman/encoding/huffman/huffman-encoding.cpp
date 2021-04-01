@@ -29,7 +29,7 @@ namespace
             // NOP
         }
 
-        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
         {
             const Datum eof = m_domain_size;
             auto copy = copy_to_vector(input);
@@ -42,7 +42,7 @@ namespace
             this->encode_input(copy, codes, output);
         }
 
-        virtual void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
         {
             auto tree = this->decode_tree(input);
             this->decode_bits(input, *tree, output);

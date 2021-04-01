@@ -18,7 +18,8 @@ u64 binary::read_bits(unsigned nbits, io::InputStream<Datum>& input)
 
     for ( unsigned i = 0; i != nbits; ++i )
     {
-        auto bit = input.read();
+        auto bit = input.end_reached() ? 0 : input.read();
+        assert(bit == 0 || bit == 1);
         result = (result << 1) | u64(bit);
     }
 

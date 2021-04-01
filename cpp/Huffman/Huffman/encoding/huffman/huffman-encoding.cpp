@@ -219,5 +219,5 @@ namespace
 
 encoding::Encoding<Datum, Datum> encoding::create_huffman_encoder(unsigned domain_size)
 {
-    return encoding::Encoding<Datum, Datum>(std::make_unique<HuffmanEncoding>(domain_size));
+    return create_encoding<HuffmanEncoding>(domain_size);
 }

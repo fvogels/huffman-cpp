@@ -40,5 +40,5 @@ namespace
 
 encoding::Encoding<Datum, Datum> encoding::create_bit_grouper(unsigned group_size)
 {
-    return encoding::Encoding<Datum, Datum>(std::make_unique<BitGrouper>(group_size));
+    return create_encoding<BitGrouper>(group_size);
 }

@@ -33,6 +33,7 @@
     <ClInclude Include="data-structures\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
+    <ClInclude Include="encoding\encoding-combiner.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\move-to-front.h" />
     <ClInclude Include="defs.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="tests\binary\binutil-tests.cpp" />
     <ClCompile Include="tests\data-structures\frequency-table-tests.cpp" />
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp" />
+    <ClCompile Include="tests\encoding\combinator-tests.cpp" />
     <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />

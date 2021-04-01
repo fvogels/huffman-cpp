@@ -20,18 +20,20 @@ namespace
 
     class HuffmanEncoding : public encoding::Encoding<Datum, Datum>
     {
-        u64 domain_size;
+        u64 m_domain_size;
         unsigned m_bits_per_datum;
 
     public:
-        HuffmanEncoding(u64 domain_size) : domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
+        HuffmanEncoding(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
         {
             // NOP
         }
 
         virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
         {
+            const Datum eof = m_domain_size;
             auto copy = copy_to_vector(input);
+            copy.push_back(eof);
             auto frequencies = data::count_frequencies(copy);
             auto tree = this->build_tree(frequencies);
             auto codes = this->build_codes(*tree);
@@ -49,10 +51,13 @@ namespace
     private:
         void decode_bits(io::InputStream<Datum>& input, const data::Node<Datum>& tree, io::OutputStream<Datum>& output) const
         {
+            const Datum eof = m_domain_size;
             const data::Node<Datum>* current_node = &tree;
+            bool end_reached = false;
 
-            while (!input.end_reached())
+            while (!end_reached)
             {
+                assert(!input.end_reached());
                 auto& bit = input.read();
 
                 assert(current_node->is_branch());
@@ -71,12 +76,19 @@ namespace
                 if (current_node->is_leaf())
                 {
                     auto leaf = static_cast<const data::Leaf<Datum>*>(current_node);
-                    output.write(leaf->value());
-                    current_node = &tree;
+                    auto datum = leaf->value();
+
+                    if (datum == eof)
+                    {
+                        end_reached = true;
+                    }
+                    else
+                    {
+                        output.write(leaf->value());
+                        current_node = &tree;
+                    }
                 }
             }
-
-            assert(current_node == &tree);
         }
 
         std::vector<Datum> copy_to_vector(io::InputStream<Datum>& input) const
@@ -156,7 +168,7 @@ namespace
 
         std::vector<std::vector<Datum>> build_codes(const data::Node<Datum>& tree) const
         {
-            std::vector<std::vector<Datum>> result(this->domain_size);
+            std::vector<std::vector<Datum>> result(this->m_domain_size + 1); // +1 for EOF
             std::vector<Datum> prefix;
             build_codes(tree, prefix, &result);
             return result;

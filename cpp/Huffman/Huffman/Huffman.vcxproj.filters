@@ -95,10 +95,10 @@
     <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="encoding\huffman\huffman-encoding.cpp">
+    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
+    <ClCompile Include="encoding\huffman\huffman-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

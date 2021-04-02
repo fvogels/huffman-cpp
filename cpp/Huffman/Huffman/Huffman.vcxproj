@@ -33,8 +33,12 @@
     <ClInclude Include="data-structures\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
+    <ClInclude Include="encoding\caster.h" />
+    <ClInclude Include="encoding\datum-encoding.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
+    <ClInclude Include="encoding\inverter.h" />
+    <ClInclude Include="encoding\mapper.h" />
     <ClInclude Include="encoding\move-to-front.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="encoding\encoding.h" />
@@ -52,6 +56,7 @@
     <ClCompile Include="binary\binutil.cpp" />
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\bit-grouper.cpp" />
+    <ClCompile Include="encoding\datum-encoding.cpp" />
     <ClCompile Include="encoding\huffman\huffman-encoding.cpp" />
     <ClCompile Include="encoding\huffman\tree-encoding.cpp" />
     <ClCompile Include="encoding\move-to-front.cpp" />

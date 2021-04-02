@@ -1,7 +1,7 @@
 #include "file-output-stream.h"
 #include <assert.h>
 #include <fstream>
-
+#include <iostream>
 
 namespace
 {

@@ -48,7 +48,7 @@ namespace encoding
     };
 
     template<typename T, class... Ts>
-    Encoding<typename T::input_type, typename T::output_type> create_encoding(Ts... args)
+    encoding::Encoding<typename T::input_type, typename T::output_type> create_encoding(Ts... args)
     {
         return Encoding<typename T::input_type, typename T::output_type>(std::make_shared<T>(args...));
     }

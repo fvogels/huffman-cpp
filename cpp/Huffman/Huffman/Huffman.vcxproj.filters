@@ -72,6 +72,18 @@
     <ClInclude Include="io\file-output-stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding\mapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\caster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\datum-encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\inverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -126,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io\file-output-stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\datum-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #ifndef FILE_INPUT_STREAM_H
 #define FILE_INPUT_STREAM_H
 
-#include "defs.h"
+#include "io/input-stream.h"
 #include <cstdint>
 #include <memory>
 #include <string>

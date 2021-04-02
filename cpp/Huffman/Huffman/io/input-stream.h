@@ -8,7 +8,7 @@ namespace io
     {
         virtual ~InputStream() { }
 
-        virtual const T& read() = 0;
+        virtual T read() = 0;
         virtual bool end_reached() const = 0;
     };
 }

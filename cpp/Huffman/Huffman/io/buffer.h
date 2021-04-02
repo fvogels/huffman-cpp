@@ -23,7 +23,7 @@ namespace io
             // NOP
         }
 
-        const T& read() override
+        T read() override
         {
             assert(m_index < m_contents->size());
 

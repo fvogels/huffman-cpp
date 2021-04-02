@@ -58,7 +58,7 @@ namespace
             while (!end_reached)
             {
                 assert(!input.end_reached());
-                auto& bit = input.read();
+                auto bit = input.read();
 
                 assert(current_node->is_branch());
 

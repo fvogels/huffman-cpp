@@ -50,6 +50,8 @@
     <ClInclude Include="io\input-stream.h" />
     <ClInclude Include="io\io-util.h" />
     <ClInclude Include="io\output-stream.h" />
+    <ClInclude Include="tests\encoding\prediction\oracle.h" />
+    <ClInclude Include="tests\encoding\prediction\prediction-encoding.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
@@ -70,6 +72,7 @@
     <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="logging.cpp" />
+    <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

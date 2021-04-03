@@ -7,9 +7,9 @@
 
 namespace encoding
 {
-    std::shared_ptr<EncodingImplementation> create_bit_grouper_implementation(u64 group_size);
+    std::shared_ptr<EncodingImplementation> create_bit_grouper_implementation(unsigned group_size);
 
-    template<u64 GROUP_SIZE>
+    template<unsigned GROUP_SIZE>
     encoding::Encoding<2, (1 << GROUP_SIZE)> create_bit_grouper()
     {
         return create_bit_grouper_implementation(GROUP_SIZE);

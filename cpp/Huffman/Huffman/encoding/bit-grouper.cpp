@@ -38,7 +38,7 @@ namespace
     };
 }
 
-std::shared_ptr<encoding::EncodingImplementation> encoding::create_bit_grouper_implementation(u64 group_size)
+std::shared_ptr<encoding::EncodingImplementation> encoding::create_bit_grouper_implementation(unsigned group_size)
 {
     return std::make_shared<BitGrouper>(group_size);
 }

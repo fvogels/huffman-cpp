@@ -10,7 +10,7 @@ namespace
 {
     void check(const std::vector<Datum>& data)
     {
-        auto encoder = encoding::create_huffman_encoder(256);
+        auto encoder = encoding::create_huffman_encoder<256>();
         io::Buffer<Datum> buffer1(data);
         io::Buffer<Datum> buffer2;
         io::Buffer<Datum> buffer3;

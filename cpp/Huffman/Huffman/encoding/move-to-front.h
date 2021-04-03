@@ -7,8 +7,20 @@
 
 namespace encoding
 {
-    encoding::Encoding<Datum, Datum> move_to_front_encoding(u64 domain_size);
-    encoding::Encoding<Datum, Datum> move_to_front_encoding_fast(u64 domain_size);
+    std::shared_ptr<encoding::EncodingImplementation> create_move_to_front_encoding_implementation(u64 domain_size);
+    std::shared_ptr<encoding::EncodingImplementation> create_move_to_front_encoding_fast_implementation(u64 domain_size);
+
+    template<unsigned N>
+    encoding::Encoding<N, N> move_to_front_encoding()
+    {
+        return Encoding<N, N>(create_move_to_front_encoding_implementation(N));
+    }
+
+    template<unsigned N>
+    encoding::Encoding<N, N> move_to_front_encoding_fast()
+    {
+        return Encoding<N, N>(create_move_to_front_encoding_fast_implementation(N));
+    }
 }
 
 #endif

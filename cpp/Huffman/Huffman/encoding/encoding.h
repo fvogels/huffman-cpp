@@ -4,54 +4,50 @@
 #include "io/input-stream.h"
 #include "io/output-stream.h"
 #include "io/buffer.h"
+#include "defs.h"
 #include <memory>
 
 
 namespace encoding
 {
-    template<typename IN, typename OUT>
     class EncodingImplementation
     {
     public:
-        typedef IN input_type;
-        typedef OUT output_type;
-
         virtual ~EncodingImplementation() { }
 
-        virtual void encode(io::InputStream<IN>& input, io::OutputStream<OUT>& output) const = 0;
-        virtual void decode(io::InputStream<OUT>& input, io::OutputStream<IN>& output) const = 0;
+        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const = 0;
+        virtual void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const = 0;
     };
 
-    template<typename IN, typename OUT>
+    template<unsigned IN, unsigned OUT>
     class Encoding
     {
-        std::shared_ptr<EncodingImplementation<IN, OUT>> m_implementation;
+        std::shared_ptr<EncodingImplementation> m_implementation;
 
     public:
-        typedef IN input_type;
-        typedef OUT output_type;
+        constexpr static unsigned input_domain_size = IN;
+        constexpr static unsigned output_domain_size = OUT;
 
-        Encoding(std::shared_ptr<EncodingImplementation<IN, OUT>> implementation) : m_implementation(implementation)
+        Encoding(std::shared_ptr<EncodingImplementation> implementation) : m_implementation(implementation)
         {
             // NOP
         }
 
-        EncodingImplementation<IN, OUT>* operator->()
+        EncodingImplementation* operator->()
         {
             return m_implementation.get();
         }
 
-        const EncodingImplementation<IN, OUT>* operator->() const
+        const EncodingImplementation* operator->() const
         {
             return m_implementation.get();
+        }
+
+        std::shared_ptr<EncodingImplementation> implementation() const
+        {
+            return m_implementation;
         }
     };
-
-    template<typename T, class... Ts>
-    encoding::Encoding<typename T::input_type, typename T::output_type> create_encoding(Ts... args)
-    {
-        return Encoding<typename T::input_type, typename T::output_type>(std::make_shared<T>(args...));
-    }
 }
 
 #endif

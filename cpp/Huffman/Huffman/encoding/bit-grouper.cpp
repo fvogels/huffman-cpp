@@ -4,7 +4,7 @@
 
 namespace
 {
-    class BitGrouper : public encoding::EncodingImplementation<Datum, Datum>
+    class BitGrouper : public encoding::EncodingImplementation
     {
     private:
         unsigned m_group_size;
@@ -38,7 +38,7 @@ namespace
     };
 }
 
-encoding::Encoding<Datum, Datum> encoding::create_bit_grouper(unsigned group_size)
+std::shared_ptr<encoding::EncodingImplementation> encoding::create_bit_grouper_implementation(u64 group_size)
 {
-    return create_encoding<BitGrouper>(group_size);
+    return std::make_shared<BitGrouper>(group_size);
 }

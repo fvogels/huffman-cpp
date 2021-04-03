@@ -10,7 +10,7 @@
 
 namespace
 {
-    void check(const std::vector<Datum>& data, std::function<encoding::Encoding<Datum, Datum>()> factory)
+    void check(const std::vector<Datum>& data, std::function<encoding::Encoding<256, 256>()> factory)
     {
         auto encoding = factory();
         io::Buffer<Datum> buffer1(data);
@@ -33,14 +33,14 @@ namespace
     void check_slow(const std::vector<Datum>& data)
     {
         check(data, []() {
-            return encoding::move_to_front_encoding(256);
+            return encoding::move_to_front_encoding<256>();
         });
     }
 
     void check_fast(const std::vector<Datum>& data)
     {
         check(data, []() {
-            return encoding::move_to_front_encoding_fast(256);
+            return encoding::move_to_front_encoding_fast<256>();
         });
     }
 }

@@ -2,37 +2,17 @@
 #define INVERTER_H
 
 #include "encoding/encoding.h"
+#include "defs.h"
 
 
 namespace encoding
 {
-    template<typename IN, typename OUT>
-    class InverterImplementation : public EncodingImplementation<OUT, IN>
-    {
-    private:
-        Encoding<IN, OUT> m_encoding;
+    std::shared_ptr<encoding::EncodingImplementation> create_combiner_implementation(std::shared_ptr<encoding::EncodingImplementation> encoding);
 
-    public:
-        InverterImplementation(Encoding<IN, OUT> encoding) : m_encoding(encoding)
-        {
-            // NOP
-        }
-
-        void encode(io::InputStream<OUT>& input, io::OutputStream<IN>& output) const
-        {
-            m_encoding->decode(input, output);
-        }
-
-        void decode(io::InputStream<IN>& input, io::OutputStream<OUT>& output) const
-        {
-            m_encoding->encode(input, output);
-        }
-    };
-
-    template<typename IN, typename OUT>
+    template<u64 IN, u64 OUT>
     encoding::Encoding<OUT, IN> operator ~(const Encoding<IN, OUT>& encoding)
     {
-        return create_encoding<InverterImplementation<IN, OUT>>(encoding);
+        return Encoding<IN, OUT>(create_combiner_implementation(encoding.implementation()));
     }
 }
 

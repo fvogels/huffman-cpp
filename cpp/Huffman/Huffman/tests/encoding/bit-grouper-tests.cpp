@@ -8,9 +8,10 @@
 
 namespace
 {
-    void check(unsigned group_size, const std::vector<Datum>& data)
+    template<u64 GROUP_SIZE>
+    void check(const std::vector<Datum>& data)
     {
-        auto encoding = encoding::create_bit_grouper(group_size);
+        auto encoding = encoding::create_bit_grouper<GROUP_SIZE>();
         io::Buffer<Datum> buffer1(data);
         io::Buffer<Datum> buffer2;
         io::Buffer<Datum> buffer3;
@@ -20,7 +21,7 @@ namespace
 
         auto result = buffer3.contents();
 
-        REQUIRE((data.size() + group_size - 1) / group_size * group_size == result->size());
+        REQUIRE((data.size() + GROUP_SIZE - 1) / GROUP_SIZE * GROUP_SIZE == result->size());
 
         for (size_t i = 0; i != data.size(); ++i)
         {
@@ -29,7 +30,7 @@ namespace
     }
 }
 
-#define TEST(GROUPSIZE, ...) TEST_CASE("Bit Grouper (group size " #GROUPSIZE ") on { " #__VA_ARGS__ " }") { check(GROUPSIZE, std::vector<Datum> { __VA_ARGS__ }); }
+#define TEST(GROUPSIZE, ...) TEST_CASE("Bit Grouper (group size " #GROUPSIZE ") on { " #__VA_ARGS__ " }") { check<GROUPSIZE>(std::vector<Datum> { __VA_ARGS__ }); }
 
 TEST(4)
 TEST(4, 0)

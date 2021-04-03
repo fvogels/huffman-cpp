@@ -75,9 +75,6 @@
     <ClInclude Include="encoding\mapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="encoding\caster.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="encoding\datum-encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -137,19 +134,28 @@
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\combinator-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="io\file-input-stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io\file-output-stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="encoding\datum-encoding.cpp">
+    <ClCompile Include="tests\encoding\prediction-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction-encoding.cpp">
+    <ClCompile Include="tests\encoding\prediction\interver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction\mapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction\encoding-combiner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction\inverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\combinator-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

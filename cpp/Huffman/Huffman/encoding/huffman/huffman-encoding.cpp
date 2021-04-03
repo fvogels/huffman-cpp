@@ -18,13 +18,13 @@ namespace
     typedef data::Leaf<wpair>     wleaf;
     typedef data::Branch<wpair>   wbranch;
 
-    class HuffmanEncoding : public encoding::EncodingImplementation<Datum, Datum>
+    class HuffmanEncodingImplementation : public encoding::EncodingImplementation
     {
         u64 m_domain_size;
         unsigned m_bits_per_datum;
 
     public:
-        HuffmanEncoding(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
+        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
         {
             // NOP
         }
@@ -217,7 +217,7 @@ namespace
     };
 }
 
-encoding::Encoding<Datum, Datum> encoding::create_huffman_encoder(unsigned domain_size)
+std::shared_ptr<encoding::EncodingImplementation> encoding::create_huffman_implementation(u64 domain_size)
 {
-    return create_encoding<HuffmanEncoding>(domain_size);
+    return std::make_shared<HuffmanEncodingImplementation>(domain_size);
 }

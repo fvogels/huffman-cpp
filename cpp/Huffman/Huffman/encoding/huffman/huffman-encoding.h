@@ -8,7 +8,13 @@
 
 namespace encoding
 {
-    Encoding<Datum, Datum> create_huffman_encoder(unsigned domain_size);
+    std::shared_ptr<EncodingImplementation> create_huffman_implementation(u64 domain_size);
+
+    template<u64 IN>
+    Encoding<IN, 2> create_huffman_encoder()
+    {
+        return encoding::Encoding<IN, 2>(create_huffman_implementation(IN));
+    }
 }
 
 #endif

@@ -6,8 +6,7 @@
 #include "encoding/huffman/huffman-encoding.h"
 #include "encoding/bit-grouper.h"
 #include "encoding/mapper.h"
-#include "encoding/caster.h"
-#include "encoding/datum-encoding.h"
+// #include "encoding/datum-encoding.h"
 #include "encoding/inverter.h"
 
 #endif

@@ -33,7 +33,6 @@
     <ClInclude Include="data-structures\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
-    <ClInclude Include="encoding\caster.h" />
     <ClInclude Include="encoding\datum-encoding.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
@@ -58,7 +57,6 @@
     <ClCompile Include="binary\binutil.cpp" />
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\bit-grouper.cpp" />
-    <ClCompile Include="encoding\datum-encoding.cpp" />
     <ClCompile Include="encoding\huffman\huffman-encoding.cpp" />
     <ClCompile Include="encoding\huffman\tree-encoding.cpp" />
     <ClCompile Include="encoding\move-to-front.cpp" />
@@ -73,6 +71,10 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
+    <ClCompile Include="tests\encoding\prediction\encoding-combiner.cpp" />
+    <ClCompile Include="tests\encoding\prediction\interver.cpp" />
+    <ClCompile Include="tests\encoding\prediction\inverter.cpp" />
+    <ClCompile Include="tests\encoding\prediction\mapper.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

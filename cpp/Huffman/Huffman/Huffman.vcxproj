@@ -29,8 +29,8 @@
   <ItemGroup>
     <ClInclude Include="binary\binutil.h" />
     <ClInclude Include="catch.hpp" />
-    <ClInclude Include="data-structures\binary-tree.h" />
-    <ClInclude Include="data-structures\frequency-table.h" />
+    <ClInclude Include="data\binary-tree.h" />
+    <ClInclude Include="data\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
     <ClInclude Include="encoding\datum-encoding.h" />

@@ -3,7 +3,7 @@
 
 #include "io/output-stream.h"
 #include "io/input-stream.h"
-#include "data-structures/binary-tree.h"
+#include "data/binary-tree.h"
 #include <memory>
 
 

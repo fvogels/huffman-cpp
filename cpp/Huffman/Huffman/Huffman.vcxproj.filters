@@ -33,10 +33,10 @@
     <ClInclude Include="encoding\encodings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data-structures\frequency-table.h">
+    <ClInclude Include="data\frequency-table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data-structures\binary-tree.h">
+    <ClInclude Include="data\binary-tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\huffman\huffman-encoding.h">

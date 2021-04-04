@@ -9,8 +9,8 @@
 
 namespace encoding
 {
-    void encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datum, io::OutputStream<Datum>& output);
-    std::unique_ptr<data::Node<Datum>> decode_tree(unsigned bits_per_datum, io::InputStream<Datum>& input);
+    void encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datum, io::OutputStream& output);
+    std::unique_ptr<data::Node<Datum>> decode_tree(unsigned bits_per_datum, io::InputStream& input);
 }
 
 #endif

@@ -2,10 +2,12 @@
 #include <assert.h>
 #include <fstream>
 #include <iostream>
+#include <limits>
+
 
 namespace
 {
-    class FileOutputStream : public io::OutputStream<uint8_t>
+    class FileOutputStream : public io::OutputStream
     {
     private:
         std::ofstream file;
@@ -16,19 +18,16 @@ namespace
             assert(file);
         }
 
-        void write(const uint8_t& datum)
+        void write(u64 datum)
         {
-            file << datum;
-        }
+            assert(datum <= std::numeric_limits<uint8_t>::max());
 
-        bool end_reached() const
-        {
-            return file.eof();
+            file << uint8_t(datum);
         }
     };
 }
 
-std::unique_ptr<io::OutputStream<uint8_t>> io::create_file_output_stream(const std::string& path)
+std::unique_ptr<io::OutputStream> io::create_file_output_stream(const std::string& path)
 {
     return std::make_unique<FileOutputStream>(path);
 }

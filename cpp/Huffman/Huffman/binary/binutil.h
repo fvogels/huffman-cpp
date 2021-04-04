@@ -9,9 +9,8 @@
 
 namespace binary
 {
-    void write_bits(u64 value, unsigned nbits, io::OutputStream<Datum>& output);
-    u64 read_bits(unsigned nbits, io::InputStream<Datum>& input);
-    unsigned bits_needed(u64 value);
+    void write_bits(u64 value, unsigned nbits, io::OutputStream& output);
+    u64 read_bits(unsigned nbits, io::InputStream& input);
 }
 
 #endif

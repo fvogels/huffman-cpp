@@ -4,7 +4,7 @@
 #include <fstream>
 
 
-std::unique_ptr<io::InputStream<uint8_t>> io::create_file_input_stream(const std::string& path)
+std::unique_ptr<io::InputStream> io::create_file_input_stream(const std::string& path)
 {
     std::ifstream file(path, std::ios::binary);
     file.seekg(0, std::ios::end);

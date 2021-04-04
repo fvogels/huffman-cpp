@@ -15,7 +15,7 @@ namespace
             // NOP
         }
 
-        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void encode(io::InputStream& input, io::OutputStream& output) const
         {
             while (!input.end_reached())
             {
@@ -23,7 +23,7 @@ namespace
             }
         }
 
-        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void decode(io::InputStream& input, io::OutputStream& output) const
         {
             while (!input.end_reached())
             {

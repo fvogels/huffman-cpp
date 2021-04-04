@@ -15,7 +15,7 @@ namespace
             // NOP
         }
 
-        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void encode(io::InputStream& input, io::OutputStream& output) const override
         {
             u64 buffer = 0;
             unsigned nbits = 0;
@@ -27,7 +27,7 @@ namespace
             }
         }
 
-        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void decode(io::InputStream& input, io::OutputStream& output) const override
         {
             while (!input.end_reached())
             {

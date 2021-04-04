@@ -4,6 +4,7 @@
 #include "io/input-stream.h"
 #include "io/output-stream.h"
 #include <assert.h>
+#include <numeric>
 #include <memory>
 #include <vector>
 
@@ -11,7 +12,7 @@
 namespace io
 {
     template<typename T>
-    class BufferInputStream : public InputStream<T>
+    class BufferInputStream : public InputStream
     {
     private:
         std::shared_ptr<const std::vector<T>> m_contents;
@@ -23,7 +24,7 @@ namespace io
             // NOP
         }
 
-        T read() override
+        u64 read() override
         {
             assert(m_index < m_contents->size());
 
@@ -37,7 +38,7 @@ namespace io
     };
 
     template<typename T>
-    class BufferOutputStream : public OutputStream<T>
+    class BufferOutputStream : public OutputStream
     {
     private:
         std::shared_ptr<std::vector<T>> m_contents;
@@ -48,9 +49,11 @@ namespace io
             // NOP
         }
 
-        void write(const T& value)
+        void write(u64 value)
         {
-            m_contents->push_back(value);
+            assert(value <= std::numeric_limits<T>::max());
+
+            m_contents->push_back(static_cast<T>(value));
         }
     };
 
@@ -76,12 +79,12 @@ namespace io
             // NOP
         }
 
-        std::unique_ptr<InputStream<T>> create_input_stream() const
+        std::unique_ptr<InputStream> create_input_stream() const
         {
             return std::make_unique<BufferInputStream<T>>(m_contents);
         }
 
-        std::unique_ptr<OutputStream<T>> create_output_stream() const
+        std::unique_ptr<OutputStream> create_output_stream() const
         {
             return std::make_unique<BufferOutputStream<T>>(m_contents);
         }

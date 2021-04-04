@@ -14,11 +14,11 @@ int main()
     const std::string file_b = R"(g:\temp\aaaaa\b.txt)";
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
-    auto pipeline = encoding::create_datum_encoding() | encoding::create_huffman_encoder(256) | encoding::create_bit_grouper(8) | ~encoding::create_datum_encoding();
+    auto pipeline = encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
     
     {
-        io::Buffer<uint8_t> input_buffer;
-        io::Buffer<uint8_t> output_buffer;
+        io::Buffer<Datum> input_buffer;
+        io::Buffer<Datum> output_buffer;
         auto input = io::create_file_input_stream(file_a);
         transfer(*input, *input_buffer.create_output_stream());
 

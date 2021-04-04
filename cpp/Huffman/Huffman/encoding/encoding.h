@@ -15,8 +15,8 @@ namespace encoding
     public:
         virtual ~EncodingImplementation() { }
 
-        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const = 0;
-        virtual void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const = 0;
+        virtual void encode(io::InputStream& input, io::OutputStream& output) const = 0;
+        virtual void decode(io::InputStream& input, io::OutputStream& output) const = 0;
     };
 
     template<unsigned IN, unsigned OUT>

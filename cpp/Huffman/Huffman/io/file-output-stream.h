@@ -9,7 +9,7 @@
 
 namespace io
 {
-    std::unique_ptr<io::OutputStream<uint8_t>> create_file_output_stream(const std::string& path);
+    std::unique_ptr<io::OutputStream> create_file_output_stream(const std::string& path);
 }
 
 #endif

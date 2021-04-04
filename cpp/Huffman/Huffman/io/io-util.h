@@ -9,7 +9,7 @@
 namespace io
 {
     template<typename T>
-    void transfer(const std::vector<T>& xs, io::OutputStream<T>& output)
+    void transfer(const std::vector<T>& xs, io::OutputStream& output)
     {
         for (auto& x : xs)
         {
@@ -17,8 +17,8 @@ namespace io
         }
     }
 
-    template<typename T>
-    void transfer(io::InputStream<T>& input, io::OutputStream<T>& output)
+    // TODO Move into cpp
+    inline void transfer(io::InputStream& input, io::OutputStream& output)
     {
         while (!input.end_reached())
         {

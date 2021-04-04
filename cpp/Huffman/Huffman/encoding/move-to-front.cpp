@@ -18,7 +18,7 @@ namespace
             // NOP
         }
 
-        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        virtual void encode(io::InputStream& input, io::OutputStream& output) const override
         {
             std::deque<Datum> table;
             add_range<Datum>(table, 0, this->domain_size);
@@ -41,7 +41,7 @@ namespace
             }
         }
 
-        virtual void decode(io::InputStream<Datum>& indices, io::OutputStream<Datum>& result) const override
+        virtual void decode(io::InputStream& indices, io::OutputStream& result) const override
         {
             std::deque<Datum> table;
             add_range<Datum>(table, 0, this->domain_size);
@@ -74,7 +74,7 @@ namespace
             // NOP
         }
 
-        virtual void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        virtual void encode(io::InputStream& input, io::OutputStream& output) const override
         {
             auto table = this->create_initial_table();
 
@@ -99,7 +99,7 @@ namespace
             }
         }
 
-        virtual void decode(io::InputStream<Datum>& indices, io::OutputStream<Datum>& result) const override
+        virtual void decode(io::InputStream& indices, io::OutputStream& result) const override
         {
             auto table = this->create_initial_table();
 

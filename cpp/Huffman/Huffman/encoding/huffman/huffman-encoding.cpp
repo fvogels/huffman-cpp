@@ -24,12 +24,12 @@ namespace
         unsigned m_bits_per_datum;
 
     public:
-        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
+        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(bits_needed(domain_size))
         {
             // NOP
         }
 
-        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void encode(io::InputStream& input, io::OutputStream& output) const override
         {
             const Datum eof = m_domain_size;
             auto copy = copy_to_vector(input);
@@ -42,14 +42,14 @@ namespace
             this->encode_input(copy, codes, output);
         }
 
-        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const override
+        void decode(io::InputStream& input, io::OutputStream& output) const override
         {
             auto tree = this->decode_tree(input);
             this->decode_bits(input, *tree, output);
         }
 
     private:
-        void decode_bits(io::InputStream<Datum>& input, const data::Node<Datum>& tree, io::OutputStream<Datum>& output) const
+        void decode_bits(io::InputStream& input, const data::Node<Datum>& tree, io::OutputStream& output) const
         {
             const Datum eof = m_domain_size;
             const data::Node<Datum>* current_node = &tree;
@@ -91,7 +91,7 @@ namespace
             }
         }
 
-        std::vector<Datum> copy_to_vector(io::InputStream<Datum>& input) const
+        std::vector<Datum> copy_to_vector(io::InputStream& input) const
         {
             std::vector<Datum> result;
 
@@ -196,17 +196,17 @@ namespace
             }
         }
 
-        void encode_tree(const data::Node<Datum>& tree, io::OutputStream<Datum>& output) const
+        void encode_tree(const data::Node<Datum>& tree, io::OutputStream& output) const
         {
             encoding::encode_tree(tree, m_bits_per_datum, output);
         }
 
-        std::unique_ptr<data::Node<Datum>> decode_tree(io::InputStream<Datum>& input) const
+        std::unique_ptr<data::Node<Datum>> decode_tree(io::InputStream& input) const
         {
             return encoding::decode_tree(m_bits_per_datum, input);
         }
 
-        void encode_input(const std::vector<Datum>& input, std::vector<std::vector<Datum>>& codes, io::OutputStream<Datum>& output) const
+        void encode_input(const std::vector<Datum>& input, std::vector<std::vector<Datum>>& codes, io::OutputStream& output) const
         {
             for ( auto& datum : input )
             {

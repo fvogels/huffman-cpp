@@ -15,7 +15,7 @@ namespace
             // NOP
         }
 
-        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void encode(io::InputStream& input, io::OutputStream& output) const
         {
             io::Buffer<Datum> buffer;
 
@@ -23,7 +23,7 @@ namespace
             m_e2->encode(*buffer.create_input_stream(), output);
         }
 
-        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void decode(io::InputStream& input, io::OutputStream& output) const
         {
             io::Buffer<Datum> buffer;
 

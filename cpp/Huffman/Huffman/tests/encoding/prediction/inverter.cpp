@@ -14,12 +14,12 @@ namespace
             // NOP
         }
 
-        void encode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void encode(io::InputStream& input, io::OutputStream& output) const
         {
             m_encoding->decode(input, output);
         }
 
-        void decode(io::InputStream<Datum>& input, io::OutputStream<Datum>& output) const
+        void decode(io::InputStream& input, io::OutputStream& output) const
         {
             m_encoding->encode(input, output);
         }

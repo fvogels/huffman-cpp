@@ -87,6 +87,18 @@
     <ClInclude Include="tests\encoding\prediction\oracle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="io\file-data-source.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\data-source.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\data-destination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\file-data-destination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -159,6 +171,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io-util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="io\file-data-source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="io\file-data-destination.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

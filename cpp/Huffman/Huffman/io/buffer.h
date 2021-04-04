@@ -3,6 +3,8 @@
 
 #include "io/input-stream.h"
 #include "io/output-stream.h"
+#include "io/data-source.h"
+#include "io/data-destination.h"
 #include <assert.h>
 #include <numeric>
 #include <memory>
@@ -58,7 +60,7 @@ namespace io
     };
 
     template<typename T>
-    class Buffer
+    class Buffer : public DataSource, public DataDestination
     {
     private:
         std::shared_ptr<std::vector<T>> m_contents;
@@ -79,12 +81,12 @@ namespace io
             // NOP
         }
 
-        std::unique_ptr<InputStream> create_input_stream() const
+        std::unique_ptr<InputStream> create_input_stream() override
         {
             return std::make_unique<BufferInputStream<T>>(m_contents);
         }
 
-        std::unique_ptr<OutputStream> create_output_stream() const
+        std::unique_ptr<OutputStream> create_output_stream() override
         {
             return std::make_unique<BufferOutputStream<T>>(m_contents);
         }

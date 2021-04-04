@@ -1,6 +1,6 @@
 #ifdef TEST_BUILD
 
-#include "binary/binutil.h"
+#include "io/io-util.h"
 #include "io/buffer.h"
 #include "defs.h"
 #include "catch.hpp"
@@ -13,8 +13,8 @@ namespace
         io::Buffer<Datum> buffer;
         auto output = buffer.create_output_stream();
         auto input = buffer.create_input_stream();
-        binary::write_bits(n, nbits, *output);
-        auto result = binary::read_bits(nbits, *input);
+        io::write_bits(n, nbits, *output);
+        auto result = io::read_bits(nbits, *input);
 
         REQUIRE(n == result);
     }

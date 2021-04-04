@@ -110,10 +110,7 @@
     <ClCompile Include="tests\data-structures\frequency-table-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="binary\binutil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\binary\binutil-tests.cpp">
+    <ClCompile Include="tests\io\io-util-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\tree-encoding.cpp">
@@ -159,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\data\type-selection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="io-util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

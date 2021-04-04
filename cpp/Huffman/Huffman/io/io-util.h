@@ -17,15 +17,10 @@ namespace io
         }
     }
 
-    // TODO Move into cpp
-    inline void transfer(io::InputStream& input, io::OutputStream& output)
-    {
-        while (!input.end_reached())
-        {
-            auto x = input.read();
-            output.write(x);
-        }
-    }
+    void transfer(io::InputStream& input, io::OutputStream& output);
+
+    void write_bits(u64 value, unsigned nbits, io::OutputStream& output);
+    u64 read_bits(unsigned nbits, io::InputStream& input);
 }
 
 #endif

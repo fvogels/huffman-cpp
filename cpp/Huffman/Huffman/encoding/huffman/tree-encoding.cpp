@@ -1,6 +1,6 @@
 #include "encoding/huffman/tree-encoding.h"
 #include "encoding/encoding.h"
-#include "binary/binutil.h"
+#include "io/io-util.h"
 #include "defs.h"
 
 
@@ -18,7 +18,7 @@ void encoding::encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datu
         auto& leaf = static_cast<const data::Leaf<Datum>&>(tree);
         auto datum = leaf.value();
         output.write(1);
-        binary::write_bits(datum, bits_per_datum, output);
+        io::write_bits(datum, bits_per_datum, output);
     }
 }
 
@@ -33,7 +33,7 @@ std::unique_ptr<data::Node<Datum>> encoding::decode_tree(unsigned bits_per_datum
     }
     else
     {
-        auto datum = binary::read_bits(bits_per_datum, input);
+        auto datum = io::read_bits(bits_per_datum, input);
 
         return std::make_unique<data::Leaf<Datum>>(datum);
     }

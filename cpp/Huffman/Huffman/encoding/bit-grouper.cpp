@@ -1,5 +1,5 @@
 #include "encoding/bit-grouper.h"
-#include "binary/binutil.h"
+#include "io/io-util.h"
 
 
 namespace
@@ -22,7 +22,7 @@ namespace
 
             while (!input.end_reached())
             {
-                auto datum = binary::read_bits(m_group_size, input);
+                auto datum = io::read_bits(m_group_size, input);
                 output.write(datum);
             }
         }
@@ -32,7 +32,7 @@ namespace
             while (!input.end_reached())
             {
                 auto datum = input.read();
-                binary::write_bits(datum, m_group_size, output);
+                io::write_bits(datum, m_group_size, output);
             }
         }
     };

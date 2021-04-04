@@ -3,7 +3,7 @@
 #pragma warning(disable : 26444)
 
 #include "catch.hpp"
-#include "data-structures/frequency-table.h"
+#include "data/frequency-table.h"
 
 
 namespace

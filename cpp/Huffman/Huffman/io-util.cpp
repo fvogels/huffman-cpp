@@ -1,8 +1,17 @@
-#include "binary/binutil.h"
+#include "io/io-util.h"
 #include <assert.h>
 
 
-void binary::write_bits(u64 value, unsigned nbits, io::OutputStream& output)
+void io::transfer(io::InputStream& input, io::OutputStream& output)
+{
+    while (!input.end_reached())
+    {
+        auto x = input.read();
+        output.write(x);
+    }
+}
+
+void io::write_bits(u64 value, unsigned nbits, io::OutputStream& output)
 {
     assert((value >> nbits) == 0);
 
@@ -13,11 +22,11 @@ void binary::write_bits(u64 value, unsigned nbits, io::OutputStream& output)
     }
 }
 
-u64 binary::read_bits(unsigned nbits, io::InputStream& input)
+u64 io::read_bits(unsigned nbits, io::InputStream& input)
 {
     u64 result = 0;
 
-    for ( unsigned i = 0; i != nbits; ++i )
+    for (unsigned i = 0; i != nbits; ++i)
     {
         auto bit = input.end_reached() ? 0 : input.read();
         assert(bit == 0 || bit == 1);

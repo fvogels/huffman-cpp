@@ -84,6 +84,12 @@
     <ClInclude Include="io\memory-buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding\huffman\adaptive-huffman-encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\huffman\tree-builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -150,6 +156,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io-util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\huffman\adaptive-huffman-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\huffman\tree-builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

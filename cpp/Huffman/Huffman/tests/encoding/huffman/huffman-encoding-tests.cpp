@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/huffman/huffman-encoding.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 
 
 namespace

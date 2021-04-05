@@ -4,7 +4,7 @@
 #include "encoding/encoding.h"
 #include "io/input-stream.h"
 #include "io/output-stream.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 #include <memory>
 
 

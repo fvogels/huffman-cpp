@@ -1,7 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "io/io-util.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 #include "defs.h"
 #include "catch.hpp"
 

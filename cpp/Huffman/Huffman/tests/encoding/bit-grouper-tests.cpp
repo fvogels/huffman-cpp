@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/bit-grouper.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 
 
 namespace

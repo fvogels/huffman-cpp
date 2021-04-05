@@ -51,7 +51,7 @@
     <ClInclude Include="io\file-data-source.h" />
     <ClInclude Include="io\input-stream.h" />
     <ClInclude Include="io\io-util.h" />
-    <ClInclude Include="io\memory-data.h" />
+    <ClInclude Include="io\memory-buffer.h" />
     <ClInclude Include="io\output-stream.h" />
     <ClInclude Include="tests\encoding\prediction\oracle.h" />
     <ClInclude Include="tests\encoding\prediction\prediction-encoding.h" />

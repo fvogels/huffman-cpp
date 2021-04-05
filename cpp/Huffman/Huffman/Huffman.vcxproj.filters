@@ -96,7 +96,7 @@
     <ClInclude Include="io\file-data-destination.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\memory-data.h">
+    <ClInclude Include="io\memory-buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

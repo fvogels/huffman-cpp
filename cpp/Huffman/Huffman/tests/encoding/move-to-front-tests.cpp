@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/encodings.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 #include "io/io-util.h"
 #include <functional>
 

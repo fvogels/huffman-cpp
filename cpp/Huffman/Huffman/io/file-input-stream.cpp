@@ -1,5 +1,5 @@
 #include "io/file-input-stream.h"
-#include "io/memory-data.h"
+#include "io/memory-buffer.h"
 #include <assert.h>
 #include <fstream>
 

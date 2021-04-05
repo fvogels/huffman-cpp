@@ -1,7 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "io/io-util.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 #include "defs.h"
 #include "catch.hpp"
 
@@ -10,9 +10,9 @@ namespace
 {
     void check(u64 n, unsigned nbits)
     {
-        io::Buffer<Datum> buffer;
-        auto output = buffer.create_output_stream();
-        auto input = buffer.create_input_stream();
+        io::MemoryBuffer<655365, Datum> buffer;
+        auto input = buffer.source()->create_input_stream();
+        auto output = buffer.destination()->create_output_stream();
         io::write_bits(n, nbits, *output);
         auto result = io::read_bits(nbits, *input);
 

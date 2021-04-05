@@ -11,6 +11,7 @@ namespace binary
 {
     constexpr unsigned bits_needed(u64 domain_size)
     {
+        --domain_size;
         unsigned i = 0;
 
         while (domain_size != 0)

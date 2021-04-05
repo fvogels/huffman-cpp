@@ -1,5 +1,5 @@
 #include "io/file-input-stream.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 #include <assert.h>
 #include <fstream>
 
@@ -11,9 +11,9 @@ std::unique_ptr<io::InputStream> io::create_file_input_stream(const std::string&
     auto size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    std::vector<uint8_t> data(size);
-    file.read(reinterpret_cast<char*>(data.data()), size);
+    auto data = std::make_shared<std::vector<uint8_t>>(size);
+    file.read(reinterpret_cast<char*>(data->data()), size);
 
-    io::Buffer<uint8_t> buffer(data);
-    return buffer.create_input_stream();
+    io::MemoryBuffer<256, uint8_t> memory(data);
+    return memory.source()->create_input_stream();
 }

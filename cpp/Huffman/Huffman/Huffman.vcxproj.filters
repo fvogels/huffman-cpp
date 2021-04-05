@@ -99,6 +99,9 @@
     <ClInclude Include="io\file-data-destination.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="io\memory-data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -156,9 +159,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\prediction\mapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\encoding\prediction\encoding-combiner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\prediction\inverter.cpp">

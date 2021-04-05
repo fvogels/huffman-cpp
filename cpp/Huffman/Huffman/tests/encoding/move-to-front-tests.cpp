@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/encodings.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 #include "io/io-util.h"
 #include <functional>
 
@@ -13,14 +13,14 @@ namespace
     void check(const std::vector<Datum>& data, std::function<encoding::Encoding<256, 256>()> factory)
     {
         auto encoding = factory();
-        io::Buffer<Datum> buffer1(data);
-        io::Buffer<Datum> buffer2;
-        io::Buffer<Datum> buffer3;
+        io::MemoryBuffer<256, Datum> buffer1(data);
+        io::MemoryBuffer<256> buffer2;
+        io::MemoryBuffer<256> buffer3;
 
-        encoding->encode(*buffer1.create_input_stream(), *buffer2.create_output_stream());
-        encoding->decode(*buffer2.create_input_stream(), *buffer3.create_output_stream());
+        encoding::encode(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
 
-        auto decoded_data = buffer3.contents();
+        auto decoded_data = buffer3.data();
 
         REQUIRE(data.size() == decoded_data->size());
 

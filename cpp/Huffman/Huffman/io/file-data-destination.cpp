@@ -5,13 +5,13 @@
 
 namespace
 {
-    class FileDataDestination: public io::DataDestination
+    class FileDataDestinationImplementation : public io::DataDestinationImplementation
     {
     private:
         std::string m_path;
 
     public:
-        FileDataDestination(const std::string& path) : m_path(path) { }
+        FileDataDestinationImplementation(const std::string& path) : m_path(path) { }
 
         std::unique_ptr<io::OutputStream> create_output_stream() override
         {
@@ -20,7 +20,7 @@ namespace
     };
 }
 
-std::unique_ptr<io::DataDestination> io::create_file_data_destination(const std::string& path)
+io::DataDestination<256> io::create_file_data_destination(const std::string& path)
 {
-    return std::make_unique<FileDataDestination>(path);
+    return io::DataDestination<256>(std::make_shared<FileDataDestinationImplementation>(path));
 }

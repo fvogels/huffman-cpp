@@ -3,23 +3,24 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/bit-grouper.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 
 
 namespace
 {
     template<u64 GROUP_SIZE>
-    void check(const std::vector<Datum>& data)
+    void check(const std::vector<byte>& data)
     {
         auto encoding = encoding::create_bit_grouper<GROUP_SIZE>();
-        io::Buffer<Datum> buffer1(data);
-        io::Buffer<Datum> buffer2;
-        io::Buffer<Datum> buffer3;
-        
-        encoding->encode(*buffer1.create_input_stream(), *buffer2.create_output_stream());
-        encoding->decode(*buffer2.create_input_stream(), *buffer3.create_output_stream());
 
-        auto result = buffer3.contents();
+        io::MemoryBuffer<2> buffer1(data);
+        io::MemoryBuffer<(1 << GROUP_SIZE)> buffer2;
+        io::MemoryBuffer<2> buffer3;
+
+        encoding::encode<2, 1 << GROUP_SIZE>(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
+
+        auto result = buffer3.data();
 
         REQUIRE((data.size() + GROUP_SIZE - 1) / GROUP_SIZE * GROUP_SIZE == result->size());
 
@@ -30,7 +31,7 @@ namespace
     }
 }
 
-#define TEST(GROUPSIZE, ...) TEST_CASE("Bit Grouper (group size " #GROUPSIZE ") on { " #__VA_ARGS__ " }") { check<GROUPSIZE>(std::vector<Datum> { __VA_ARGS__ }); }
+#define TEST(GROUPSIZE, ...) TEST_CASE("Bit Grouper (group size " #GROUPSIZE ") on { " #__VA_ARGS__ " }") { check<GROUPSIZE>(std::vector<uint8_t> { __VA_ARGS__ }); }
 
 TEST(4)
 TEST(4, 0)

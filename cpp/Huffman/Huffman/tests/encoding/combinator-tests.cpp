@@ -3,7 +3,7 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/encodings.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 #include "io/io-util.h"
 #include <functional>
 
@@ -11,16 +11,16 @@
 namespace
 {
     template<u64 IN, u64 OUT>
-    void check(const std::vector<Datum>& data, encoding::Encoding<IN, OUT> encoding)
+    void check(const std::vector<u64>& data, encoding::Encoding<IN, OUT> encoding)
     {
-        io::Buffer<Datum> buffer1(data);
-        io::Buffer<Datum> buffer2;
-        io::Buffer<Datum> buffer3;
+        io::MemoryBuffer<IN, u64> buffer1(data);
+        io::MemoryBuffer<OUT> buffer2;
+        io::MemoryBuffer<IN> buffer3;
 
-        encoding->encode(*buffer1.create_input_stream(), *buffer2.create_output_stream());
-        encoding->decode(*buffer2.create_input_stream(), *buffer3.create_output_stream());
+        encoding::encode(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
 
-        auto decoded_data = buffer3.contents();
+        auto decoded_data = buffer3.data();
 
         REQUIRE(data.size() == decoded_data->size());
 

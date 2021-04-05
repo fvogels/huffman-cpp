@@ -7,7 +7,7 @@
 
 namespace io
 {
-    std::unique_ptr<io::DataDestination> create_file_data_destination(const std::string& path);
+    io::DataDestination<256> create_file_data_destination(const std::string& path);
 }
 
 #endif

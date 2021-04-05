@@ -3,16 +3,16 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/huffman/tree-encoding.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 
 
 namespace
 {
     void check(const data::Node<Datum>& tree, unsigned bits_per_datum)
     {
-        io::Buffer<Datum> buffer;
-        auto input = buffer.create_input_stream();
-        auto output = buffer.create_output_stream();
+        io::MemoryBuffer<256> buffer;
+        auto input = buffer.source()->create_input_stream();
+        auto output = buffer.destination()->create_output_stream();
 
         encoding::encode_tree(tree, bits_per_datum, *output);
         auto result = encoding::decode_tree(bits_per_datum, *input);
@@ -31,7 +31,7 @@ namespace
     }
 }
 
-#define TEST(t, bpd)    TEST_CASE("Encoding/decoding tree " #t ", " #bpd " bits per datum") \
+#define TEST(t, bpd)    TEST_CASE("Encoding/decoding tree " #t ", " #bpd " bits per datum")    \
                         {                                                                      \
                             auto tree = t;                                                     \
                             auto bits_per_datum = bpd;                                         \

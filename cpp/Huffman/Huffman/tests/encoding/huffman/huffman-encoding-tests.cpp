@@ -3,22 +3,23 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/huffman/huffman-encoding.h"
-#include "io/buffer.h"
+#include "io/memory-data.h"
 
 
 namespace
 {
     void check(const std::vector<Datum>& data)
     {
-        auto encoder = encoding::create_huffman_encoder<256>();
-        io::Buffer<Datum> buffer1(data);
-        io::Buffer<Datum> buffer2;
-        io::Buffer<Datum> buffer3;
+        auto encoding = encoding::create_huffman_encoder<256>();
 
-        encoder->encode(*buffer1.create_input_stream(), *buffer2.create_output_stream());
-        encoder->decode(*buffer2.create_input_stream(), *buffer3.create_output_stream());
+        io::MemoryBuffer<256, Datum> buffer1(data);
+        io::MemoryBuffer<2> buffer2;
+        io::MemoryBuffer<256> buffer3;
 
-        auto results = buffer3.contents();
+        encoding::encode(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
+
+        auto results = buffer3.data();
 
         REQUIRE(data.size() == results->size());
 

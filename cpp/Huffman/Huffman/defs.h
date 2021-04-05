@@ -6,8 +6,9 @@
 #include <deque>
 
 
-typedef uint64_t               u64;
-typedef uint64_t               Datum;
+typedef uint8_t    byte;
+typedef uint64_t   u64;
+typedef uint64_t   Datum; // TODO Remove?
 
 template<typename T>
 void add_range(std::deque<T>& vector, const T& start, const T& end)

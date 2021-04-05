@@ -5,13 +5,13 @@
 
 namespace
 {
-    class FileDataSource : public io::DataSource
+    class FileDataSourceImplementation : public io::DataSourceImplementation
     {
     private:
         std::string m_path;
 
     public:
-        FileDataSource(const std::string& path) : m_path(path) { }
+        FileDataSourceImplementation(const std::string& path) : m_path(path) { }
 
         std::unique_ptr<io::InputStream> create_input_stream() override
         {
@@ -20,7 +20,7 @@ namespace
     };
 }
 
-std::unique_ptr<io::DataSource> io::create_file_data_source(const std::string& path)
+io::DataSource<256> io::create_file_data_source(const std::string& path)
 {
-    return std::make_unique<FileDataSource>(path);
+    return io::DataSource<256>(std::make_shared<FileDataSourceImplementation>(path));
 }

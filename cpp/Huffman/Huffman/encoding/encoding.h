@@ -48,6 +48,24 @@ namespace encoding
             return m_implementation;
         }
     };
+
+    template<u64 IN, u64 OUT>
+    void encode(io::DataSource<IN> source, Encoding<IN, OUT> encoding, io::DataDestination<OUT> destination)
+    {
+        auto input_stream = source->create_input_stream();
+        auto output_stream = destination->create_output_stream();
+
+        encoding->encode(*input_stream, *output_stream);
+    }
+
+    template<u64 IN, u64 OUT>
+    void decode(io::DataSource<OUT> source, Encoding<IN, OUT> encoding, io::DataDestination<IN> destination)
+    {
+        auto input_stream = source->create_input_stream();
+        auto output_stream = destination->create_output_stream();
+
+        encoding->decode(*input_stream, *output_stream);
+    }
 }
 
 #endif

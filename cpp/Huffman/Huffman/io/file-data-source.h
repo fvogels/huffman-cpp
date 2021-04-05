@@ -7,7 +7,7 @@
 
 namespace io
 {
-    std::unique_ptr<io::DataSource> create_file_data_source(const std::string& path);
+    io::DataSource<256> create_file_data_source(const std::string& path);
 }
 
 #endif

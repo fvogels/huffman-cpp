@@ -63,10 +63,7 @@
     <ClInclude Include="encoding\encoding-combiner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\file-input-stream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="io\file-output-stream.h">
+    <ClInclude Include="io\file-streams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\mapper.h">
@@ -143,10 +140,7 @@
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="io\file-input-stream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="io\file-output-stream.cpp">
+    <ClCompile Include="io\file-streams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\prediction-encoding.cpp">

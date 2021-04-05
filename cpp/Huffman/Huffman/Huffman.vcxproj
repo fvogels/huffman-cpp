@@ -46,8 +46,7 @@
     <ClInclude Include="io\data-destination.h" />
     <ClInclude Include="io\data-source.h" />
     <ClInclude Include="io\file-data-destination.h" />
-    <ClInclude Include="io\file-input-stream.h" />
-    <ClInclude Include="io\file-output-stream.h" />
+    <ClInclude Include="io\file-streams.h" />
     <ClInclude Include="io\file-data-source.h" />
     <ClInclude Include="io\input-stream.h" />
     <ClInclude Include="io\io-util.h" />
@@ -65,8 +64,7 @@
     <ClCompile Include="encoding\move-to-front.cpp" />
     <ClCompile Include="io-util.cpp" />
     <ClCompile Include="io\file-data-destination.cpp" />
-    <ClCompile Include="io\file-input-stream.cpp" />
-    <ClCompile Include="io\file-output-stream.cpp" />
+    <ClCompile Include="io\file-streams.cpp" />
     <ClCompile Include="io\file-data-source.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />
     <ClCompile Include="tests\data-structures\frequency-table-tests.cpp" />

@@ -1,6 +1,6 @@
 #include "io/file-data-source.h"
 #include "io/data-source.h"
-#include "io/file-input-stream.h"
+#include "io/file-streams.h"
 
 
 namespace

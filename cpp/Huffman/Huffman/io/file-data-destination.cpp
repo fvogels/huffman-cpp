@@ -1,6 +1,6 @@
 #include "io/file-data-destination.h"
 #include "io/data-destination.h"
-#include "io/file-output-stream.h"
+#include "io/file-streams.h"
 
 
 namespace

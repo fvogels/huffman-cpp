@@ -1,8 +1,10 @@
 #include "encoding/huffman/huffman-encoding.h"
 #include "encoding/huffman/tree-encoding.h"
 #include "encoding/huffman/tree-builder.h"
+#include "encoding/huffman/code-builder.h"
 #include "data/frequency-table.h"
 #include "data/binary-tree.h"
+#include "io/memory-buffer.h"
 #include "io/streams.h"
 #include "io/io-util.h"
 #include "binary/binutil.h"
@@ -32,7 +34,7 @@ namespace
             copy.push_back(eof);
             auto frequencies = data::count_frequencies(copy);
             auto tree = encoding::huffman::build_tree(frequencies);
-            auto codes = this->build_codes(*tree);
+            auto codes = encoding::huffman::build_codes(*tree, m_domain_size);
 
             this->encode_tree(*tree, output);
             this->encode_input(copy, codes, output);
@@ -99,36 +101,6 @@ namespace
             return result;
         }
         
-        std::vector<std::vector<Datum>> build_codes(const data::Node<Datum>& tree) const
-        {
-            std::vector<std::vector<Datum>> result(this->m_domain_size + 1); // +1 for EOF
-            std::vector<Datum> prefix;
-            build_codes(tree, prefix, &result);
-            return result;
-        }
-
-        void build_codes(const data::Node<Datum>& node, std::vector<Datum>& prefix, std::vector<std::vector<Datum>>* result) const
-        {
-            if (node.is_branch())
-            {
-                auto& branch = static_cast<const data::Branch<Datum>&>(node);
-
-                prefix.push_back(0);
-                build_codes(branch.left_child(), prefix, result);
-                prefix.pop_back();
-                prefix.push_back(1);
-                build_codes(branch.right_child(), prefix, result);
-                prefix.pop_back();
-            }
-            else
-            {
-                auto& leaf = static_cast<const data::Leaf<Datum>&>(node);
-                auto& datum = leaf.value();
-
-                (*result)[datum] = prefix; // don't forget ()!
-            }
-        }
-
         void encode_tree(const data::Node<Datum>& tree, io::OutputStream& output) const
         {
             encoding::encode_tree(tree, m_bits_per_datum, output);

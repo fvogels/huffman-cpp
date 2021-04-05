@@ -14,8 +14,8 @@ namespace
         auto input = buffer.source()->create_input_stream();
         auto output = buffer.destination()->create_output_stream();
 
-        encoding::encode_tree(tree, bits_per_datum, *output);
-        auto result = encoding::decode_tree(bits_per_datum, *input);
+        encoding::huffman::encode_tree(tree, bits_per_datum, *output);
+        auto result = encoding::huffman::decode_tree(bits_per_datum, *input);
 
         REQUIRE(tree.equal_to(*result));
     }

@@ -28,7 +28,7 @@ namespace
 
 std::vector<std::vector<Datum>> encoding::huffman::build_codes(const data::Node<Datum>& tree, u64 domain_size)
 {
-    std::vector<std::vector<Datum>> result(domain_size);
+    std::vector<std::vector<Datum>> result(domain_size + 1);
     std::vector<Datum> prefix;
 
     ::build_codes(tree, prefix, &result);

@@ -93,6 +93,9 @@
     <ClInclude Include="encoding\huffman\code-building.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding\huffman\decoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -168,6 +171,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\code-building.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\huffman\decoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

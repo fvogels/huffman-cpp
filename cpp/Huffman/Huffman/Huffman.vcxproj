@@ -43,7 +43,6 @@
     <ClInclude Include="encoding\encoding.h" />
     <ClInclude Include="encoding\encodings.h" />
     <ClInclude Include="encoding\huffman\huffman-encoding.h" />
-    <ClInclude Include="io\buffer.h" />
     <ClInclude Include="io\data-destination.h" />
     <ClInclude Include="io\data-source.h" />
     <ClInclude Include="io\file-data-destination.h" />

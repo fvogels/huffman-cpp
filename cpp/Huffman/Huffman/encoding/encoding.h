@@ -3,7 +3,8 @@
 
 #include "io/input-stream.h"
 #include "io/output-stream.h"
-#include "io/buffer.h"
+#include "io/data-source.h"
+#include "io/data-destination.h"
 #include "defs.h"
 #include <memory>
 

@@ -54,9 +54,6 @@
     <ClInclude Include="io\output-stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="io\io-util.h">
       <Filter>Header Files</Filter>
     </ClInclude>

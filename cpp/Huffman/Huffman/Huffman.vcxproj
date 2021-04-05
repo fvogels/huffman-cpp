@@ -33,7 +33,6 @@
     <ClInclude Include="data\frequency-table.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
-    <ClInclude Include="encoding\datum-encoding.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\inverter.h" />

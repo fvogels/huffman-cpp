@@ -1,4 +1,4 @@
-#include "encoding/huffman/tree-builder.h"
+#include "encoding/huffman/tree-building.h"
 #include <algorithm>
 
 

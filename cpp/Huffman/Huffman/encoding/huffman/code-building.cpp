@@ -1,4 +1,4 @@
-#include "encoding/huffman/code-builder.h"
+#include "encoding/huffman/code-building.h"
 
 
 namespace

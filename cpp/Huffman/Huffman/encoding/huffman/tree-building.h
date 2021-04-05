@@ -1,5 +1,5 @@
-#ifndef TREE_BUILDER_H
-#define TREE_BUILDER_H
+#ifndef TREE_BUILDING_H
+#define TREE_BUILDING_H
 
 #include "data/frequency-table.h"
 #include "data/binary-tree.h"

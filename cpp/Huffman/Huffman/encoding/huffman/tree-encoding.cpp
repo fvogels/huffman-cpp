@@ -4,7 +4,7 @@
 #include "defs.h"
 
 
-void encoding::encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datum, io::OutputStream& output)
+void encoding::huffman::encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datum, io::OutputStream& output)
 {
     if (tree.is_branch())
     {
@@ -22,7 +22,7 @@ void encoding::encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datu
     }
 }
 
-std::unique_ptr<data::Node<Datum>> encoding::decode_tree(unsigned bits_per_datum, io::InputStream& input)
+std::unique_ptr<data::Node<Datum>> encoding::huffman::decode_tree(unsigned bits_per_datum, io::InputStream& input)
 {
     if (input.read() == 0)
     {

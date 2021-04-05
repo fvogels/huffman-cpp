@@ -1,5 +1,5 @@
-#ifndef CODE_BUILDER_H
-#define CODE_BUILDER_H
+#ifndef CODE_BUILDING_H
+#define CODE_BUILDING_H
 
 #include "data/binary-tree.h"
 #include <vector>

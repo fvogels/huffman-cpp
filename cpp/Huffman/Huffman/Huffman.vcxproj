@@ -35,8 +35,8 @@
     <ClInclude Include="encoding\bit-grouper.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
     <ClInclude Include="encoding\huffman\adaptive-huffman-encoding.h" />
-    <ClInclude Include="encoding\huffman\code-builder.h" />
-    <ClInclude Include="encoding\huffman\tree-builder.h" />
+    <ClInclude Include="encoding\huffman\code-building.h" />
+    <ClInclude Include="encoding\huffman\tree-building.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\inverter.h" />
     <ClInclude Include="encoding\mapper.h" />
@@ -59,9 +59,9 @@
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\bit-grouper.cpp" />
     <ClCompile Include="encoding\huffman\adaptive-huffman-encoding.cpp" />
-    <ClCompile Include="encoding\huffman\code-builder.cpp" />
+    <ClCompile Include="encoding\huffman\code-building.cpp" />
     <ClCompile Include="encoding\huffman\huffman-encoding.cpp" />
-    <ClCompile Include="encoding\huffman\tree-builder.cpp" />
+    <ClCompile Include="encoding\huffman\tree-building.cpp" />
     <ClCompile Include="encoding\huffman\tree-encoding.cpp" />
     <ClCompile Include="encoding\move-to-front.cpp" />
     <ClCompile Include="io-util.cpp" />

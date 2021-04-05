@@ -1,7 +1,7 @@
 #include "encoding/huffman/huffman-encoding.h"
 #include "encoding/huffman/tree-encoding.h"
-#include "encoding/huffman/tree-builder.h"
-#include "encoding/huffman/code-builder.h"
+#include "encoding/huffman/tree-building.h"
+#include "encoding/huffman/code-building.h"
 #include "data/frequency-table.h"
 #include "data/binary-tree.h"
 #include "io/memory-buffer.h"
@@ -15,7 +15,6 @@
 
 namespace
 {
-
     class HuffmanEncodingImplementation : public encoding::EncodingImplementation
     {
         u64 m_domain_size;
@@ -36,13 +35,13 @@ namespace
             auto tree = encoding::huffman::build_tree(frequencies);
             auto codes = encoding::huffman::build_codes(*tree, m_domain_size);
 
-            this->encode_tree(*tree, output);
+            encoding::huffman::encode_tree(*tree, m_bits_per_datum, output);
             this->encode_input(copy, codes, output);
         }
 
         void decode(io::InputStream& input, io::OutputStream& output) const override
         {
-            auto tree = this->decode_tree(input);
+            auto tree = encoding::huffman::decode_tree(m_bits_per_datum, input);
             this->decode_bits(input, *tree, output);
         }
 
@@ -101,16 +100,6 @@ namespace
             return result;
         }
         
-        void encode_tree(const data::Node<Datum>& tree, io::OutputStream& output) const
-        {
-            encoding::encode_tree(tree, m_bits_per_datum, output);
-        }
-
-        std::unique_ptr<data::Node<Datum>> decode_tree(io::InputStream& input) const
-        {
-            return encoding::decode_tree(m_bits_per_datum, input);
-        }
-
         void encode_input(const std::vector<Datum>& input, std::vector<std::vector<Datum>>& codes, io::OutputStream& output) const
         {
             for ( auto& datum : input )

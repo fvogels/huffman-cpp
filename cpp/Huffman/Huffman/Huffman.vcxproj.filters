@@ -87,10 +87,10 @@
     <ClInclude Include="encoding\huffman\adaptive-huffman-encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="encoding\huffman\tree-builder.h">
+    <ClInclude Include="encoding\huffman\tree-building.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="encoding\huffman\code-builder.h">
+    <ClInclude Include="encoding\huffman\code-building.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -164,10 +164,10 @@
     <ClCompile Include="encoding\huffman\adaptive-huffman-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="encoding\huffman\tree-builder.cpp">
+    <ClCompile Include="encoding\huffman\tree-building.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="encoding\huffman\code-builder.cpp">
+    <ClCompile Include="encoding\huffman\code-building.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,6 +20,8 @@ namespace
         {
             auto& leaf = static_cast<const data::Leaf<Datum>&>(node);
             auto& datum = leaf.value();
+            
+            assert(datum < result->size());
 
             (*result)[datum] = prefix;
         }

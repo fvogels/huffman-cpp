@@ -31,15 +31,13 @@ namespace
 
         void encode(io::InputStream& input, io::OutputStream& output) const override
         {
-            data::FrequencyTable<Datum> frequencies;
-            frequencies.add_to_domain(m_eof);
-            frequencies.add_to_domain(m_nyt);
+            auto frequencies = create_initial_frequencies();
 
             while (!input.end_reached())
             {
                 auto datum = input.read();
                 auto tree = encoding::huffman::build_tree(frequencies);
-                auto codes = encoding::huffman::build_codes(*tree, m_domain_size);
+                auto codes = encoding::huffman::build_codes(*tree, m_domain_size + 2);
 
                 if (codes[datum].size() == 0) // Code length 0 is impossible since EOF and NYT are guaranteed to be included in the tree
                 {
@@ -53,13 +51,15 @@ namespace
 
                 frequencies.increment(datum);
             }
+
+            auto tree = encoding::huffman::build_tree(frequencies);
+            auto codes = encoding::huffman::build_codes(*tree, m_domain_size + 2);
+            io::transfer(codes[m_eof], output);
         }
 
         void decode(io::InputStream& input, io::OutputStream& output) const override
         {
-            data::FrequencyTable<Datum> frequencies;
-            frequencies.add_to_domain(m_eof);
-            frequencies.add_to_domain(m_nyt);
+            auto frequencies = create_initial_frequencies();
 
             while (true)
             {
@@ -72,15 +72,23 @@ namespace
                 }
                 else if (datum == m_nyt)
                 {
-                    transfer(input, output, m_bits_per_datum);
-                }
-                else
-                {
-                    output.write(datum);
+                    datum = io::read_bits(m_bits_per_datum, input);
                 }
 
+                output.write(datum);
                 frequencies.increment(datum);
             }
+        }
+
+    private:
+        data::FrequencyTable<Datum> create_initial_frequencies() const
+        {
+            data::FrequencyTable<Datum> frequencies;
+
+            frequencies.add_to_domain(m_eof);
+            frequencies.add_to_domain(m_nyt);
+
+            return frequencies;
         }
     };
 }

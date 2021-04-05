@@ -11,9 +11,9 @@ namespace encoding
     std::shared_ptr<EncodingImplementation> create_adaptive_huffman_implementation(u64 domain_size);
 
     template<u64 IN>
-    Encoding<IN, 2> create_huffman_encoder()
+    Encoding<IN, 2> create_adaptive_huffman_encoder()
     {
-        return encoding::Encoding<IN, 2>(create_huffman_implementation(IN));
+        return encoding::Encoding<IN, 2>(create_adaptive_huffman_implementation(IN));
     }
 }
 

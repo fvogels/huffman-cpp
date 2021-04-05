@@ -3,18 +3,18 @@
 #include "catch.hpp"
 #include "defs.h"
 #include "encoding/huffman/huffman-encoding.h"
+#include "encoding/huffman/adaptive-huffman-encoding.h"
 #include "io/memory-buffer.h"
 
 
 namespace
 {
-    void check(const std::vector<Datum>& data)
+    template<u64 IN>
+    void check(const std::vector<Datum>& data, encoding::Encoding<IN, 2> encoding)
     {
-        auto encoding = encoding::create_huffman_encoder<256>();
-
-        io::MemoryBuffer<256, Datum> buffer1(data);
+        io::MemoryBuffer<IN, Datum> buffer1(data);
         io::MemoryBuffer<2> buffer2;
-        io::MemoryBuffer<256> buffer3;
+        io::MemoryBuffer<IN> buffer3;
 
         encoding::encode(buffer1.source(), encoding, buffer2.destination());
         encoding::decode(buffer2.source(), encoding, buffer3.destination());
@@ -30,12 +30,24 @@ namespace
     }
 }
 
-#define TEST(...) TEST_CASE("Huffman Encoding on { " #__VA_ARGS__ " }") { check(std::vector<Datum> { __VA_ARGS__ }); }
+#define TESTN(N, ...) TEST_CASE("Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check(std::vector<Datum> { __VA_ARGS__ }, encoding::create_huffman_encoder<N>()); } \
+                      TEST_CASE("Adaptive Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check(std::vector<Datum> { __VA_ARGS__ }, encoding::create_adaptive_huffman_encoder<N>()); }
 
-TEST(1, 2)
-TEST(1, 1, 2)
-TEST(1, 1, 2, 2)
-TEST(1, 2, 3, 2, 1)
-TEST(1, 1, 2, 3, 3, 4, 4, 4, 4, 3, 2, 1, 2, 3, 4)
+
+#define TEST4(...)   TESTN(4, __VA_ARGS__)
+#define TEST16(...)  TESTN(16, __VA_ARGS__)
+#define TEST256(...) TESTN(256, __VA_ARGS__)
+
+TEST4(0)
+TEST4(1)
+TEST4(0, 0)
+TEST4(0, 1)
+TEST256(0)
+TEST256(1)
+TEST256(1, 2)
+TEST256(1, 1, 2)
+TEST256(1, 1, 2, 2)
+TEST256(1, 2, 3, 2, 1)
+TEST256(1, 1, 2, 3, 3, 4, 4, 4, 4, 3, 2, 1, 2, 3, 4)
 
 #endif

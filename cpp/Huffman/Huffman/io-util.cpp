@@ -15,6 +15,8 @@ void io::transfer(io::InputStream& input, io::OutputStream& output, unsigned cou
 {
     while (count > 0)
     {
+        assert(!input.end_reached());
+
         auto x = input.read();
         output.write(x);
         --count;

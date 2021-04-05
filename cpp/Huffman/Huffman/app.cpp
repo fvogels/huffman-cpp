@@ -2,8 +2,7 @@
 
 #include <fstream>
 #include "encoding/encodings.h"
-#include "io/file-input-stream.h"
-#include "io/file-output-stream.h"
+#include "io/files.h"
 #include "io/io-util.h"
 #include <iostream>
 
@@ -17,25 +16,18 @@ int main()
     auto pipeline = encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
     
     {
-        io::Buffer<Datum> input_buffer;
-        io::Buffer<Datum> output_buffer;
-        auto input = io::create_file_input_stream(file_a);
-        transfer(*input, *input_buffer.create_output_stream());
+        auto input = io::create_file_data_source(file_a);
+        auto output = io::create_file_data_destination(file_b);
 
-        // auto output = io::create_file_output_stream(file_b);
-        auto output = output_buffer.create_output_stream();
-
-        pipeline->encode(*input_buffer.create_input_stream(), *output_buffer.create_output_stream());
-
-        std::cout << input_buffer.contents()->size() << " -> " << output_buffer.contents()->size();
+        encoding::encode(input, pipeline, output);
     }
 
-    //{
-    //    auto input = io::create_file_input_stream(file_b);
-    //    auto output = io::create_file_output_stream(file_c);
+    {
+        auto input = io::create_file_data_source(file_b);
+        auto output = io::create_file_data_destination(file_c);
 
-    //    pipeline->decode(*input, *output);
-    //}
+        encoding::decode(input, pipeline, output);
+    }
 }
 
 #endif

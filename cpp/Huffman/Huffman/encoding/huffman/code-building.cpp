@@ -21,14 +21,14 @@ namespace
             auto& leaf = static_cast<const data::Leaf<Datum>&>(node);
             auto& datum = leaf.value();
 
-            (*result)[datum] = prefix; // don't forget ()!
+            (*result)[datum] = prefix;
         }
     }
 }
 
 std::vector<std::vector<Datum>> encoding::huffman::build_codes(const data::Node<Datum>& tree, u64 domain_size)
 {
-    std::vector<std::vector<Datum>> result(domain_size + 1);
+    std::vector<std::vector<Datum>> result(domain_size);
     std::vector<Datum> prefix;
 
     ::build_codes(tree, prefix, &result);

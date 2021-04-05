@@ -11,6 +11,16 @@ void io::transfer(io::InputStream& input, io::OutputStream& output)
     }
 }
 
+void io::transfer(io::InputStream& input, io::OutputStream& output, unsigned count)
+{
+    while (count > 0)
+    {
+        auto x = input.read();
+        output.write(x);
+        --count;
+    }
+}
+
 void io::write_bits(u64 value, unsigned nbits, io::OutputStream& output)
 {
     assert((value >> nbits) == 0);

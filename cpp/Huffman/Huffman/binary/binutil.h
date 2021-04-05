@@ -2,8 +2,7 @@
 #define BINUTIL_H
 
 #include "defs.h"
-#include "io/input-stream.h"
-#include "io/output-stream.h"
+#include "io/streams.h"
 #include <vector>
 
 

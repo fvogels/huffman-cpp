@@ -1,8 +1,7 @@
 #ifndef TREE_ENCODING_H
 #define TREE_ENCODING_H
 
-#include "io/output-stream.h"
-#include "io/input-stream.h"
+#include "io/streams.h"
 #include "data/binary-tree.h"
 #include <memory>
 

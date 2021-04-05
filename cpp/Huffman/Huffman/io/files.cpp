@@ -1,5 +1,5 @@
-#include "io/file-streams.h"
-#include "io/input-stream.h"
+#include "io/files.h"
+#include "io/streams.h"
 #include "io/memory-buffer.h"
 #include <assert.h>
 #include <fstream>
@@ -29,6 +29,34 @@ namespace
             file << uint8_t(datum);
         }
     };
+
+    class FileDataSourceImplementation : public io::DataSourceImplementation
+    {
+    private:
+        std::string m_path;
+
+    public:
+        FileDataSourceImplementation(const std::string& path) : m_path(path) { }
+
+        std::unique_ptr<io::InputStream> create_input_stream() override
+        {
+            return io::create_file_input_stream(m_path);
+        }
+    };
+
+    class FileDataDestinationImplementation : public io::DataDestinationImplementation
+    {
+    private:
+        std::string m_path;
+
+    public:
+        FileDataDestinationImplementation(const std::string& path) : m_path(path) { }
+
+        std::unique_ptr<io::OutputStream> create_output_stream() override
+        {
+            return io::create_file_output_stream(m_path);
+        }
+    };
 }
 
 std::unique_ptr<io::InputStream> io::create_file_input_stream(const std::string& path)
@@ -48,5 +76,16 @@ std::unique_ptr<io::InputStream> io::create_file_input_stream(const std::string&
 std::unique_ptr<io::OutputStream> io::create_file_output_stream(const std::string& path)
 {
     return std::make_unique<FileOutputStream>(path);
+}
+
+io::DataSource<256> io::create_file_data_source(const std::string& path)
+{
+    return io::DataSource<256>(std::make_shared<FileDataSourceImplementation>(path));
+}
+
+
+io::DataDestination<256> io::create_file_data_destination(const std::string& path)
+{
+    return io::DataDestination<256>(std::make_shared<FileDataDestinationImplementation>(path));
 }
 

@@ -1,7 +1,7 @@
 #ifndef DATA_DESTINATION_H
 #define DATA_DESTINATION_H
 
-#include "io/output-stream.h"
+#include "io/streams.h"
 #include <memory>
 
 namespace io

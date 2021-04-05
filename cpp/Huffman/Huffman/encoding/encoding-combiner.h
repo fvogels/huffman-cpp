@@ -2,8 +2,7 @@
 #define ENCODING_COMBINER_H
 
 #include "encoding/encoding.h"
-#include "io/input-stream.h"
-#include "io/output-stream.h"
+#include "io/streams.h"
 #include "io/memory-buffer.h"
 #include <memory>
 

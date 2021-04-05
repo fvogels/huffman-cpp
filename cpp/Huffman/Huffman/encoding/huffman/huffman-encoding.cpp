@@ -2,7 +2,7 @@
 #include "encoding/huffman/tree-encoding.h"
 #include "data/frequency-table.h"
 #include "data/binary-tree.h"
-#include "io/input-stream.h"
+#include "io/streams.h"
 #include "io/io-util.h"
 #include "binary/binutil.h"
 #include "defs.h"

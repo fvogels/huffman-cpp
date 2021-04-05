@@ -48,10 +48,7 @@
     <ClInclude Include="encoding\huffman\tree-encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\input-stream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="io\output-stream.h">
+    <ClInclude Include="io\streams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\io-util.h">
@@ -63,7 +60,7 @@
     <ClInclude Include="encoding\encoding-combiner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\file-streams.h">
+    <ClInclude Include="io\files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\mapper.h">
@@ -81,16 +78,10 @@
     <ClInclude Include="tests\encoding\prediction\oracle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\file-data-source.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="io\data-source.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\data-destination.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="io\file-data-destination.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\memory-buffer.h">
@@ -140,7 +131,7 @@
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="io\file-streams.cpp">
+    <ClCompile Include="io\files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\prediction-encoding.cpp">
@@ -162,12 +153,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io-util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="io\file-data-source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="io\file-data-destination.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

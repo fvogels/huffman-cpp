@@ -1,7 +1,7 @@
 #ifndef DATA_SOURCE_H
 #define DATA_SOURCE_H
 
-#include "io/input-stream.h"
+#include "io/streams.h"
 #include <memory>
 
 

@@ -1,8 +1,7 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
-#include "io/input-stream.h"
-#include "io/output-stream.h"
+#include "io/streams.h"
 #include "io/data-source.h"
 #include "io/data-destination.h"
 #include "defs.h"

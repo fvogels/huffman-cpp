@@ -1,8 +1,7 @@
 #ifndef IO_UTIL_H
 #define IO_UTIL_H
 
-#include "io/input-stream.h"
-#include "io/output-stream.h"
+#include "io/streams.h"
 #include <vector>
 
 

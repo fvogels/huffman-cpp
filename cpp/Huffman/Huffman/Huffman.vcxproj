@@ -69,7 +69,7 @@
     <ClCompile Include="io-util.cpp" />
     <ClCompile Include="io\files.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />
-    <ClCompile Include="tests\data-structures\frequency-table-tests.cpp" />
+    <ClCompile Include="tests\data\frequency-table-tests.cpp" />
     <ClCompile Include="tests\data\type-selection.cpp" />
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp" />
     <ClCompile Include="tests\encoding\combinator-tests.cpp" />

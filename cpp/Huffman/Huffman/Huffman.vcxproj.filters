@@ -146,13 +146,10 @@
     <ClCompile Include="tests\encoding\prediction-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction\interver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tests\encoding\prediction\mapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction\inverter.cpp">
+    <ClCompile Include="encoding\inverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\combinator-tests.cpp">

@@ -78,8 +78,7 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
-    <ClCompile Include="tests\encoding\prediction\interver.cpp" />
-    <ClCompile Include="tests\encoding\prediction\inverter.cpp" />
+    <ClCompile Include="encoding\inverter.cpp" />
     <ClCompile Include="tests\encoding\prediction\mapper.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>

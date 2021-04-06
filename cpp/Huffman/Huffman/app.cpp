@@ -7,13 +7,21 @@
 #include <iostream>
 
 
+u64 file_size(const std::string& path)
+{
+    std::ifstream file(path);
+    file.seekg(0, std::ios::end);
+    return file.tellg();
+}
+
+
 int main()
 {
     const std::string file_a = R"(g:\temp\aaaaa\a.txt)";
     const std::string file_b = R"(g:\temp\aaaaa\b.txt)";
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
-    auto pipeline = encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
+    auto pipeline = encoding::create_adaptive_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
     
     {
         auto input = io::create_file_data_source(file_a);
@@ -24,10 +32,17 @@ int main()
 
     {
         auto input = io::create_file_data_source(file_b);
-        auto output = io::create_file_data_destination(file_c);
+        // auto output = io::create_file_data_destination(file_c);
+        io::MemoryBuffer<256> buffer;
+        auto output = buffer.destination();
 
-        encoding::decode(input, pipeline, output);
+        encoding::decode(input, pipeline, output);        
     }
+
+    auto uncompressed_size = file_size(file_a);
+    auto compressed_size = file_size(file_b);
+
+    std::cout << uncompressed_size << " -> " << compressed_size;
 }
 
 #endif

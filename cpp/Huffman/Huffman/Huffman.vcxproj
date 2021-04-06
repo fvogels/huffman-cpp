@@ -79,7 +79,7 @@
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
     <ClCompile Include="encoding\inverter.cpp" />
-    <ClCompile Include="tests\encoding\prediction\mapper.cpp" />
+    <ClCompile Include="encoding\mapper.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

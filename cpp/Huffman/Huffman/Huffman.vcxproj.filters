@@ -146,7 +146,7 @@
     <ClCompile Include="tests\encoding\prediction-encoding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction\mapper.cpp">
+    <ClCompile Include="encoding\mapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\inverter.cpp">

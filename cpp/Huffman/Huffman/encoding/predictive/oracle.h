@@ -6,7 +6,7 @@
 
 namespace encoding
 {
-    namespace prediction
+    namespace predictive
     {
         class Oracle
         {

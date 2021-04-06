@@ -1,17 +1,17 @@
-#include "encoding/prediction/prediction-encoding.h"
+#include "encoding/predictive/predictive-encoding.h"
 #include <assert.h>
 
 
 namespace
 {
-    class PredictiveEncodingImplementation : encoding::EncodingImplementation
+    class PredictiveEncodingImplementation : public encoding::EncodingImplementation
     {
     private:
         u64 m_domain_size;
-        std::unique_ptr<encoding::prediction::Oracle> m_oracle;
+        std::unique_ptr<encoding::predictive::Oracle> m_oracle;
 
     public:
-        PredictiveEncodingImplementation(u64 domain_size, std::unique_ptr<encoding::prediction::Oracle> oracle) : m_domain_size(domain_size), m_oracle(std::move(oracle))
+        PredictiveEncodingImplementation(u64 domain_size, std::unique_ptr<encoding::predictive::Oracle> oracle) : m_domain_size(domain_size), m_oracle(std::move(oracle))
         {
             // NOP
         }
@@ -59,13 +59,13 @@ namespace
             assert(predicted_datum < m_domain_size);
             assert(correction < m_domain_size);
 
-            assert(predicted_datum + correction < predicted_datum);
+            assert(predicted_datum + correction >= predicted_datum);
             return (predicted_datum + correction) % m_domain_size;
         }
     };
 }
 
-std::shared_ptr<encoding::EncodingImplementation> create_predictive_encoding_implementation(u64 domain_size, std::unique_ptr<encoding::prediction::Oracle> oracle)
+std::shared_ptr<encoding::EncodingImplementation> encoding::create_predictive_encoding_implementation(u64 domain_size, std::unique_ptr<encoding::predictive::Oracle> oracle)
 {
-    return std::make_shared<encoding::EncodingImplementation>(domain_size, std::move(oracle));
+    return std::make_shared<PredictiveEncodingImplementation>(domain_size, std::move(oracle));
 }

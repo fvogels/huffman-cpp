@@ -46,14 +46,17 @@
     <ClInclude Include="encoding\encoding.h" />
     <ClInclude Include="encoding\encodings.h" />
     <ClInclude Include="encoding\huffman\huffman-encoding.h" />
+    <ClInclude Include="encoding\predictive\constant-oracle.h" />
+    <ClInclude Include="encoding\predictive\oracles.h" />
+    <ClInclude Include="encoding\predictive\repeating-oracle.h" />
     <ClInclude Include="io\data-destination.h" />
     <ClInclude Include="io\data-source.h" />
     <ClInclude Include="io\files.h" />
     <ClInclude Include="io\streams.h" />
     <ClInclude Include="io\io-util.h" />
     <ClInclude Include="io\memory-buffer.h" />
-    <ClInclude Include="tests\encoding\prediction\oracle.h" />
-    <ClInclude Include="tests\encoding\prediction\prediction-encoding.h" />
+    <ClInclude Include="encoding\predictive\oracle.h" />
+    <ClInclude Include="encoding\predictive\predictive-encoding.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
@@ -66,8 +69,12 @@
     <ClCompile Include="encoding\huffman\tree-building.cpp" />
     <ClCompile Include="encoding\huffman\tree-encoding.cpp" />
     <ClCompile Include="encoding\move-to-front.cpp" />
+    <ClCompile Include="encoding\predictive\constant-oracle.cpp" />
+    <ClCompile Include="encoding\predictive\predictive-encoding.cpp" />
+    <ClCompile Include="encoding\predictive\repeating-oracle.cpp" />
     <ClCompile Include="io-util.cpp" />
     <ClCompile Include="io\files.cpp" />
+    <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />
     <ClCompile Include="tests\data\frequency-table-tests.cpp" />
     <ClCompile Include="tests\data\type-selection.cpp" />

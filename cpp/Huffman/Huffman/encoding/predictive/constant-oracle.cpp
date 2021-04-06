@@ -1,9 +1,9 @@
-#include "encoding/prediction/constant-oracle.h"
+#include "encoding/predictive/constant-oracle.h"
 
 
 namespace
 {
-    class ConstantOracleImplementation : public encoding::prediction::Oracle
+    class ConstantOracleImplementation : public encoding::predictive::Oracle
     {
     private:
         Datum m_datum;
@@ -26,7 +26,7 @@ namespace
     };
 }
 
-std::unique_ptr<encoding::prediction::Oracle> encoding::prediction::constant_oracle(Datum datum)
+std::unique_ptr<encoding::predictive::Oracle> encoding::predictive::constant_oracle(Datum datum)
 {
     return std::make_unique<ConstantOracleImplementation>(datum);
 }

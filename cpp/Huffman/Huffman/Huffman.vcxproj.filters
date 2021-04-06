@@ -69,10 +69,10 @@
     <ClInclude Include="encoding\inverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tests\encoding\prediction\prediction-encoding.h">
+    <ClInclude Include="encoding\predictive\predictive-encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tests\encoding\prediction\oracle.h">
+    <ClInclude Include="encoding\predictive\oracle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\data-source.h">
@@ -94,6 +94,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\huffman\decoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\predictive\constant-oracle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\predictive\repeating-oracle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\predictive\oracles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -171,6 +180,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\decoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\predictive\constant-oracle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\predictive\predictive-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\predictive\repeating-oracle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

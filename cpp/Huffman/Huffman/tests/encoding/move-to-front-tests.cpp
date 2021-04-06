@@ -33,14 +33,14 @@ namespace
     void check_slow(const std::vector<Datum>& data)
     {
         check(data, []() {
-            return encoding::move_to_front_encoding<256>();
+            return encoding::move_to_front<256>();
         });
     }
 
     void check_fast(const std::vector<Datum>& data)
     {
         check(data, []() {
-            return encoding::move_to_front_encoding_fast<256>();
+            return encoding::move_to_front_fast<256>();
         });
     }
 }

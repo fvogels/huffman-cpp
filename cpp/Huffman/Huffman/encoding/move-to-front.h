@@ -11,13 +11,13 @@ namespace encoding
     std::shared_ptr<encoding::EncodingImplementation> create_move_to_front_encoding_fast_implementation(u64 domain_size);
 
     template<unsigned N>
-    encoding::Encoding<N, N> move_to_front_encoding()
+    encoding::Encoding<N, N> move_to_front()
     {
         return Encoding<N, N>(create_move_to_front_encoding_implementation(N));
     }
 
     template<unsigned N>
-    encoding::Encoding<N, N> move_to_front_encoding_fast()
+    encoding::Encoding<N, N> move_to_front_fast()
     {
         return Encoding<N, N>(create_move_to_front_encoding_fast_implementation(N));
     }

@@ -46,9 +46,9 @@ namespace
     TEST(encoding, 97) \
     TEST(encoding, 97, 98, 97, 98, 97, 98)
 
-TEST_DATUMS(encoding::move_to_front_encoding<256>() | encoding::huffman_encoder<256>())
-TEST_DATUMS(encoding::move_to_front_encoding<256>() | encoding::huffman_encoder<256>() | encoding::move_to_front_encoding<2>())
-TEST_DATUMS(encoding::huffman_encoder<256>() | encoding::bit_grouper<8>())
-TEST_DATUMS(encoding::move_to_front_encoding<256>() | encoding::huffman_encoder<256>() | encoding::bit_grouper<8>())
+TEST_DATUMS(encoding::move_to_front<256>() | encoding::huffman_encoding<256>())
+TEST_DATUMS(encoding::move_to_front<256>() | encoding::huffman_encoding<256>() | encoding::move_to_front<2>())
+TEST_DATUMS(encoding::huffman_encoding<256>() | encoding::bit_grouper<8>())
+TEST_DATUMS(encoding::move_to_front<256>() | encoding::huffman_encoding<256>() | encoding::bit_grouper<8>())
 
 #endif

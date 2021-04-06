@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include "encoding/encodings.h"
+#include "encoding/predictive/oracles.h"
 #include "io/files.h"
 #include "io/io-util.h"
 #include <iostream>
@@ -21,7 +22,9 @@ int main()
     const std::string file_b = R"(g:\temp\aaaaa\b.txt)";
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
-    auto pipeline = encoding::create_adaptive_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
+    // auto pipeline = encoding::create_predictive_encoder<256>(encoding::predictive::repeating_oracle(0)) | encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
+    // auto pipeline = encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
+    auto pipeline = encoding::create_predictive_encoder<256>(encoding::predictive::repeating_oracle(0));
     
     {
         auto input = io::create_file_data_source(file_a);

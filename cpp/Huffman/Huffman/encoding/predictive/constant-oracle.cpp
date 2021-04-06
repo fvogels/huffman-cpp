@@ -23,6 +23,11 @@ namespace
         {
             return m_datum;
         }
+
+        void reset() override
+        {
+            // NOP
+        }
     };
 }
 

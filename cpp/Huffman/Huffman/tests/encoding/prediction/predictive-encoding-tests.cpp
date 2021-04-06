@@ -45,10 +45,12 @@ namespace
 
 #define TEST_ORACLE(oracle, ...) TEST_CASE("Predictive Encoding with " #oracle ": " #__VA_ARGS__) { check(oracle, std::vector<Datum> { __VA_ARGS__ } ); }
 
-#define TEST(...) TEST_ORACLE(constant(0), __VA_ARGS__) \
-                  TEST_ORACLE(constant(1), __VA_ARGS__) \
-                  TEST_ORACLE(repeat(0), __VA_ARGS__) \
-                  TEST_ORACLE(repeat(1), __VA_ARGS__) \
+#define TEST(...) \
+    TEST_ORACLE(constant(0), __VA_ARGS__) \
+    TEST_ORACLE(constant(1), __VA_ARGS__) \
+    TEST_ORACLE(repeat(0), __VA_ARGS__) \
+    TEST_ORACLE(repeat(1), __VA_ARGS__)
+
 
 TEST()
 TEST(0)

@@ -18,10 +18,13 @@ namespace
 
         void encode(io::InputStream& input, io::OutputStream& output) const override
         {
+            m_oracle->reset();
+
             while (!input.end_reached())
             {
                 auto actual_datum = input.read();
                 auto predicted_datum = m_oracle->predict();
+                m_oracle->tell(actual_datum);
                 auto correction = correct(actual_datum, predicted_datum);
                 output.write(correction);
             }
@@ -29,11 +32,14 @@ namespace
 
         void decode(io::InputStream& input, io::OutputStream& output) const override
         {
+            m_oracle->reset();
+
             while (!input.end_reached())
             {
                 auto correction = input.read();
                 auto predicted_datum = m_oracle->predict();
                 auto datum = apply_correction(predicted_datum, correction);
+                m_oracle->tell(datum);
                 output.write(datum);
             }
         }

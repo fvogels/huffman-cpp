@@ -6,10 +6,11 @@ namespace
     class RepeatingOracleImplementation : public encoding::predictive::Oracle
     {
     private:
+        Datum m_initial;
         Datum m_last_datum;
 
     public:
-        RepeatingOracleImplementation(Datum datum) : m_last_datum(datum)
+        RepeatingOracleImplementation(Datum datum) : m_initial(datum), m_last_datum(datum)
         {
             // NOP
         }
@@ -22,6 +23,11 @@ namespace
         Datum predict() const override
         {
             return m_last_datum;
+        }
+
+        void reset() override
+        {
+            m_last_datum = m_initial;
         }
     };
 }

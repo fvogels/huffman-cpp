@@ -13,8 +13,9 @@ namespace encoding
         public:
             virtual ~Oracle() { }
 
-            virtual void tell(Datum datum) = 0;
-            virtual Datum predict() const = 0;
+            virtual void reset()             = 0;
+            virtual void tell(Datum datum)   = 0;
+            virtual Datum predict() const    = 0;
         };
     }
 }

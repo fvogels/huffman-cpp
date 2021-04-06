@@ -11,7 +11,7 @@ namespace
     template<u64 GROUP_SIZE>
     void check(const std::vector<byte>& data)
     {
-        auto encoding = encoding::create_bit_grouper<GROUP_SIZE>();
+        auto encoding = encoding::bit_grouper<GROUP_SIZE>();
 
         io::MemoryBuffer<2> buffer1(data);
         io::MemoryBuffer<(1 << GROUP_SIZE)> buffer2;

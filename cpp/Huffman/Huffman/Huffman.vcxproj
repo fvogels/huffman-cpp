@@ -40,7 +40,6 @@
     <ClInclude Include="encoding\huffman\tree-building.h" />
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\inverter.h" />
-    <ClInclude Include="encoding\mapper.h" />
     <ClInclude Include="encoding\move-to-front.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="encoding\encoding.h" />
@@ -86,7 +85,6 @@
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
     <ClCompile Include="encoding\inverter.cpp" />
-    <ClCompile Include="encoding\mapper.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

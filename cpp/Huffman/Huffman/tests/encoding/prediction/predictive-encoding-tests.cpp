@@ -13,7 +13,7 @@ namespace
 {
     void check(std::unique_ptr<encoding::predictive::Oracle> oracle, const std::vector<Datum>& data)
     {
-        auto encoding = encoding::create_predictive_encoder<256>(std::move(oracle));
+        auto encoding = encoding::predictive_encoder<256>(std::move(oracle));
         io::MemoryBuffer<256, Datum> buffer1(data);
         io::MemoryBuffer<256> buffer2;
         io::MemoryBuffer<256> buffer3;

@@ -102,6 +102,9 @@
     <ClInclude Include="encoding\predictive\oracles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding\eof-encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -110,31 +113,13 @@
     <ClCompile Include="easylogging++.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\move-to-front.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\move-to-front-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\data\frequency-table-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\io\io-util-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="encoding\huffman\tree-encoding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\huffman-encoding.cpp">
@@ -143,22 +128,10 @@
     <ClCompile Include="encoding\bit-grouper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="io\files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction-encoding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="encoding\inverter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\encoding\combinator-tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\data\type-selection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="io-util.cpp">
@@ -185,7 +158,40 @@
     <ClCompile Include="encoding\predictive\repeating-oracle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="encoding\eof-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\combinator-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\data\frequency-table-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\data\type-selection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\bit-grouper-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\move-to-front-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction-encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\io\io-util-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

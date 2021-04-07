@@ -20,10 +20,9 @@ namespace
     {
         u64 m_domain_size;
         unsigned m_bits_per_datum;
-        Datum m_eof;
 
     public:
-        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_eof(domain_size), m_bits_per_datum(binary::bits_needed(domain_size + 1)) // +1 for eof
+        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
         {
             // NOP
         }
@@ -31,7 +30,6 @@ namespace
         void encode(io::InputStream& input, io::OutputStream& output) const override
         {
             auto copy = copy_to_vector(input);
-            copy.push_back(m_eof);
             auto frequencies = data::count_frequencies(copy);
             auto tree = encoding::huffman::build_tree(frequencies);
             auto codes = encoding::huffman::build_codes(*tree, m_domain_size + 1);
@@ -43,7 +41,7 @@ namespace
         void decode(io::InputStream& input, io::OutputStream& output) const override
         {
             auto tree = encoding::huffman::decode_tree(m_bits_per_datum, input);
-            encoding::huffman::decode_bits(input, *tree, output, m_bits_per_datum, m_eof);
+            encoding::huffman::decode_bits(input, *tree, output, m_bits_per_datum);
         }
 
     private:

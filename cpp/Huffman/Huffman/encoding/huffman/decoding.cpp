@@ -1,12 +1,11 @@
 #include "encoding/huffman/decoding.h"
 
 
-void encoding::huffman::decode_bits(io::InputStream& input, const data::Node<Datum>& tree, io::OutputStream& output, u64 domain_size, Datum eof)
+void encoding::huffman::decode_bits(io::InputStream& input, const data::Node<Datum>& tree, io::OutputStream& output, u64 domain_size)
 {
-    Datum datum;
-
-    while ((datum = encoding::huffman::decode_single_datum(input, tree, domain_size)) != eof)
+    while (!input.end_reached())
     {
+        auto datum = encoding::huffman::decode_single_datum(input, tree, domain_size);
         output.write(datum);
     }
 }
@@ -15,9 +14,8 @@ Datum encoding::huffman::decode_single_datum(io::InputStream& input, const data:
 {
     const data::Node<Datum>* current_node = &tree;
 
-    while (true)
+    while (!input.end_reached())
     {
-        assert(!input.end_reached());
         auto bit = input.read();
 
         assert(current_node->is_branch());
@@ -41,4 +39,6 @@ Datum encoding::huffman::decode_single_datum(io::InputStream& input, const data:
             return datum;
         }
     }
+
+    return 0;
 }

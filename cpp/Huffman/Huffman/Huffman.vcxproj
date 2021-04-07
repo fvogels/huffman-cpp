@@ -34,6 +34,7 @@
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
+    <ClInclude Include="encoding\eof-encoding.h" />
     <ClInclude Include="encoding\huffman\adaptive-huffman-encoding.h" />
     <ClInclude Include="encoding\huffman\decoding.h" />
     <ClInclude Include="encoding\huffman\code-building.h" />
@@ -61,6 +62,7 @@
     <ClCompile Include="app.cpp" />
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\bit-grouper.cpp" />
+    <ClCompile Include="encoding\eof-encoding.cpp" />
     <ClCompile Include="encoding\huffman\adaptive-huffman-encoding.cpp" />
     <ClCompile Include="encoding\huffman\decoding.cpp" />
     <ClCompile Include="encoding\huffman\code-building.cpp" />
@@ -73,8 +75,8 @@
     <ClCompile Include="encoding\predictive\repeating-oracle.cpp" />
     <ClCompile Include="io-util.cpp" />
     <ClCompile Include="io\files.cpp" />
-    <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
-    <ClCompile Include="tests\io\io-util-tests.cpp" />
+    <ClCompile Include="logging.cpp" />
+    <ClCompile Include="encoding\inverter.cpp" />
     <ClCompile Include="tests\data\frequency-table-tests.cpp" />
     <ClCompile Include="tests\data\type-selection.cpp" />
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp" />
@@ -82,9 +84,9 @@
     <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
-    <ClCompile Include="logging.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
-    <ClCompile Include="encoding\inverter.cpp" />
+    <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
+    <ClCompile Include="tests\io\io-util-tests.cpp" />
     <ClCompile Include="tests\tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

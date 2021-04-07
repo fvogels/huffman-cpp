@@ -8,5 +8,6 @@
 #include "encoding/bit-grouper.h"
 #include "encoding/inverter.h"
 #include "encoding/predictive/predictive-encoding.h"
+#include "encoding/eof-encoding.h"
 
 #endif

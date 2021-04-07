@@ -38,12 +38,8 @@ namespace
 #define TEST16(...)  TESTN(16, __VA_ARGS__)
 #define TEST256(...) TESTN(256, __VA_ARGS__)
 
-TEST4(0)
-TEST4(1)
-TEST4(0, 0)
 TEST4(0, 1)
-TEST256(0)
-TEST256(1)
+TEST256(0, 1)
 TEST256(1, 2)
 TEST256(1, 1, 2)
 TEST256(1, 1, 2, 2)

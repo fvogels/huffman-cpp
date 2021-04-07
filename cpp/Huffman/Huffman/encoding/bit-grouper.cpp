@@ -1,5 +1,7 @@
 #include "encoding/bit-grouper.h"
 #include "io/io-util.h"
+#include "binary/binutil.h"
+#include <assert.h>
 
 
 namespace

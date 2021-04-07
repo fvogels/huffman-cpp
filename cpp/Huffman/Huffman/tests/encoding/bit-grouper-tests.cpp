@@ -8,16 +8,17 @@
 
 namespace
 {
-    template<u64 GROUP_SIZE>
+    template<unsigned GROUP_SIZE>
     void check(const std::vector<byte>& data)
     {
+        constexpr auto domain_size = 1 << GROUP_SIZE;
         auto encoding = encoding::bit_grouper<GROUP_SIZE>();
 
         io::MemoryBuffer<2> buffer1(data);
-        io::MemoryBuffer<(1 << GROUP_SIZE)> buffer2;
+        io::MemoryBuffer<domain_size> buffer2;
         io::MemoryBuffer<2> buffer3;
 
-        encoding::encode<2, 1 << GROUP_SIZE>(buffer1.source(), encoding, buffer2.destination());
+        encoding::encode<2, domain_size>(buffer1.source(), encoding, buffer2.destination());
         encoding::decode(buffer2.source(), encoding, buffer3.destination());
 
         auto result = buffer3.data();

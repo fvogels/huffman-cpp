@@ -8,6 +8,8 @@
 #include <iostream>
 
 
+using namespace encoding;
+
 u64 file_size(const std::string& path)
 {
     std::ifstream file(path);
@@ -22,8 +24,7 @@ int main()
     const std::string file_b = R"(g:\temp\aaaaa\b.txt)";
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
-    // auto pipeline = encoding::create_predictive_encoder<256>(encoding::predictive::repeating_oracle(0)) | encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
-    auto pipeline = ~encoding::bit_grouper<8>() | encoding::bit_grouper<16>() | encoding::huffman_encoding<65536>() | encoding::bit_grouper<8>();
+    auto pipeline = eof_encoding<256>() | ~bit_grouper<257>() | bit_grouper<65537>() | huffman_encoding<65537>() | bit_grouper<256>();
     
     {
         auto input = io::create_file_data_source(file_a);

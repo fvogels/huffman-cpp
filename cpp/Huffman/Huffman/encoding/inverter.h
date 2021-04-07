@@ -12,7 +12,7 @@ namespace encoding
     template<u64 IN, u64 OUT>
     encoding::Encoding<OUT, IN> operator ~(const Encoding<IN, OUT>& encoding)
     {
-        return Encoding<IN, OUT>(create_combiner_implementation(encoding.implementation()));
+        return Encoding<OUT, IN>(create_combiner_implementation(encoding.implementation()));
     }
 }
 

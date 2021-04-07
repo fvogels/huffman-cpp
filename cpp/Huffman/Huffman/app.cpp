@@ -23,7 +23,7 @@ int main()
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
     // auto pipeline = encoding::create_predictive_encoder<256>(encoding::predictive::repeating_oracle(0)) | encoding::create_huffman_encoder<256>() | encoding::create_bit_grouper<8>();
-    auto pipeline = encoding::huffman_encoding<256>() | encoding::bit_grouper<8>();
+    auto pipeline = ~encoding::bit_grouper<8>() | encoding::bit_grouper<16>() | encoding::huffman_encoding<65536>() | encoding::bit_grouper<8>();
     
     {
         auto input = io::create_file_data_source(file_a);
@@ -34,9 +34,9 @@ int main()
 
     {
         auto input = io::create_file_data_source(file_b);
-        // auto output = io::create_file_data_destination(file_c);
-        io::MemoryBuffer<256> buffer;
-        auto output = buffer.destination();
+        auto output = io::create_file_data_destination(file_c);
+        // io::MemoryBuffer<256> buffer;
+        // auto output = buffer.destination();
 
         encoding::decode(input, pipeline, output);        
     }

@@ -1,0 +1,5 @@
+# Overview
+
+When dealing with lossless compression, compression and decompression are each other's exact opposites.
+
+image::compression-diagram.svg[Static,align="center"]

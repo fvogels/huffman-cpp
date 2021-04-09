@@ -1,0 +1,80 @@
+require 'asciidoctor'
+require 'asciidoctor/extensions'
+require 'fileutils'
+require 'pathname'
+require_relative 'scripts/asciidoc-task'
+
+
+
+def corresponding_dist_path(path)
+  path.sub(/^src/, 'dist')
+end
+
+
+def compile_asciidoc(source, destination)
+  puts "#{source} -> #{destination}"
+
+  destination.dirname.mkpath
+
+  attributes = {
+    'nofooter' => true,
+    'source-highlighter' => 'pygments',
+    'stem' => 'latexmath'
+  }
+
+  Asciidoctor.convert_file(source.to_s, safe: :safe, backend: 'html', to_file: destination.to_s, attributes: attributes)
+end
+
+def compile_graphviz(source, destination)
+  `dot -Tsvg #{source.to_s} -o #{destination.to_s}`
+end
+
+
+
+Rake::FileList.new('src/**/*.asciidoc').then do |asciidoc_files|
+  html_files = asciidoc_files.pathmap('%{^src/,dist/}X.html')
+
+  asciidoc_files.zip(html_files).each do |asciidoc_file, html_file|
+    source = Pathname.new asciidoc_file
+    target = Pathname.new html_file
+
+    desc "Compile #{asciidoc_file}"
+    file html_file => asciidoc_file do
+      compile_asciidoc(source, target)
+    end
+  end
+
+  desc 'Compiles all asciidocs to htmls'
+  task :asciidoc => html_files
+end
+
+
+Rake::FileList.new('src/**/*.gv').then do |graphviz_files|
+  svg_files = graphviz_files.pathmap('%{^src/,dist/}X.svg')
+
+  graphviz_files.zip(svg_files).each do |graphviz_file, svg_file|
+    source = Pathname.new graphviz_file
+    target = Pathname.new svg_file
+
+    desc "Compile #{graphviz_file}"
+    file svg_file => graphviz_file do
+      compile_graphviz(source, target)
+    end
+  end
+
+  desc 'Compiles graphviz to svg'
+  task :graphviz => svg_files
+end
+
+desc 'Removes dist'
+task :clean do
+  FileUtils.rm_rf 'dist'
+end
+
+desc 'Performs a build'
+task :build => [ :asciidoc, :graphviz ]
+
+desc 'Performs clean build'
+task :cleanbuild => [ :clean, :build ]
+
+task :default => [ :build ]

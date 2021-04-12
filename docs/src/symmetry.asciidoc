@@ -1,0 +1,120 @@
+:toc: left
+
+# Symmetry
+
+## Invertible Operations
+
+When dealing with compression, we deal with two distinct operations: compression and decompression.
+
+image::compression-decompression.svg[Static,align="center"]
+
+When dealing with a _lossless_ compression algorithm, these operations are each other's exact opposites, meaning that they perfectly undo each other's effect.
+If we combine both operations in a single pipeline, as shown below, the whole is equivalent with a no-operation, i.e., the output is exactly the same as the input, as if we did nothing at all.
+
+image::compression-diagram.svg[Static,align="center"]
+
+[IMPORTANT]
+====
+We will use the notation O^-1^ to denote the inverse of operation O.
+This means that O^-1^(O(x)) will be equal to x.
+====
+
+.Compression and decompression as inverse operations
+[example]
+====
+Say that we use C to denote compression, then C^-1^ would be decompression.
+C^-1^(C(data)) means "we compress data and then we decompress it again".
+We of course want to outcome of this series of operations to be equal to the original data again.
+====
+
+## Testing Invertible Operations
+
+This property of symmetry comes in handy for testing.
+Typically, unit test focus on each operation separately:
+
+[source,language='python']
+----
+def test_compression():
+    data = [0, 0, 0, 0]
+    actual = compress(data)
+    expected = ???
+    assert expected == actual
+
+def test_decompression():
+    compressed_data = [1, 0, 1, 1, 0, 1]
+    actual = decompress(compressed_data)
+    expected = ???
+    assert expected == actual
+----
+
+However, to write such tests, we need to specify what the expected values are.
+More specifically, we would need to perform the compression and decompression by hand and put these manually obtained results in our tests.
+This requires a lot of effort.
+
+Fortunately, we can avoid this by leveraging the operations' symmetric nature and writing our tests as follows:
+
+[source,language='python']
+----
+def test_compression(original_data):
+    result = decompress(compress(original_data))
+    assert data == result
+
+test_compression([0,0,0,0])
+----
+
+This approach allows us to easily write many tests: we simply need to call `test_compression` with many different argument values.
+For example, we could simply generate all possible inputs up to a certain length:
+
+[source,language='python']
+----
+from itertools import product
+
+for data_length in range(max_data_length):
+    for data in product(range(256), repeat=data_length):
+        test_compression(data)
+----
+
+Assuming that input is given as a list of bytes, i.e., numbers whose value range from `0` to `255`, the code above relies on https://docs.python.org/3/library/itertools.html#itertools.product[`itertools.product`] to generate all possible inputs up to size `max_data_length`.
+Each of these possible inputs is fed to `test_compression` in turn.
+In other words, we can thoroughly test our compression/decompression code by automatically generating tests.
+
+[NOTE]
+====
+One could object to this approach by pointing out it is far too easy to write fake `compress` and `decompress` functions that pass the test:
+
+[source,language='python']
+----
+def compress(data):
+    return data
+
+def decompress(data):
+    return data
+----
+
+While such an dummy implementation is indeed a possibility, this is merely shooting in your own foot.
+Tests can generally assume the implementer is well intentioned and actually wants to write working code.
+====
+
+## Leveraging Symmetry
+
+Testing as described above can only happen when both Huffman encoding and decoding are fully implemented.
+This is rather risky: we would rather be able to perform tests every step along the way.
+Fortunately, we can split up the encoding and decoding in suboperations, each of which are also inverses of each other:
+
+image::decomposing.svg[Static,align="center"]
+
+Dividing it up as shown above allows us to choose an implementation order that lets us perform tests often:
+
+[.center,%header,cols="^,^",width="50%"]
+|===
+| Wrong Approach | Right Approach
+| A | A
+| B | A^-1^
+| | Test A^-1^(A(x)) == x
+| C | B
+| A^-1^ | B^-1^
+| | Test B^-1^(B(x)) == x
+| B^-1^ | C
+| C^-1^ | C^-1^
+| Test C^-1^(B^-1^(C^-1^(C(B(A(x)))))) | Test C^-1^(C(x)) == x
+|===

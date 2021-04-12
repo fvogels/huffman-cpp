@@ -26,7 +26,7 @@ def compile_asciidoc(source, destination)
 end
 
 def compile_graphviz(source, destination)
-  `dot -Tsvg #{source.to_s} -o #{destination.to_s}`
+  sh "dot -Tsvg #{source.to_s} -o #{destination.to_s}"
 end
 
 

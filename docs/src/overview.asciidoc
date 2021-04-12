@@ -1,5 +1,19 @@
 # Overview
 
-When dealing with lossless compression, compression and decompression are each other's exact opposites.
+For this project, you will have to implement https://en.wikipedia.org/wiki/Huffman_coding[Huffman encoding], a commonly used data compression technique.
+While conceptually Huffman encoding is not difficult to understand, implementing it can prove difficult if you are careless.
+One of the goals of this project is to force you to take small steps and create the habit of checking your work as often as possible.
+If you write 50 lines of code and find out it doesn't work as expected, you will have 50 lines of code to check.
+If, however, you make sure to check your code every 10 lines, you only need to check those 10.
+It is important to limit the amount of code you need to verify in case of a bug, _especially_ when using C++.
 
-image::compression-diagram.svg[Static,align="center"]
+When tackling a problem of nontrivial size, you need to find ways to reduce its complexity.
+For this project, there are three ways to help you achieve this:
+
+* You get this guide.
+  It decomposes the task at hand in many smaller parts.
+  It should help you find out what components to make and how to make these different components work together.
+* You get a working Python implementation.
+  Studying it will help you better understand how things work.
+  It can also help you in debugging: you can use it to compare intermediate results between your code and mine.
+* Huffman encoding lends itself well to testing: as explained later, it is easy to thoroughly test your code.

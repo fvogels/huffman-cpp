@@ -1,0 +1,28 @@
+digraph G {
+    node [shape="box"];
+    rankdir=LR;
+
+    subgraph cluster_compression
+    {
+        A -> B;
+        B -> C;
+        label="compression";
+        style="filled";
+        color=lightgray;
+    }
+
+    subgraph cluster_decompression
+    {
+        CI -> BI;
+        BI -> AI;
+        label="decompression";
+        color=lightgray;
+        style="filled";
+
+        AI [label=<A<SUP>-1</SUP>>];
+        BI [label=<B<SUP>-1</SUP>>];
+        CI [label=<C<SUP>-1</SUP>>];
+    }
+
+    C -> CI;
+}

@@ -1,0 +1,362 @@
+:toc: left
+:cpp: C++
+
+# Assertions
+
+[NOTE]
+====
+The term "assertion" might sound familiar to you: the word is often used by unit test libraries such as `assertEquals` and `assertTrue`.
+In this context, however, assertions have a very specific meaning, unrelated to unit testing.
+====
+
+When you write code, you want to check if it works.
+In this section, we introduce the concept of _assertions_.
+Assertions serve the same purpose as tests, but do so in a very different way.
+
+[IMPORTANT]
+====
+Assertions do *not* replace tests.
+They are an _additional_ aid in checking correctness.
+Testing and assertions each have their advantages and drawbacks.
+You can combine their strengths by relying on both.
+====
+
+## Checking One's Work
+
+You have just implemented a function.
+What's the next step?
+
+* An (overconfident) beginner will simply start working on the next function.
+  Confidence, however, is not a good trait for programmers: always check everything as you go.
+* More humble beginners will probably write some code that directly calls this function and print out the results to the console.
+  This way, they check a small number of specific cases and verify the results manually.
+  However, the testing code is quite short-lived: it is often deleted to make place for new testing code.
+* A more advanced programmer will write actual tests.
+  Their greatest advantage their persistence: the tests remain available and can be run whenever a nontrivial change is made to the code base.
+  This way we can remain confident that whatever change we made did not break anything.
+
+## Self Checking Code
+
+Say you are writing a sorting function.
+This is a nontrivial task.
+We better make sure our code works correctly.
+
+### Tests
+
+Using tests, your code could look as follows:
+
+[source,language=python]
+----
+# Important code
+def sort(xs):
+    ...
+    return result
+
+
+# Tests
+def test_sort_empty_list():
+    input = []
+    expected = []
+    actual = sort(input)
+    must_be_equal(expected, actual)
+
+def test_sort_singleton_list():
+    input = [1]
+    expected = [1]
+    actual = sort(input)
+    must_be_equal(expected, actual)
+
+def test_sort_multiple_items():
+    input = [1, 3, 5, 7, 6, 2, 4]
+    expected = [1, 2, 3, 4, 5, 6, 7]
+    actual = sort(input)
+    must_be_equal(expected, actual)
+----
+
+In the code above, we can distinguish three aspects of the tests:
+
+* The tests provide test inputs.
+* The tests contain hardcoded expected results.
+* The tests check that the actual results match the expected results.
+
+### Solving vs Verifying
+
+A short theoretical detour: let's make the distinction between _finding_ a solution and _verifying_ a solution.
+In our case,
+
+* the problem to be solved is "sort this list";
+* finding the solution means "actually sort the list";
+* verifying the solution means "does the resulting list have the same elements as the original list and are they ordered as intended?"
+
+You can see that _verification_ is easier to implement than _solving_.
+This frequently occurs in the world of algorithms.
+
+[%collapsible]
+.Example: Square Root
+====
+[example]
+=====
+A square root can easily be verified by squaring its results.
+
+[source,language='python']
+----
+result = sqrt(n)
+is_correct = result ** 2 == n
+----
+=====
+====
+
+[%collapsible]
+.Example: Maximum
+====
+[example]
+=====
+To verify a `maximum(ns)` function, we must perform two checks:
+
+* The result must be an element of `ns`.
+* The result must be greater or equal to each element of `ns`.
+
+[source,language='python']
+----
+result = maximum(ns)
+is_correct = result in ns and all(result >= n for n in ns)
+----
+=====
+====
+
+
+[%collapsible]
+.Example: Cryptography
+====
+[example]
+=====
+Encryption is an extreme example of how "unbalanced" the solving vs verifying can be.
+Say the problem is "here is an encrypted message, find the encryption key so as to decrypt the message".
+
+* _Solving_ corresponds to finding the encryption key.
+  The encryption algorithm is designed in such a way that this would take multiple times the age of the universe if all currently available computing power is harnessed just for this problem.
+* _Verifying_ corresponds to you having the encryption key and simply use it to decrypt the message.
+  This is very efficient: think of the gigabytes of encrypted data we receive daily from the internet.
+=====
+====
+
+### No More Expectations
+
+We could rewrite our tests as follows:
+
+[source,language=python]
+----
+# Important code
+def sort(xs):
+    ...
+    return result
+
+def contains_same_elements(xs, ys):
+    '''Checks that xs and ys contain the same elements'''
+    return Counter(xs) == Counter(ys)
+
+def is_ordered(xs):
+    '''Checks that all elements in xs occur in non-decreasing order'''
+    return all(x <= y for x, y in zip(xs, xs[1:]))
+
+
+# Tests
+def test_sort(input):
+    sorted_input = sort(input)
+    must_be_true(contains_same_elements(input, sorted_input))
+    must_be_true(is_ordered(sorted_input))
+
+test_sort([])
+test_sort([1])
+test_sort([1, 3, 5, 7, 6, 2, 4])
+----
+
+The expected outputs need not be determined manually anymore: instead, we let the machine verify its own results using `contains_same_elements` and `is_ordered`.
+
+* The tests provide test inputs.
+* The tests verify the obtained results.
+
+### Moving the Checks
+
+Now let's try something crazy.
+The result-checking code currently resides in the tests.
+Let's move it into the sorting function:
+
+[source,language=python]
+----
+# Important code
+def sort(xs):
+    ...
+
+    # Check results before returning
+    must_be_true(contains_same_elements(input, sorted_input))
+    must_be_true(is_ordered(sorted_input))
+    return result
+
+def contains_same_elements(xs, ys):
+    '''Checks that xs and ys contain the same elements'''
+    return Counter(xs) == Counter(ys)
+
+def is_ordered(xs):
+    '''Checks that all elements in xs occur in non-decreasing order'''
+    return all(x <= y for x, y in zip(xs, xs[1:]))
+
+
+# Tests
+sort([])
+sort([1])
+sort([1, 3, 5, 7, 6, 2, 4])
+----
+
+Now the tests have only one remaining responsibility:
+
+* The tests provide the test inputs.
+
+### Getting Rid of the Tests Altogether
+
+Right now, we still need the tests to provide actual inputs to test our `sort` function on.
+However, we probably wrote `sort` for a reason: it's reasonable to assume that some other piece of code calls `sort`.
+The caller must provide its own list to be sorted, thereby providing inputs to `sort`.
+So, there really is no need for tests anymore: we let the program provide its own inputs instead!
+If you want to know if your code works, simply run the program and it'll test itself.
+
+## Assertions
+
+What is an assertion exactly?
+This question requires a nuanced answer, as it would be easy to use assertions in places where they don't belong.
+
+An assertion can be interpreted as a sanity check: it's code checking itself.
+If the assertion condition were to evaluate to false, it must mean a _bug_ was encountered.
+In our `sort` example, if either check `contains_same_elements` or `is_ordered`, it clearly means the sorting algorithm contains a mistake.
+
+When an assertion fails, the program should _crash_.
+There is no point in trying to continue: the results are _wrong_.
+Trying to recover from an assertion error makes absolutely no sense: what would you do?
+Keep sorting again until it gets through the checks?
+Assertion errors are _unrecoverable_.
+
+### Implementation
+
+Assertions can come in handy when using {cpp}: so many things can go wrong, and when they do, they do so dramatically.
+Here are are few examples where assertions should be used:
+
+* When receiving a pointer, check that it is indeed not `nullptr`.
+* When indexing an array, check that the index is within range.
+* When dividing, ensure that the divider is not `0`.
+* Where possible, have functions check their own results, as we did above with `sort`.
+
+One could wonder why {cpp} doesn't have those checks built-in, such as is the case for most with Java.
+The answer is always the same: {cpp} is obsessed with speed and those checks don't come for free.
+But then why introduce them ourselves?
+Are we then not working against the language?
+
+Assertion checking can typically be turned off.
+In {cpp}, this is achieved by leveraging the preprocessor.
+We distinguish two kinds of builds: debug build and release build.
+Our code can detect which build is active: in release build, the `NDEBUG` macro is defined.
+This allows us to write
+
+[source,language='cpp']
+----
+#ifdef NDEBUG
+// only seen by compiler in release build
+#else
+// only seen by compiler in debug build
+#endif
+----
+
+We can then proceed to write the `assert` macro:
+
+[source,language='cpp']
+----
+#ifdef NDEBUG
+#define assert(condition) /* no nothing */
+#else
+#define assert(condition) if ( !(condition) ) abort();
+#endif
+----
+
+* In debug build, `assert(condition)` will be replaced by an actual check that will abort if `condition` evaluates to false.
+* In release build, `assert(condition)` will simply be removed.
+
+Luckily, this `assert` macro is part of the https://en.cppreference.com/w/c/error/assert[standard library], i.e., you do not need to define it yourself.
+You only need to include `assert.h` in each `.cpp` file in which you make use of `assert`.
+
+Assertions are not specific to {cpp}: many other languages support them in one way or another.
+
+[%collapsible]
+.Assertions in Java
+====
+=====
+Whereas {cpp} relies on the preprocessor to introduce assertions, Java has them https://docs.oracle.com/javase/7/docs/technotes/guides/language/assert.html[built-in]:
+
+[source,language="java"]
+----
+assert condition;
+----
+
+will throw an `AssertionError` if `condition` evaluates to `false`.
+
+Note, however, that assertions are off by default.
+You need to explicitly enable them by passing the `-ea` flag (enable assertions) to the JVM.
+=====
+====
+
+[%collapsible]
+.Assertions in C#
+====
+=====
+The `System.Diagnostics.Debug` class contains a static https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.debug.assert[Assert] method.
+
+[source,language="csharp"]
+----
+Debug.Assert(condition);
+----
+
+The fact that it looks like a regular method call can be misleading.
+If it were a regular method call, the `condition` argument would still be evaluated in release mode, which is what we want to avoid for the sake of performance.
+However, the `Assert` method has a special attribute attached to it which makes the compiler recognize it as something that needs to be fully omitted in release build.
+=====
+====
+
+[%collapsible]
+.Assertions in Python
+====
+=====
+Like Java, Python has a https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement[special syntax] for assertions:
+
+[source,language="python"]
+----
+assert condition
+----
+
+This statement raises an `AssertionError` if `condition` evaluates to a falsey value.
+
+Assertions are turned on by default.
+They can be removed when optimization is turned on using https://docs.python.org/3/using/cmdline.html#cmdoption-o[`-O` command line flag].
+=====
+====
+
+## Usage
+
+* Be generous with assertions.
+* Make your assumptions explicit by using assertions.
+* Where possible, verify the results of your code.
+* Some https://docs.oracle.com/javase/7/docs/technotes/guides/language/assert.html[sources] say not to use assertions to perform parameter checking in publicly accessible functions.
+  Instead, they should rather advise not to rely _solely_ on assertions in these situations: you could have _both_ an assertion and an `if-throw`.
+  This way, you indicate that violating the rule is a _bug_ and you prevent code from trying to recover by catching the exception.
+* When your program crashes, you want to know exactly which condition fails.
+  This means you should not combine multiple conditions using `&&`, but instead put every condition in its own `assert`.
+* The assertion condition must have not side effects, i.e., it must not modify the state of variables.
+  You do not want the behavior of your code to change when you turn assertions off.
+
+## Comparison
+
+* Assertions don't require test inputs: the program provides its own while running.
+* Contrary to tests, which are fully automated, checking using assertions requires manual work.
+  This follows from the fact that your assertion checks are only performed when execution actually reaches them, meaning you have to force the application to run through that specific code you want checked by entering data and making the application sort it.
+  This is a major disadvantage.
+* Assertion require the results to be easily verified.
+* Assertions require the verification code itself to be correct whereas tests require the expected results to be correct.
+  Which is easiest to achieve depends on the situation.
+* Assertions can be placed deep inside your code (e.g., private methods) whereas tests can't reach there.

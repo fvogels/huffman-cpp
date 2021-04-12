@@ -1,13 +1,15 @@
 digraph G {
     rankdir=LR
 
+    compressed2 [label="compressed data",shape="none"];
+    decompression [shape="box"];
+    output [label="data",shape="none"];
+    compressed2 -> decompression;
+    decompression -> output;
+
     data [shape="none"];
     compression [shape="box"];
     compressed [label="compressed data",shape="none"];
-    decompression [shape="box"];
-    output [label="data",shape="none"];
     data -> compression;
     compression -> compressed;
-    compressed -> decompression;
-    decompression -> output;
 }

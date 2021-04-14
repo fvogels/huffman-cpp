@@ -1,0 +1,123 @@
+:toc: left
+:experimental:
+
+# Setting Things Up
+
+## Getting the Starter Code
+
+First, you must download your starter code.
+This is done through GitHub Classroom.
+You will find the link to the assignment on Toledo.
+After you have accepted the assignment, a fork repository will be created for you.
+Note the URL and use it to clone the repository.
+
+[TASK]
+====
+Clone your repository.
+
+[source,language="bash"]
+----
+$ git clone URL
+----
+====
+
+## Getting Acquainted
+
+### Opening the Solution
+
+[TASK]
+====
+Open the solution file named `huffman.sln` in Visual Studio.
+Do *not* open the project as a folder as nothing will work then.
+====
+
+### Solution Explorer
+
+Find the Solution Explorer pane.
+It should be open on the right, but it could be hidden or simply somewhere else.
+By default, it shows a list containing
+
+* Header Files
+* Resource Files
+* Source Files
+
+This view is not interesting to us.
+
+[TASK]
+====
+At the top of the Solution Explorer, find the button "Show All Files" and click on it.
+You should now see actual folders and files such as `app.cpp`, `catch.hpp` and son on.
+====
+
+### Builds
+
+In the toolbar at the top of the screen, you should see a dropdown box with items `Debug`, `Release` and `Testing`.
+These represent the three different builds.
+
+* Debug build will start executing in the `main` function defined in `app.cpp`.
+  All safety checks will be active, meaning your code will run slowly.
+* Release build will also start executing in the `main` function defined in `app.cpp`.
+  No safety checks will be ran during execution and your code will be optimized.
+* Testing build is set up to define the `TEST_BUILD` macro.
+  Using this build will cause the tests to be ran.
+  The `main` function in `app.cpp` will be ignored: the testing framework has its own `main` function which is hidden from your eyes.
+
+[TASK]
+====
+* Pick debug build.
+* Run the project (kbd:[CTRL+F5]).
+* A message `You are running the debug build` should be shown.
+* Go look in `app.cpp` to see where the code showing this message resides.
+====
+
+[TASK]
+====
+* Pick release build.
+* Run the project (kbd:[CTRL+F5]).
+* A message `You are running the release build` should be shown.
+====
+
+[TASK]
+====
+* Pick testing build.
+* Run the project (kbd:[CTRL+F5]).
+* One test should pass, one test should fail.
+* Go take a look in `tests/example-tests.cpp`.
+* Remove the failing test.
+====
+
+[NOTE]
+====
+Feel free to remove `example-tests.cpp`.
+However, we suggest you hold on to it for now: you can use it as a template for other test files later on.
+
+Realize that there are two ways to remove a file:
+
+* You can remove it from the project.
+  It will be ignored by the compiler, but the file still exists on your drive and will be shown in the Solution Explorer, albeit with a red symbol next to it meaning it's not part of the project.
+* You can remove it from your drive.
+  This of course also removes it from your project.
+
+If you want to remove the example tests, we advise to use the second way: there is no point in keeping the file itself around and have it pollute your Solution Explorer.
+Remember that you can always use git to bring it back.
+====
+
+## Debugging
+
+There are two ways to run your code:
+
+* Using "Start Debugging" (using kbd:[F5] or pressing the play button in the toolbar): execution will stop at breakpoints.
+* Using "Start Without Debugging" (using kbd:[CTRL+F5]): execution will ignore breakpoints.
+
+If you need to debug your code, we suggest the following approach:
+
+* Activate testing build.
+* Have a small test ready which you expect to trigger the bug
+* Add a breakpoint at the start of this test (left click in the margin).
+* Start debugging (kbd:[F5]).
+
+[IMPORTANT]
+====
+While it is certainly possible to do so, we advise you to *not* debug your code in release build.
+Use debug or testing build instead.
+====

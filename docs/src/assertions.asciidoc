@@ -340,6 +340,8 @@ They can be removed when optimization is turned on using https://docs.python.org
 ## Usage
 
 * Be generous with assertions.
+* When you find out some piece of code contains a bug, think of where you can add assertions.
+  These will help pinpoint the problem.
 * Make your assumptions explicit by using assertions.
 * Where possible, verify the results of your code.
 * Some https://docs.oracle.com/javase/7/docs/technotes/guides/language/assert.html[sources] say not to use assertions to perform parameter checking in publicly accessible functions.

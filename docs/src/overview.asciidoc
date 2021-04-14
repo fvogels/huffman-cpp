@@ -8,12 +8,13 @@ If, however, you make sure to check your code every 10 lines, you only need to c
 It is important to limit the amount of code you need to verify in case of a bug, _especially_ when using C++.
 
 When tackling a problem of nontrivial size, you need to find ways to reduce its complexity.
-For this project, there are three ways to help you achieve this:
+For this project, there are multiple ways to help you achieve this:
 
 * You get this guide.
-  It decomposes the task at hand in many smaller parts.
+  It divides up the task at hand in many smaller parts.
   It should help you find out what components to make and how to make these different components work together.
 * You get a working Python implementation.
   Studying it will help you better understand how things work.
-  It can also help you in debugging: you can use it to compare intermediate results between your code and mine.
+  It can also help you in debugging: you can use it to compare intermediate results.
 * Huffman encoding lends itself well to testing: as explained later, it is easy to thoroughly test your code.
+* Rely heavily on assertions.

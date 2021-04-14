@@ -1,0 +1,29 @@
+# Include Guards
+
+Include guards prevent header files from being included more than once.
+
+We associate a unique macro with each header file.
+Typically, this macro is chosen to be the same as the header file's name in all caps with some underscores thrown in.
+For example, for `example-file.h` we would use `EXAMPLE_FILE_H`.
+
+Each header file then starts by checking if this macro has already been defined.
+
+* If so, it means the header file has already been included in the past and the rest of the file should be skipped.
+* If not, the macro is defined straight away.
+
+In code, it looks as follows:
+
+.example-file.h
+[source,language="cpp"]
+----
+#ifndef EXAMPLE_FILE_H
+#define EXAMPLE_FILE_H
+
+// Contents
+
+#endif
+----
+
+## Further Reading
+
+* https://en.wikipedia.org/wiki/Include_guard[Wikipedia]

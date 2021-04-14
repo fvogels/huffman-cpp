@@ -1,0 +1,45 @@
+:toc: left
+
+# FrequencyTable
+
+## Context
+
+The first thing (nonadaptive) Huffman encoding needs to do is count the frequencies of each byte in its input stream.
+We will create a class `FrequencyTable` to assist us in this task.
+
+## Intended Usage
+
+[source,language="cpp"]
+----
+// Create new frequency table to count chars
+FrequencyTable<char> freqtable;
+
+// Count 'a' one time
+freqtable.increment('a');
+
+// Count 'b' twice
+freqtable.increment('b');
+freqtable.increment('b');
+
+// Query frequencies
+freqtable['a']  // -> 1
+freqtable['b']  // -> 2
+freqtable['c']  // -> 0
+
+// Ask for list of values
+std::vector<char> letters = freqtable.values(); // -> { 'a', 'b' }
+----
+
+## Implementation
+
+[TASK]
+====
+* In the Solution Explorer, create a folder `data`.
+* In this folder, add a new file `frequency-table.h`.
+* Add <<include-guards#,include guards>>.
+* Start a <<namespaces#,namespace>> named `data`.
+  All further `FrequencyTable` related code will reside within this namespace.
+====
+
+We want our `FrequencyTable` to be flexible and not hardcode it to use a specific type.
+Therefore, we chose to make it a template class.

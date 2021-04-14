@@ -1,0 +1,31 @@
+# Namespaces
+
+Namespaces serve a similar purpose to packages in Java: they help organize your code.
+Java demands that a package `foo` resides in a directory `foo`.
+C++ has no such limitation, but we'll follow the same rule anyway: everything residing in a namespace `foo` will be placed in a folder named `foo`.
+
+.foo.h
+[source,language="cpp"]
+----
+namespace foo
+{
+    // Declaration
+    void bar();
+}
+----
+
+.foo.cpp
+[source,language="cpp"]
+----
+// Definition
+void foo::bar()
+{
+    // body of bar
+}
+----
+
+[IMPORTANT]
+====
+When defining a function `bar` in a namespace `foo`, do not forget to qualify the function name with its namespace!
+More specifically, notice how the definition mentions `foo::bar`, not just `bar`.
+====

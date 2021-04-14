@@ -1,4 +1,4 @@
-# Overview
+# Huffman Project
 
 For this project, you will have to implement https://en.wikipedia.org/wiki/Huffman_coding[Huffman encoding], a commonly used data compression technique.
 While conceptually Huffman encoding is not difficult to understand, implementing it can prove difficult if you are careless.
@@ -12,9 +12,16 @@ For this project, there are multiple ways to help you achieve this:
 
 * You get this guide.
   It divides up the task at hand in many smaller parts.
-  It should help you find out what components to make and how to make these different components work together.
+  It should help you find out what components to create and how to make these different components work together.
 * You get a working Python implementation.
   Studying it will help you better understand how things work.
   It can also help you in debugging: you can use it to compare intermediate results.
-* Huffman encoding lends itself well to testing: as explained later, it is easy to thoroughly test your code.
-* Rely heavily on assertions.
+* Huffman encoding lends itself well to testing: as explained later, it is easy to thoroughly test your implementation.
+* Rely heavily on assertions (see below for an explanation.)
+
+## How to Start
+
+* <<assertions#,Assertions>>: we strongly recommend to make use of assertions.
+  In case of bugs, these will make your code fail fast.
+* <<setup#,Setting Things Up>>
+* <<implementation/index#,Implement Huffman Encoding>>

@@ -9,7 +9,7 @@ The term "assertion" might sound familiar to you: the word is often used by unit
 In this context, however, assertions have a very specific meaning, unrelated to unit testing.
 ====
 
-When you write code, you want to check if it works.
+When you write code, you want to check if everything works as intended.
 In this section, we introduce the concept of _assertions_.
 Assertions serve the same purpose as tests, but do so in a very different way.
 
@@ -21,25 +21,11 @@ Testing and assertions each have their advantages and drawbacks.
 You can combine their strengths by relying on both.
 ====
 
-## Checking One's Work
-
-You have just implemented a function.
-What's the next step?
-
-* An (overconfident) beginner will simply start working on the next function.
-  Confidence, however, is not a good trait for programmers: always check everything as you go.
-* More humble beginners will probably write some code that directly calls this function and print out the results to the console.
-  This way, they check a small number of specific cases and verify the results manually.
-  However, the testing code is quite short-lived: it is often deleted to make place for new testing code.
-* A more advanced programmer will write actual tests.
-  Their greatest advantage their persistence: the tests remain available and can be run whenever a nontrivial change is made to the code base.
-  This way we can remain confident that whatever change we made did not break anything.
-
 ## Self Checking Code
 
 Say you are writing a sorting function.
 This is a nontrivial task.
-We better make sure our code works correctly.
+We better check our code works correctly.
 
 ### Tests
 
@@ -362,3 +348,64 @@ They can be removed when optimization is turned on using https://docs.python.org
 * Assertions require the verification code itself to be correct whereas tests require the expected results to be correct.
   Which is easiest to achieve depends on the situation.
 * Assertions can be placed deep inside your code (e.g., private methods) whereas tests can't reach there.
+
+## Example
+
+Below you'll find code for a binary search.
+The algorithmic is not important; rather focus on the assertions themselves.
+
+[source,language="cpp"]
+----
+/*
+ * ns points to an array whose elements occur in increasing order
+ * length is the number of elements in this array
+ * value is the number to look for in ns
+ *
+ * The function returns the index of value in ns, or -1 if ns does not contain value
+ */
+inline int binary_search(const int* ns, int length, int value)
+{
+    assert(ns != nullptr || length == 0); // <1>
+    assert(length >= 0);
+
+    int left = 0;
+    int right = length - 1;
+
+    while (left < right)
+    {
+        int middle = (left + right) / 2;
+        assert(left <= middle && middle <= right); // <2>
+        assert(0 <= middle && middle < length);
+
+        if (ns[middle] < value)
+        {
+            left = middle + 1;
+        }
+        else if (ns[middle] > value)
+        {
+            right = middle - 1;
+        }
+        else
+        {
+            left = right = middle;
+        }
+    }
+
+    int result = left >= length || ns[left] != value ? -1 : left;
+
+    assert(result == -1 || (0 <= result && result < length));
+    assert(result == -1 || ns[result] == value);
+    return result;
+}
+----
+<1> `ns` is allowed to be `nullptr` as long as `length == 0`.
+<2> This assertion could actually fail in some circumstances.
+
+[NOTE]
+====
+Although assertions were used to check the parameter values, we cannot claim we have actual input validation: remember that assertions are removed in release buid.
+This means the best we can say about this code is that _if_ the inputs are valid, it will return a correct result.
+The function's behavior is _undefined_ for invalid inputs.
+
+If we want a more robust implementation, we would add `if`s that check for input validity and throw exceptions in case of trouble.
+====

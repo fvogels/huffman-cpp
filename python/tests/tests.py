@@ -17,20 +17,6 @@ from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
-def test_adaptive_huffman_encoding_with_full_tree():
-    def check(data):
-        encoding = FullTreeAdaptiveHuffmanEncoding(256)
-        data = [ *data.encode('ascii') ]
-        encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'data={data}, decoded={decoded}'
-    yield check, 'abc'
-    yield check, 'aabbbc'
-    yield check, 'aababcabcdabcde'
-    yield check, 'abbccccdddddddd'
-    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio'
-
-
 def test_encoding_inverter():
     def check(encoding, data):
         e = encoding | ~encoding

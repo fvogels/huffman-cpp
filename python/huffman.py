@@ -1,79 +1,21 @@
 from __future__ import annotations
+import typing
 from typing import Any, TypeVar, Union, Literal, Generic
 from math import ceil, log2
 from collections.abc import Iterable, Iterator, Callable
 from abc import *
-import struct
 from freqtable import FrequencyTable
+import struct
 from util import Bit, bits, from_bits, bits_needed, take, rotate_left, append
 from oracles import Oracle, ConstantOracle, RepeatOracle, MarkovOracle, MemoryOracle
+from encoding import Encoding
+from tree import Node, Leaf, Branch
+from defs import Datum, Data
+import cProfile
 
 
 T = TypeVar('T')
 U = TypeVar('U')
-V = TypeVar('V')
-
-
-Datum = int
-Data = Iterable[Datum]
-
-
-class Node(Generic[T]):
-    @abstractmethod
-    def map(self, func : Callable[[T], U]) -> Node[U]:
-        ...
-
-    @abstractmethod
-    def __eq__(self, other : Any) -> bool:
-        ...
-
-    @abstractmethod
-    def __repr__(self) -> str:
-        ...
-
-
-class Branch(Node[T]):
-    __left : Node[T]
-    __right : Node[T]
-
-    def __init__(self, left : Node[T], right : Node[T]):
-        self.__left = left
-        self.__right = right
-
-    @property
-    def left(self) -> Node[T]:
-        return self.__left
-
-    @property
-    def right(self) -> Node[T]:
-        return self.__right
-
-    def __eq__(self, other : Any) -> bool:
-        return isinstance(other, Branch) and self.left == other.left and self.right == other.right
-
-    def map(self, func : Callable[[T], U]) -> Branch[U]:
-        left : Node[U] = self.left.map(func)
-        right : Node[U] = self.right.map(func)
-        return Branch(left, right)
-
-    def __repr__(self) -> str:
-        return f"B[{self.left}|{self.right}]"
-
-
-class Leaf(Node[T]):
-    datum : T
-
-    def __init__(self, datum : T):
-        self.datum = datum
-
-    def __eq__(self, other : Any) -> bool:
-        return isinstance(other, Leaf) and self.datum == other.datum
-
-    def map(self, func : Callable[[T], U]) -> Leaf[U]:
-        return Leaf(func(self.datum))
-
-    def __repr__(self) -> str:
-        return f"L[{repr(self.datum)}]"
 
 
 class TreeEncoding:
@@ -150,90 +92,6 @@ def decode_data(bits : Iterator[Bit], root : Node[Datum]) -> Iterable[Datum]:
 
 
 
-
-class Encoding(Generic[T,U]):
-    def encode(self, x : T) -> U:
-        raise NotImplementedError()
-
-    def decode(self, x : U) -> T:
-        raise NotImplementedError()
-
-    def __or__(self, other : Encoding[U, V]) -> Encoding[T, V]:
-        return EncodingCombinator(self, other)
-
-    def __invert__(self) -> Encoding[U, T]:
-        return EncodingInverter(self)
-
-
-
-class EncodingCombinator(Generic[T, U, V], Encoding[T, V]):
-    __left : Encoding[T, U]
-    __right : Encoding[U, V]
-
-    def __init__(self, left : Encoding[T, U], right : Encoding[U, V]):
-        self.__left = left
-        self.__right = right
-
-    def encode(self, x : T) -> V:
-        return self.__right.encode(self.__left.encode(x))
-
-    def decode(self, x : V) -> T:
-        return self.__left.decode(self.__right.decode(x))
-
-
-class EncodingInverter(Encoding[U, T]):
-    __encoding : Encoding[T, U]
-
-    def __init__(self, encoding : Encoding[T, U]):
-        self.__encoding = encoding
-
-    def encode(self, x : U) -> T:
-        return self.__encoding.decode(x)
-
-    def decode(self, x : T) -> U:
-        return self.__encoding.encode(x)
-
-
-class PredictionEncoding(Encoding[Data, Data]):
-    __nvalues : int
-
-    def __init__(self, oracle_factory : Callable[[], Oracle], nvalues : int):
-        assert oracle_factory is not None
-        assert nvalues > 0
-        self.__oracle_factory = oracle_factory
-        self.__nvalues = nvalues
-
-    def encode(self, data : Data) -> Data:
-        assert data is not None
-        oracle = self.__oracle_factory()
-        for actual in data:
-            assert 0 <= actual < self.__nvalues, f'actual={actual}, nvalues={self.__nvalues}'
-            prediction = oracle.predict()
-            oracle.tell(actual)
-            correction = self.__compute_correction(prediction, actual)
-            assert 0 <= correction < self.__nvalues
-            yield correction
-
-    def __compute_correction(self, prediction : Datum, actual : Datum) -> Datum:
-        result = (actual - prediction) % self.__nvalues
-        return result
-
-    def decode(self, corrections : Data) -> Data:
-        assert corrections is not None
-        oracle = self.__oracle_factory()
-        for correction in corrections:
-            assert 0 <= correction < self.__nvalues
-            prediction = oracle.predict()
-            actual = self.__apply_correction(prediction, correction)
-            oracle.tell(actual)
-            assert 0 <= actual < self.__nvalues
-            yield actual
-
-    def __apply_correction(self, prediction : Datum, correction : Datum) -> Datum:
-        result = (prediction + correction) % self.__nvalues
-        return result
-
-
 class BurrowsWheeler(Encoding[Data, Data]):
     __nvalues : int
 
@@ -272,6 +130,30 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     def encode(self, data : Data) -> Iterable[Bit]:
         values = list(data)
         frequencies : FrequencyTable[Datum] = FrequencyTable.count_from_iterable(values)
+        tree : Node[Datum] = build_tree(frequencies)
+        codes : dict[Datum, list[Bit]] = build_codebook(tree)
+        yield from self.__tree_encoding.encode(tree)
+        yield from encode_data(values, codes)
+
+    def decode(self, bits : Iterable[Bit]) -> Data:
+        iterator = iter(bits)
+        tree : Node[Datum] = self.__tree_encoding.decode(iterator)
+        decoded = decode_data(iterator, tree)
+        return decoded
+
+
+class HuffmanEncoding2(Encoding[Data, Iterable[Bit]]):
+    __tree_encoding : TreeEncoding
+    __nvalues : int
+
+    def __init__(self, nvalues : int):
+        assert 0 < nvalues
+        self.__nvalues = nvalues
+        self.__tree_encoding = TreeEncoding(bits_needed(nvalues))
+
+    def encode(self, data : Data) -> Iterable[Bit]:
+        values = list(data)
+        frequencies : FrequencyTable[Datum] = IntegerFrequencyTable.count_from_iterable(self.__nvalues, values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from self.__tree_encoding.encode(tree)
@@ -329,7 +211,6 @@ class GrowingTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
                 else:
                     end_reached = True
 
-
 class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     __nvalues : int
 
@@ -361,31 +242,7 @@ class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
                 current_node = build_tree(frequencies)
 
 
-class MoveToFrontEncoding(Encoding[Data, Data]):
-    __nvalues : int
 
-    def __init__(self, nvalues : int):
-        self.__nvalues = nvalues
-
-    def encode(self, data : Data) -> Data:
-        table = list(range(self.__nvalues))
-        for datum in data:
-            assert 0 <= datum < self.__nvalues, f'datum={datum}, nvalues={self.__nvalues}'
-            index = table.index(datum)
-            assert 0 <= index < self.__nvalues
-            yield index
-            del table[index]
-            table.insert(0, datum)
-
-    def decode(self, data : Data) -> Data:
-        table = list(range(self.__nvalues))
-        for x in data:
-            assert 0 <= x < self.__nvalues
-            value = table[x]
-            assert 0 <= value <= self.__nvalues
-            yield value
-            del table[x]
-            table.insert(0, value)
 
 
 class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
@@ -445,40 +302,46 @@ class UnpackEncoding(Encoding[bytes, Data]):
 
 def main():
     encodings = [
-        (
-            'GT-Adaptive',
-            GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
-        (
-            'Repeat GT-Adaptive',
-            PredictionEncoding(lambda: RepeatOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
-        (
-            'Markov GT-Adaptive',
-            PredictionEncoding(lambda: MarkovOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
-        (
-            'M1 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(1, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
-        (
-            'M2 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(2, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
-        (
-            'M5 GT-Adaptive',
-            PredictionEncoding(lambda: MemoryOracle(5, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
-        ),
+        # (
+        #     'Huffman',
+        #     HuffmanEncoding(257)
+        # ),
+        # (
+        #     'GT-Adaptive',
+        #     GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
+        # (
+        #     'Repeat GT-Adaptive',
+        #     PredictionEncoding(lambda: RepeatOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
+        # (
+        #     'Markov GT-Adaptive',
+        #     PredictionEncoding(lambda: MarkovOracle(0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
+        # (
+        #     'M1 GT-Adaptive',
+        #     PredictionEncoding(lambda: MemoryOracle(1, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
+        # (
+        #     'M2 GT-Adaptive',
+        #     PredictionEncoding(lambda: MemoryOracle(2, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
+        # (
+        #     'M5 GT-Adaptive',
+        #     PredictionEncoding(lambda: MemoryOracle(5, 0), 257) | GrowingTreeAdaptiveHuffmanEncoding(257)
+        # ),
         (
             'FT-Adaptive',
-            FullTreeAdaptiveHuffmanEncoding(257)
+            FullTreeAdaptiveHuffmanEncoding2(257)
         ),
     ]
 
     inputs = [
-        b'\0' * 100,
-        b'abcdef' * 100,
-        b'Fruit flies like a banana'
+        b'\0' * 10**2,
+        # b'\0\1' * 100,
+        # b'abcdef' * 100,
+        # b'ababbbcbcdbdebe' * 100,
+        # b'Fruit flies like a banana' * 100
     ]
 
     for index, data in enumerate(inputs):
@@ -493,4 +356,5 @@ def main():
         print()
 
 
-main()
+if __name__ == '__main__':
+    cProfile.run('main()')

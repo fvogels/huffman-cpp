@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, TypeVar, Union, Literal, Generic
 from collections.abc import Iterable, Iterator, Callable
 from freqtable import FrequencyTable
+from abc import *
 
 T = TypeVar('T')
 
@@ -17,11 +18,13 @@ def last(xs : list[T], n : int) -> list[T]:
 
 
 class Oracle(Generic[T]):
+    @abstractmethod
     def tell(self, value : T) -> None:
-        raise NotImplementedError()
+        ...
 
+    @abstractmethod
     def predict(self) -> T:
-        raise NotImplementedError()
+        ...
 
 
 class ConstantOracle(Oracle[T]):

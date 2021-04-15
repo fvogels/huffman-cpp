@@ -1,6 +1,8 @@
 from huffman import *
-from util import *
-from oracles import *
+from util import group, pad
+from freqtable import FrequencyTable
+from move_to_front import MoveToFrontEncoding
+from prediction import PredictionEncoding
 
 
 def test_bits_needed():
@@ -50,6 +52,7 @@ def test_bits():
 def test_from_bits():
     def check(expected, bits):
         assert expected == from_bits(bits)
+
     yield check, 0, [0]
     yield check, 1, [1]
     yield check, 1, [0, 1]
@@ -60,12 +63,12 @@ def test_from_bits():
 
 def test_build_tree():
     def check(expected, d):
-        frequencies = FrequencyTable()
+        frequencies : FrequencyTable[str] = FrequencyTable[str]()
         for value, n in d.items():
             for _ in range(n):
                 frequencies.increment(value)
-
         assert expected == build_tree(frequencies)
+
     yield check, Leaf('a'), { 'a': 1 }
     yield check, Branch( Leaf('a'), Leaf('b') ), { 'a': 1, 'b': 2 }
     yield check, Branch( Leaf('b'), Leaf('a') ), { 'a': 2, 'b': 1 }
@@ -296,10 +299,10 @@ def test_encoding_inverter():
         decoded = list(e.decode(encoded))
         assert data == decoded
 
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), []
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 1, 1, 1, 1]
-    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0)), [1, 2, 1, 3, 1, 4, 1, 5]
-    yield check, MoveToFrontEncoding(), []
-    yield check, MoveToFrontEncoding(), [0]
-    yield check, MoveToFrontEncoding(), [0, 0, 0, 0, 0]
-    yield check, MoveToFrontEncoding(), [1, 1, 1, 1, 1]
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0), 10), []
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0), 10), [1, 1, 1, 1, 1]
+    yield check, PredictionEncoding(lambda: MemoryOracle(2, 0), 10), [1, 2, 1, 3, 1, 4, 1, 5]
+    yield check, MoveToFrontEncoding(10), []
+    yield check, MoveToFrontEncoding(10), [0]
+    yield check, MoveToFrontEncoding(10), [0, 0, 0, 0, 0]
+    yield check, MoveToFrontEncoding(10), [1, 1, 1, 1, 1]

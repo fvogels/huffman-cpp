@@ -17,19 +17,6 @@ from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
-def test_packing():
-    def check(bytes):
-        encoding = UnpackEncoding()
-        packed = encoding.encode(bytes)
-        unpacked = encoding.decode(packed)
-        assert bytes == unpacked, repr(unpacked)
-    yield check, b""
-    yield check, b"\0"
-    yield check, b"\0\1"
-    yield check, b"\0\1\255"
-    yield check, b"abcde456789"
-
-
 def test_encode_data():
     def check(expected, data, book):
         assert expected == list(encode_data(data, book))

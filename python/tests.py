@@ -1,9 +1,13 @@
 from huffman import *
+from huffman_util import build_tree, build_codebook, encode_data, decode_data
 from util import group, pad
 from freqtable import FrequencyTable
 from move_to_front import MoveToFrontEncoding
 from prediction import PredictionEncoding
 from burrows_wheeler import BurrowsWheeler
+from unpack import UnpackEncoding
+from eof_encoding import EofEncoding
+from bit_grouper import BitGrouperEncoding
 
 
 def test_bits_needed():

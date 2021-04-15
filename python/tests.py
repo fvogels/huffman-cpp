@@ -1,6 +1,9 @@
-from huffman import *
+from huffman import TreeEncoding, HuffmanEncoding
+from huffman_ga import GrowingTreeAdaptiveHuffmanEncoding
+from huffman_fta import FullTreeAdaptiveHuffmanEncoding
 from huffman_util import build_tree, build_codebook, encode_data, decode_data
-from util import group, pad
+from tree import Node, Leaf, Branch
+from util import group, pad, from_bits, bits, bits_needed
 from freqtable import FrequencyTable
 from move_to_front import MoveToFrontEncoding
 from prediction import PredictionEncoding
@@ -8,6 +11,7 @@ from burrows_wheeler import BurrowsWheeler
 from unpack import UnpackEncoding
 from eof_encoding import EofEncoding
 from bit_grouper import BitGrouperEncoding
+from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
 def test_bits_needed():

@@ -12,6 +12,7 @@ from encoding import Encoding
 from tree import Node, Leaf, Branch
 from defs import Datum, Data
 from eof_encoding import EofEncoding
+from bit_grouper import BitGrouperEncoding
 import cProfile
 
 
@@ -199,33 +200,6 @@ class FullTreeAdaptiveHuffmanEncoding(Encoding[Data, Iterable[Bit]]):
 
 
 
-class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
-    __nbits : int
-
-    def __init__(self, nbits : int):
-        assert nbits > 0
-        self.__nbits = nbits
-
-    def encode(self, bits : Iterable[Bit]) -> Data:
-        bitcount = 0
-        acc = 0
-        for bit in bits:
-            assert bit == 0 or bit == 1
-            acc = acc * 2 + bit
-            bitcount += 1
-            if bitcount == self.__nbits:
-                yield acc
-                acc = 0
-                bitcount = 0
-        while bitcount < self.__nbits:
-            acc *= 2
-            bitcount += 1
-        yield acc
-
-    def decode(self, data : Data) -> Iterable[Bit]:
-        for byte in data:
-            for bit in bits(byte, self.__nbits):
-                yield bit
 
 
 

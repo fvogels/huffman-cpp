@@ -17,20 +17,6 @@ from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
-def test_huffman_encoding():
-    def check(data):
-        encoding = HuffmanEncoding(256)
-        data = [ *data.encode('ascii') ]
-        encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'data={data}, decoded={decoded}'
-    yield check, 'abc'
-    yield check, 'aabbbc'
-    yield check, 'aababcabcdabcde'
-    yield check, 'abbccccdddddddd'
-    yield check, 'acndjlkajcipocidjfdjslkfjsfjoijciojdiocjaiojcoisdjiojaiocjiojoijcio' * 1000
-
-
 def test_predictions():
     def check(data, oracle_factory):
         encoding = PredictionEncoding(oracle_factory, 256)

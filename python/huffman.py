@@ -11,6 +11,7 @@ from oracles import Oracle, ConstantOracle, RepeatOracle, MarkovOracle, MemoryOr
 from encoding import Encoding
 from tree import Node, Leaf, Branch
 from defs import Datum, Data
+from eof_encoding import EofEncoding
 import cProfile
 
 
@@ -107,30 +108,6 @@ class HuffmanEncoding(Encoding[Data, Iterable[Bit]]):
     def encode(self, data : Data) -> Iterable[Bit]:
         values = list(data)
         frequencies : FrequencyTable[Datum] = FrequencyTable.count_from_iterable(values)
-        tree : Node[Datum] = build_tree(frequencies)
-        codes : dict[Datum, list[Bit]] = build_codebook(tree)
-        yield from self.__tree_encoding.encode(tree)
-        yield from encode_data(values, codes)
-
-    def decode(self, bits : Iterable[Bit]) -> Data:
-        iterator = iter(bits)
-        tree : Node[Datum] = self.__tree_encoding.decode(iterator)
-        decoded = decode_data(iterator, tree)
-        return decoded
-
-
-class HuffmanEncoding2(Encoding[Data, Iterable[Bit]]):
-    __tree_encoding : TreeEncoding
-    __nvalues : int
-
-    def __init__(self, nvalues : int):
-        assert 0 < nvalues
-        self.__nvalues = nvalues
-        self.__tree_encoding = TreeEncoding(bits_needed(nvalues))
-
-    def encode(self, data : Data) -> Iterable[Bit]:
-        values = list(data)
-        frequencies : FrequencyTable[Datum] = IntegerFrequencyTable.count_from_iterable(self.__nvalues, values)
         tree : Node[Datum] = build_tree(frequencies)
         codes : dict[Datum, list[Bit]] = build_codebook(tree)
         yield from self.__tree_encoding.encode(tree)
@@ -251,21 +228,7 @@ class BitGrouperEncoding(Encoding[Iterable[Bit], Data]):
                 yield bit
 
 
-class EofEncoding(Encoding[Data, Data]):
-    __nvalues : int
 
-    def __init__(self, nvalues : int):
-        self.__nvalues = nvalues
-
-    def encode(self, data : Data) -> Data:
-        eof = self.__nvalues
-        return append(data, eof)
-
-    def decode(self, data : Data) -> Data:
-        eof = self.__nvalues
-        values = iter(data)
-        while (datum := next(values)) != eof:
-            yield datum
 
 
 class UnpackEncoding(Encoding[bytes, Data]):

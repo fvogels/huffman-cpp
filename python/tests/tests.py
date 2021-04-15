@@ -17,27 +17,6 @@ from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
-def test_build_tree():
-    def check(expected, d):
-        frequencies : FrequencyTable[str] = FrequencyTable[str]()
-        for value, n in d.items():
-            for _ in range(n):
-                frequencies.increment(value)
-        assert expected == build_tree(frequencies)
-
-    yield check, Leaf('a'), { 'a': 1 }
-    yield check, Branch( Leaf('a'), Leaf('b') ), { 'a': 1, 'b': 2 }
-    yield check, Branch( Leaf('b'), Leaf('a') ), { 'a': 2, 'b': 1 }
-
-
-def test_build_codebook():
-    def check(expected, tree):
-        actual = build_codebook(tree)
-        assert expected == actual, repr(actual)
-    yield check, { 'a': [0], 'b': [1] }, Branch( Leaf('a'), Leaf('b') )
-    yield check, { 'a': [0, 0], 'b': [0, 1], 'c': [1, 0], 'd': [1, 1] }, Branch( Branch( Leaf('a'), Leaf('b') ), Branch( Leaf('c'), Leaf('d') ) )
-
-
 def test_tree_encoding():
     def check(tree):
         encoding = TreeEncoding(4)

@@ -1,0 +1,166 @@
+# Parameter Types
+
+Say you are writing a function which should receive a value `x` of some type `T`.
+C++ offers many ways to pass this value along.
+This text serves as a guide to help you pick the correct way.
+
+## `T x`
+
+* The function receives a _copy_ of `x`.
+* For big `T`s this copying can be very inefficient.
+* The function can read and write to `x`, but writes will have no effect on the caller's `x`.
+* Use this only if `T` is a small type, such as `bool`, `int`, `double`, or small objects (few/small fields.)
+* If `T` makes part of a class hierarchy (i.e., virtual functions and overriding), you should very probably *not* pass the object by value.
+
+.Example
+[%collapsible]
+====
+=====
+[source,language="cpp"]
+----
+int max(int x, int y);
+----
+
+* `max` is content with _copies_ of `x` and `y`.
+* `int`s are small enough to be copied efficiently.
+=====
+====
+
+## `const T& x`
+
+* This passes a _reference_ to `x`.
+  This means the function receives the _address_ of `x`, which is often more efficient than making a copy of `x`.
+* Due to the `const` qualifier, the function receives `read-only` access to `x`.
+* Use this if a function requires read access to `x` and does not store a reference/pointer to `x` internally for later use.
++
+[%collapsible]
+====
+=====
+An example of a function storing a parameter internally would be a constructor which stores `x` in an object's fields.
+
+* If the constructor wants to store a _copy_ of the value, then using `const T&` is okay.
+* If the constructor wants to keep track of the object itself (using its address), use `unique_ptr<T>` or `shared_ptr<T>`.
+=====
+====
+
+.Example
+[%collapsible]
+====
+=====
+[source,language="cpp"]
+----
+int max(const std::vector<int>& ns);
+----
+
+* `max` needs only be able to read from `ns`; it is not interested in altering `ns` in any way.
+* A vector can be large; copying it might be very inefficient.
+* The `&` part makes passing it to `max` efficient.
+  The `const` part states that `max` will not modify `ns`.
+=====
+====
+
+## `T* x`
+
+* The function receives a _pointer_ to `x`.
+* The function gets both read and write access directly to `x` itself, i.e., not a copy.
+* Use this only if the function actually needs this write access; otherwise use `const T&`.
+* The size of `T` does not matter since the alternative (`T x`) does not provide write access.
+* `T* x` is meant for functions that access this `x` and then forget about it.
+  If the function needs to store this `x` internally (e.g., a constructor), use `unique_ptr<T>` or `shared_ptr<T>`.
+
+.Example
+[%collapsible]
+====
+=====
+[source,language="cpp"]
+----
+// Changes x from true to false and vice versa.
+void flip(bool* x)
+{
+    *x = !*x;
+}
+----
+
+* `flip` needs to be able to both read from and write to `x`.
+  A copy or a `const` reference will not suffice.
+* A pointer to `x` will give `flip` both read and write access.
+* `flip` does not keep `x` around: once it's done flipping `x`, it forgets about it.
+=====
+====
+
+## `unique_ptr<T> x`
+
+* The function receives a _pointer_ to `x`, which is efficient.
+* Use this only if the function stores `x` internally, such as a constructor.
+* Use this only if the function must receive full ownership of `x`, i.e., if `x` is only needed in exactly one place.
+* Keep in mind that the caller loses all access to `x` after calling the function.
+* If the caller still needs to be able to access `x` after the call, use `shared_ptr<T>`.
+
+.Example
+[%collapsible]
+====
+=====
+[source,language="cpp"]
+----
+struct Node
+{
+    int value;
+    std::unique_ptr<Node> next;
+}
+
+class LinkedList
+{
+    std::unique_ptr<Node> first;
+
+public:
+    LinkedList(std::unique_ptr<Node> first)
+        : first(std::move(first))
+    {
+        // Empty
+    }
+}
+----
+
+* Each `Node` can have only one owner.
+  `LinkedList`s cannot share nodes.
+* If the `LinkedList` is being freed, the `first` node will automatically be freed with it thanks to the `unique_ptr<Node>`.
+  This causes a deallocation chain reaction: this first node has a `unique_ptr<Node>` to the second node, etc. causing all nodes in the list to be freed automatically.
+* Note that passing `unique_ptr`s often requires an explicit `std::move` around them to make it explicit you know you are giving up ownership.
+  This is a safety feature.
+=====
+====
+
+## `shared_ptr<T> x`
+
+* The function receives a _pointer_ to `x`, which is efficient.
+* Use this only if the function stores `x` internally, such as a constructor.
+* Use this only if the function shares ownership with others, i.e., if multiple places at once need access to `x`.
+* If the caller still needs to be able to access `x` after the call, use `shared_ptr<T>`.
+
+.Example
+[%collapsible]
+====
+=====
+[source,language="cpp"]
+----
+class Person
+{
+    std::shared_ptr<Person> mother;
+    std::shared_ptr<Person> father;
+
+public:
+    Person(std::shared_ptr<Person> mother, std::shared_ptr<Person> father)
+        : mother(mother), father(father)
+    {
+        // Empty
+    }
+}
+----
+
+* The `Person` constructor stores `mother` and `father` internally in fields.
+  A `Person` object becomes an _owner_ of these two objects.
+  Based on this we need to use either `shared_ptr<T>` or `unique_ptr<T>`.
+* Other objects might also want access to the same `mother` and `father` objects, e.g., brothers and sisters share parents.
+  This is only possible using `shared_ptr<T>`.
+=====
+====

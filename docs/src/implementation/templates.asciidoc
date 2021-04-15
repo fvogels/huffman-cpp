@@ -1,0 +1,41 @@
+# Templates
+
+[IMPORTANT]
+====
+Templates need to be fully defined in header files.
+This is due to the fact that the compiler needs access to the complete source to be able to generate the necessary code.
+Remember that code inside another `.cpp` is off limits.
+====
+
+[#class]
+## Type Parameters
+
+TODO
+
+
+.smart-array.h
+[source,language="cpp"]
+----
+// Definition inside header file!
+template<typename T>
+class SmartArray
+{
+    T* elements;
+    int size;
+
+public:
+    SmartArray(int size)
+        : elements(new T[size]), size(size)
+    {
+        // Left empty on purpose
+    }
+
+    ~SmartArray()
+    {
+        // Free memory
+        delete[] elements;
+    }
+
+    // ...
+};
+----

@@ -1,6 +1,3 @@
-:toc: left
-:cpp: C++
-
 # Assertions
 
 [NOTE]

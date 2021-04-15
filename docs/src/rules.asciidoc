@@ -1,0 +1,21 @@
+# Rules
+
+## Asking for Help
+
+* Do not send me code. We have GitHub for that.
+* Do not send me screenshots of your code.
+* Do not send me pictures of your screen with code on it either.
+* In case of a bug, write a minimal test that causes the bug to appear.
+
+## Submitting Your Code
+
+* Your code has to compile. Remove (or put in comments) all code that does not compile.
+
+## Code
+
+* No `#pragma once` allowed. Use old fashioned <<implementation/include-guards#,include guards>>.
+* Every header file needs an include guard.
+* Do *not* ignore warnings.
+* No `using namespace` allowed in header files.
+* No `const_cast`.
+* Stay away from `new` and `delete` as much as you can. Stack allocation, `std::make_shared` and `std::make_unique` are your friends.

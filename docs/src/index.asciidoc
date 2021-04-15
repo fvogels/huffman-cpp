@@ -21,6 +21,7 @@ For this project, there are multiple ways to help you achieve this:
 
 ## How to Start
 
+* <<rules#,Rules>>: some rules you have to abide by. Please read these.
 * <<assertions#,Assertions>>: we strongly recommend to make use of assertions.
   In case of bugs, these will make your code fail fast.
 * <<setup#,Setting Things Up>>

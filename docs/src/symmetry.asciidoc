@@ -1,5 +1,3 @@
-:toc: left
-
 # Symmetry
 
 ## Invertible Operations

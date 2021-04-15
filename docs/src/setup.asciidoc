@@ -1,6 +1,3 @@
-:toc: left
-:experimental:
-
 # Setting Things Up
 
 ## Getting the Starter Code

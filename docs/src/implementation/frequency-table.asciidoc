@@ -1,5 +1,3 @@
-:toc: left
-
 # FrequencyTable
 
 ## Context
@@ -7,7 +5,19 @@
 The first thing (nonadaptive) Huffman encoding needs to do is count the frequencies of each byte in its input stream.
 We will create a class `FrequencyTable` to assist us in this task.
 
-## Intended Usage
+## Prerequisites
+
+None.
+
+## Goal
+
+* `FrequencyTable` must be able to count _any_ kind of values. E.g., we want to be able to count chars with a `FrequencyTable<char>`, or strings with `FrequencyTable<std::string>`, etc.
+* Required functionality:
+** `freqtable.increment(x)` must increment the frequency of `x`.
+** `freqtable[x]` must return the frequency of `x`.
+** `freqtable.values()` must return a list of all values which have ever been counted.
+
+### Example Usage
 
 [source,language="cpp"]
 ----
@@ -30,16 +40,135 @@ freqtable['c']  // -> 0
 std::vector<char> letters = freqtable.values(); // -> { 'a', 'b' }
 ----
 
-## Implementation
+## Class Implementation
+
+### Skeleton
 
 [TASK]
 ====
 * In the Solution Explorer, create a folder `data`.
 * In this folder, add a new file `frequency-table.h`.
 * Add <<include-guards#,include guards>>.
-* Start a <<namespaces#,namespace>> named `data`.
+* Add a <<namespaces#,namespace>> named `data`.
   All further `FrequencyTable` related code will reside within this namespace.
 ====
 
 We want our `FrequencyTable` to be flexible and not hardcode it to use a specific type.
-Therefore, we chose to make it a template class.
+Therefore, we choose to make it a template class.
+
+[TASK]
+====
+Create an empty <<templates#class,template class>> named `FrequencyTable` inside the `data` namespace.
+====
+
+### Fields
+
+A `FrequencyMap` associates values of type `T` with frequencies of integral type.
+There are many integral types, so which one would you use, taking into account that
+
+* frequencies cannot go negative;
+* we want the largest type available that's still directly supported by the cpu.
+
+Look for the right https://en.cppreference.com/w/cpp/container/map[data structure] to store these value-frequency associations in.
+
+[TASK]
+====
+Add a private field that will store the frequency data.
+
+No funny business with pointers or references is needed here.
+Keep it simple.
+====
+
+### Constructor
+
+No constructor should be needed.
+The field will automatically construct itself.
+
+.Example usage
+[%collapsible]
+====
+[source,language='cpp']
+----
+FrequencyTable<char> freqtable;
+----
+====
+
+### Destructor
+
+No destructor should be needed.
+
+### Method `increment`
+
+`freqtable.increment(x)` method should increase the frequency of `x`.
+
+.Example usage
+[%collapsible]
+====
+[source,language='cpp']
+----
+FrequencyTable<char> freqtable;
+freqtable.increment('a'); // a has now frequency 1
+----
+====
+
+### Indexing
+
+.Example usage
+[%collapsible]
+====
+[source,language='cpp']
+----
+FrequencyTable<char> freqtable;
+freqtable['a']; // returns 0
+freqtable.increment('a');
+freqtable['a']; // returns 1
+----
+====
+
+### Method `values`
+
+.Example usage
+[%collapsible]
+====
+[source,language='cpp']
+----
+FrequencyTable<char> freqtable;
+freqtable.values() // returns empty list { }
+freqtable.increment('a');
+freqtable.values() // returns list { 'a' }
+----
+====
+
+## Python Implementation
+
+[source,language="python"]
+----
+class FrequencyTable(Generic[T]):
+    __table : dict[T, int]
+
+    def __init__(self):
+        '''
+        Initializes the freqtable
+        '''
+        self.__table = {}
+
+    def __getitem__(self, value : T) -> int:
+        '''
+        freqtable[x] returns the frequency of x.
+        If x has not been encountered before, its frequency is 0.
+        '''
+        return self.__table.get(value, 0)
+
+    def increment(self, value : T) -> None:
+        '''
+        freqtable.increment(x) increments the frequency of x by one.
+        '''
+        self.__table[value] = self[value] + 1
+
+    @property
+    def values(self) -> Iterable[T]:
+        '''
+        freqtable.values returns a sequence of only the values (i.e., not their frequencies).
+        '''
+        return self.__table.keys()
+----

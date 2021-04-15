@@ -3,6 +3,7 @@ from util import group, pad
 from freqtable import FrequencyTable
 from move_to_front import MoveToFrontEncoding
 from prediction import PredictionEncoding
+from burrows_wheeler import BurrowsWheeler
 
 
 def test_bits_needed():

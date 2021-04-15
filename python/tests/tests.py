@@ -16,16 +16,6 @@ from eof_encoding import EofEncoding
 from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
-
-def test_group():
-    def check(expected, xs, group_size):
-        assert expected == group(xs, group_size)
-    yield check, [[1], [2], [3]], [1, 2, 3], 1
-    yield check, [[1, 2], [3]], [1, 2, 3], 2
-    yield check, [[1, 2], [3, 4]], [1, 2, 3, 4], 2
-    yield check, [[1, 2], [3, 4], [5, 6]], [1, 2, 3, 4, 5, 6], 2
-
-
 def test_bits():
     def check(expected, n, size):
         assert expected == bits(n, size)

@@ -17,45 +17,6 @@ from bit_grouper import BitGrouperEncoding
 from oracles import MemoryOracle, MarkovOracle, ConstantOracle, RepeatOracle
 
 
-def test_encoder_combination():
-    def check(encoding, data):
-        encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'data={data}, decoded={decoded}'
-
-    encodings = [
-        MoveToFrontEncoding(256),
-        MoveToFrontEncoding(256) | MoveToFrontEncoding(256),
-        MoveToFrontEncoding(256) | BurrowsWheeler(256),
-        BurrowsWheeler(256) | MoveToFrontEncoding(257),
-        HuffmanEncoding(256),
-        EofEncoding(256) | HuffmanEncoding(257),
-        EofEncoding(256) | HuffmanEncoding(257) | BitGrouperEncoding(8)
-    ]
-    for encoding in encodings:
-        yield check, encoding, [1, 2, 3, 4]
-        yield check, encoding, [5, 1, 3, 2, 6, 5, 8]
-        yield check, encoding, [1, 2, 3] * 10
-
-
-
-
-
-def test_eof_encoding():
-    def check(data, nvalues):
-        encoding = EofEncoding(nvalues)
-        encoded = encoding.encode(data)
-        decoded = list(encoding.decode(encoded))
-        assert data == decoded, f'data={data}, decoded={decoded}'
-
-    yield check, [], 4
-    yield check, [0], 4
-    yield check, [1], 4
-    yield check, [1, 1], 4
-    yield check, [1, 2, 3, 4, 3, 2, 1], 16
-    yield check, list(range(100)), 100
-
-
 def test_adaptive_huffman_encoding_with_growing_tree():
     def check(data):
         encoding = GrowingTreeAdaptiveHuffmanEncoding(256)

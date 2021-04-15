@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from huffman import TreeEncoding, HuffmanEncoding
 from huffman_ga import GrowingTreeAdaptiveHuffmanEncoding
 from huffman_fta import FullTreeAdaptiveHuffmanEncoding

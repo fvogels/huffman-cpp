@@ -2,7 +2,7 @@
 
 #include "io/io-util.h"
 #include "io/memory-buffer.h"
-#include "defs.h"
+#include "util.h"
 #include "catch.hpp"
 
 

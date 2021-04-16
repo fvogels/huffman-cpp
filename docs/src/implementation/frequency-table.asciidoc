@@ -16,10 +16,6 @@ A bit of terminology (apologies if this is confusing - I can change it if necess
 
 See `freqtable.py`.
 
-## Prerequisites
-
-None.
-
 ## Goal
 
 * `FrequencyTable` must be able to count _any_ kind of values. E.g., we want to be able to count chars with a `FrequencyTable<char>`, or strings with `FrequencyTable<std::string>`, etc.
@@ -143,6 +139,8 @@ freqtable.increment('a'); // a has now frequency 1
 We need a way to ask a `FrequencyTable` what the frequency of some value `x` is.
 Instead of using a regular method, we will be using the syntax `freqtable[x]`.
 
+If `x` has never been `increment`ed before, `freqtable[x]` should return `0`.
+
 [TASK]
 ====
 Overload the `[]` operator.
@@ -152,6 +150,9 @@ Overload the `[]` operator.
 ** Size of `T` is unknown, so do not assume it is small.
 ** No write access needed.
 ** No ownership transfer.
+* Return type: keep it simple.
+* Think of <<const-correctness#,`const`-correctness>>.
+* You might have to look up online how to find out if some `x` is https://www.cplusplus.com/reference/map/map/find/[part of a map or not].
 ====
 
 [NOTE]
@@ -165,6 +166,7 @@ freqtable[x] = 5;
 ----
 
 We do not want such functionality.
+`freqtable[x]` should simply give us the frequency, nothing more.
 ====
 
 .Example usage
@@ -181,9 +183,16 @@ freqtable['a']; // returns 1
 
 ### Method `values`
 
+This method should return a list of _values_ (i.e., not the frequencies.)
+Return them using a `std::vector`.
+
 [TASK]
 ====
 Implement this method.
+
+* No parameters needed.
+* Think of <<const-correctness#,`const`-correctness>>.
+* Return type: keep it simple and simply return the vector by value. No reference/pointer shenanigans necessary.
 ====
 
 .Example usage
@@ -196,4 +205,19 @@ freqtable.values() // returns empty list { }
 freqtable.increment('a');
 freqtable.values() // returns list { 'a' }
 ----
+====
+
+## Helper Function
+
+We want a helper function `count_frequencies` that given a vector of values, counts them and returns the frequencies as a `FrequencyTable`.
+This function should reside _outside_ the class (but still inside the `data` namespace).
+
+[TASK]
+====
+* This function is a <<templates#functions,template>>.
+* It takes a vector of values as a parameter.
+** This vector has the potential to be very large.
+** The function needs only read access.
+** The function does not store the vector internally.
+* Return type: return the `FrequencyTable` by value.
 ====

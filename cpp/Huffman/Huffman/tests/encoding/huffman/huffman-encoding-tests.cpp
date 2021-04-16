@@ -1,7 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "catch.hpp"
-#include "defs.h"
+#include "util.h"
 #include "encoding/huffman/huffman-encoding.h"
 #include "encoding/huffman/adaptive-huffman-encoding.h"
 #include "io/memory-buffer.h"

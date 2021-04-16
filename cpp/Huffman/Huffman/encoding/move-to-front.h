@@ -1,7 +1,7 @@
 #ifndef MOVE_TO_FRONT_CPP
 #define MOVE_TO_FRONT_CPP
 
-#include "defs.h"
+#include "util.h"
 #include "encoding/encoding.h"
 #include <memory>
 

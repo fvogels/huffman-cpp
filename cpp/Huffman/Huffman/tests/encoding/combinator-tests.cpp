@@ -1,7 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "catch.hpp"
-#include "defs.h"
+#include "util.h"
 #include "encoding/encodings.h"
 #include "io/memory-buffer.h"
 #include "io/io-util.h"

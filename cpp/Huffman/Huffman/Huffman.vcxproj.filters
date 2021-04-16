@@ -24,7 +24,7 @@
     <ClInclude Include="encoding\move-to-front.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="defs.h">
+    <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\encoding.h">
@@ -40,9 +40,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\huffman\huffman-encoding.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="binary\binutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\huffman\tree-encoding.h">
@@ -105,6 +102,12 @@
     <ClInclude Include="encoding\eof-encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="data\trie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\predictive\trie-oracle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp">
@@ -134,7 +137,7 @@
     <ClCompile Include="encoding\inverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="io-util.cpp">
+    <ClCompile Include="io\io-util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encoding\huffman\adaptive-huffman-encoding.cpp">
@@ -192,6 +195,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\io\io-util-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\data\trie-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\predictive\trie-oracle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\util-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

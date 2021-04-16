@@ -27,10 +27,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="binary\binutil.h" />
     <ClInclude Include="catch.hpp" />
     <ClInclude Include="data\binary-tree.h" />
     <ClInclude Include="data\frequency-table.h" />
+    <ClInclude Include="data\trie.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="encoding\bit-grouper.h" />
     <ClInclude Include="encoding\encoding-combiner.h" />
@@ -42,13 +42,14 @@
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\inverter.h" />
     <ClInclude Include="encoding\move-to-front.h" />
-    <ClInclude Include="defs.h" />
+    <ClInclude Include="util.h" />
     <ClInclude Include="encoding\encoding.h" />
     <ClInclude Include="encoding\encodings.h" />
     <ClInclude Include="encoding\huffman\huffman-encoding.h" />
     <ClInclude Include="encoding\predictive\constant-oracle.h" />
     <ClInclude Include="encoding\predictive\oracles.h" />
     <ClInclude Include="encoding\predictive\repeating-oracle.h" />
+    <ClInclude Include="encoding\predictive\trie-oracle.h" />
     <ClInclude Include="io\data-destination.h" />
     <ClInclude Include="io\data-source.h" />
     <ClInclude Include="io\files.h" />
@@ -73,11 +74,13 @@
     <ClCompile Include="encoding\predictive\constant-oracle.cpp" />
     <ClCompile Include="encoding\predictive\predictive-encoding.cpp" />
     <ClCompile Include="encoding\predictive\repeating-oracle.cpp" />
-    <ClCompile Include="io-util.cpp" />
+    <ClCompile Include="encoding\predictive\trie-oracle.cpp" />
+    <ClCompile Include="io\io-util.cpp" />
     <ClCompile Include="io\files.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="encoding\inverter.cpp" />
     <ClCompile Include="tests\data\frequency-table-tests.cpp" />
+    <ClCompile Include="tests\data\trie-tests.cpp" />
     <ClCompile Include="tests\data\type-selection.cpp" />
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp" />
     <ClCompile Include="tests\encoding\combinator-tests.cpp" />
@@ -86,8 +89,10 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
     <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
+    <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />
     <ClCompile Include="tests\tests.cpp" />
+    <ClCompile Include="tests\util-tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -1,7 +1,7 @@
 #ifndef ORACLE_H
 #define ORACLE_H
 
-#include "defs.h"
+#include "util.h"
 
 
 namespace encoding

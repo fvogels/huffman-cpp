@@ -1,7 +1,7 @@
 #ifndef BINARY_TREE_H
 #define BINARY_TREE_H
 
-#include "defs.h"
+#include "util.h"
 #include <functional>
 #include <assert.h>
 #include <memory>
@@ -101,6 +101,8 @@ namespace data
         }
     };
 
+    // Needs to be external function because of OUT type parameter
+    // It is impossible to create a template virtual method
     template<typename IN, typename OUT>
     std::unique_ptr<Node<OUT>> map(const Node<IN>& tree, std::function<OUT(const IN&)> function)
     {

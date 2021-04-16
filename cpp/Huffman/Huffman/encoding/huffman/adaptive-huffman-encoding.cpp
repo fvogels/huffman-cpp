@@ -8,8 +8,7 @@
 #include "io/memory-buffer.h"
 #include "io/streams.h"
 #include "io/io-util.h"
-#include "binary/binutil.h"
-#include "defs.h"
+#include "util.h"
 #include <assert.h>
 #include <utility>
 #include <memory>
@@ -24,7 +23,7 @@ namespace
         Datum m_nyt;
 
     public:
-        AdaptiveHuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_eof(domain_size), m_nyt(domain_size + 1), m_bits_per_datum(binary::bits_needed(domain_size + 2)) // +1 for eof, // +1 for nyt
+        AdaptiveHuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_eof(domain_size), m_nyt(domain_size + 1), m_bits_per_datum(bits_needed(domain_size + 2)) // +1 for eof, // +1 for nyt
         {
             // NOP
         }

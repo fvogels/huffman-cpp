@@ -2,7 +2,7 @@
 #define HUFFMAN_ENCODING_H
 
 #include "encoding/encoding.h"
-#include "defs.h"
+#include "util.h"
 #include <memory>
 
 

@@ -1,7 +1,7 @@
 #ifndef FREQUENCY_TABLE_H
 #define FREQUENCY_TABLE_H
 
-#include "defs.h"
+#include "util.h"
 #include <memory>
 #include <vector>
 #include <map>
@@ -16,6 +16,11 @@ namespace data
         std::map<T, u64> frequencies;
 
     public:
+        void increment(const T& value)
+        {
+            this->frequencies[value]++;
+        }
+
         u64 operator[](const T& value) const
         {
             auto it = this->frequencies.find(value);
@@ -29,22 +34,7 @@ namespace data
                 return it->second;
             }
         }
-
-        void add_to_domain(const T& value)
-        {
-            auto it = this->frequencies.find(value);
-
-            if (it == this->frequencies.end())
-            {
-                this->frequencies[value] = 0;
-            }
-        }
-
-        void increment(const T& value)
-        {
-            this->frequencies[value]++;
-        }
-
+                
         std::vector<T> values() const
         {
             std::vector<T> result;
@@ -55,6 +45,16 @@ namespace data
             }
 
             return result;
+        }
+
+        void add_to_domain(const T& value)
+        {
+            auto it = this->frequencies.find(value);
+
+            if (it == this->frequencies.end())
+            {
+                this->frequencies[value] = 0;
+            }
         }
     };
 

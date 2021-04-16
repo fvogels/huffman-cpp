@@ -3,7 +3,7 @@
 
 #include "data/binary-tree.h"
 #include <vector>
-#include "defs.h"
+#include "util.h"
 
 namespace encoding
 {

@@ -3,7 +3,7 @@
 
 #include "io/streams.h"
 #include "data/binary-tree.h"
-#include "defs.h"
+#include "util.h"
 
 
 namespace encoding

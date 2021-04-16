@@ -1,7 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "catch.hpp"
-#include "defs.h"
+#include "util.h"
 #include "encoding/bit-grouper.h"
 #include "io/memory-buffer.h"
 
@@ -19,7 +19,7 @@ namespace
         io::MemoryBuffer<2> buffer3;
 
         encoding::encode<2, domain_size>(buffer1.source(), encoding, buffer2.destination());
-        encoding::decode(buffer2.source(), encoding, buffer3.destination());
+        encoding::decode<2, domain_size>(buffer2.source(), encoding, buffer3.destination());
 
         auto result = buffer3.data();
 

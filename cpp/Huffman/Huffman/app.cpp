@@ -24,7 +24,7 @@ int main()
     const std::string file_b = R"(g:\temp\aaaaa\b.txt)";
     const std::string file_c = R"(g:\temp\aaaaa\c.txt)";
 
-    auto pipeline = eof_encoding<256>() | ~bit_grouper<257>() | bit_grouper<65537>() | huffman_encoding<65537>() | bit_grouper<256>();
+    auto pipeline = predictive_encoding<256>(encoding::predictive::trie_oracle(5)) | eof_encoding<256>() | adaptive_huffman<257>() | bit_grouper<8>();
     
     {
         auto input = io::create_file_data_source(file_a);

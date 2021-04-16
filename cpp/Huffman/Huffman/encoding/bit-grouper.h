@@ -2,7 +2,7 @@
 #define BIT_GROUPER_H
 
 #include "encoding/encoding.h"
-#include "defs.h"
+#include "util.h"
 #include <memory>
 
 namespace encoding

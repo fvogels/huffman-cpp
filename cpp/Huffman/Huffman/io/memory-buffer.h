@@ -3,11 +3,10 @@
 
 #include "data-source.h"
 #include "data-destination.h"
-#include "binary/binutil.h"
 #include <assert.h>
-#include <numeric>
 #include <utility>
 #include <vector>
+#include <limits>
 
 
 namespace io
@@ -110,7 +109,7 @@ namespace io
         return DataDestination<N>(std::make_shared<MemoryDataDestinationImplementation<T>>(buffer));
     }
 
-    template<u64 N, typename T = typename binary::SelectIntegerTypeByDomainSize<N>::type>
+    template<u64 N, typename T = typename SelectIntegerTypeByDomainSize<N>::type>
     class MemoryBuffer
     {
     private:

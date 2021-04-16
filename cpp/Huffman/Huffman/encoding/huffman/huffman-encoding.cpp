@@ -8,8 +8,7 @@
 #include "io/memory-buffer.h"
 #include "io/streams.h"
 #include "io/io-util.h"
-#include "binary/binutil.h"
-#include "defs.h"
+#include "util.h"
 #include <assert.h>
 #include <utility>
 #include <memory>
@@ -22,7 +21,7 @@ namespace
         unsigned m_bits_per_datum;
 
     public:
-        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(binary::bits_needed(domain_size))
+        HuffmanEncodingImplementation(u64 domain_size) : m_domain_size(domain_size), m_bits_per_datum(bits_needed(domain_size))
         {
             // NOP
         }

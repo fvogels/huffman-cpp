@@ -1,7 +1,7 @@
 #include "encoding/huffman/tree-encoding.h"
 #include "encoding/encoding.h"
 #include "io/io-util.h"
-#include "defs.h"
+#include "util.h"
 
 
 void encoding::huffman::encode_tree(const data::Node<Datum>& tree, unsigned bits_per_datum, io::OutputStream& output)

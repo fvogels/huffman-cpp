@@ -8,10 +8,9 @@ Remember that code inside another `.cpp` is off limits.
 ====
 
 [#class]
-## Type Parameters
+## Classes
 
 TODO
-
 
 .smart-array.h
 [source,language="cpp"]
@@ -38,4 +37,16 @@ public:
 
     // ...
 };
+----
+
+[#functions]
+## Functions
+
+[source,language='cpp']
+----
+template<typename T, typename U>
+U some_function(const T& x)
+{
+    // ...
+}
 ----

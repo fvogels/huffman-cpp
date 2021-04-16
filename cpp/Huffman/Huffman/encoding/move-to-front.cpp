@@ -1,5 +1,5 @@
 #include "encoding/move-to-front.h"
-#include "defs.h"
+#include "util.h"
 #include <deque>
 #include <assert.h>
 #include <numeric>

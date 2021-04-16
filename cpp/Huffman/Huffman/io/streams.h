@@ -1,7 +1,7 @@
 #ifndef INPUT_STREAM_H
 #define INPUT_STREAM_H
 
-#include "defs.h"
+#include "util.h"
 
 
 namespace io

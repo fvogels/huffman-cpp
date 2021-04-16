@@ -1,0 +1,55 @@
+# Testing
+
+[IMPORTANT]
+====
+Make sure every `.cpp` in your project has a unique name.
+Folders are ignored!
+So having `a/foo.cpp` and `b/foo.cpp` is not allowed, despite them being in separate folders.
+====
+
+## Writing Tests
+
+In the folder `tests`, add a new `.cpp` file with a name of your choice.
+Choose something descriptive, e.g. `frequency-table-tests.cpp`.
+
+Copy paste the following template:
+
+[source,language="cpp"]
+----
+#ifdef TEST_BUILD
+
+#include "catch.hpp"
+
+
+TEST_CASE("1 + 2 == 3")
+{
+    int a = 1, b = 2;
+    int actual = a + b;
+    int expected = 3;
+
+    REQUIRE(expected == actual);
+}
+
+#endif
+----
+
+* You can write as many tests in a single file as you want.
+* Write tests any way you want them.
+  The most important thing is that you check that everything works as intended.
+
+[IMPORTANT]
+====
+The test description string _must_ be unique for every test.
+Tests will not run if this is not the case.
+
+If you can't be bothered with writing out decent descriptions, feel free to use `FrequencyTable 1`, `FrequencyTable 2`, or something similar.
+====
+
+## Running Tests
+
+* Select testing build.
+* Run the tests using kbd:[CTRL+F5], or kbd:[F5] if you want the debugger to take over at breakpoints.
+
+## Extra Reading
+
+* https://github.com/catchorg/Catch2/tree/v2.x[Testing Library Documentation]

@@ -95,6 +95,7 @@ void flip(bool* x)
 * Use this only if the function must receive full ownership of `x`, i.e., if `x` is only needed in exactly one place.
 * Keep in mind that the caller loses all access to `x` after calling the function.
 * If the caller still needs to be able to access `x` after the call, use `shared_ptr<T>`.
+* If only read access is necessary, you can go for `unique_ptr<const T>`.
 
 .Example
 [%collapsible]
@@ -136,6 +137,7 @@ public:
 * Use this only if the function stores `x` internally, such as a constructor.
 * Use this only if the function shares ownership with others, i.e., if multiple places at once need access to `x`.
 * If the caller still needs to be able to access `x` after the call, use `shared_ptr<T>`.
+* If only read access is necessary, you can go for `shared_ptr<const T>`.
 
 .Example
 [%collapsible]
@@ -164,3 +166,7 @@ public:
   This is only possible using `shared_ptr<T>`.
 =====
 ====
+
+## Visual Helper
+
+image::parameter-types.svg[Static,align="center"]

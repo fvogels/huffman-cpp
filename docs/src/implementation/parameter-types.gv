@@ -1,0 +1,28 @@
+digraph G {
+    node [shape="box"];
+
+    sharing [label="Stores the value internally?"];
+    noshare_write [label="Write access needed?"];
+    noshare_readonly_small [label="Is T small?"];
+    shared [label="Shared with others?"];
+    unique_write [label="Write access needed?"];
+    shared_write [label="Write access needed?"];
+    T [label="T"];
+    const_T_ref [label="const T&"];
+    shared_ptr [label="shared_ptr<T>"];
+    const_shared_ptr [label="shared_ptr<const T>"];
+    unique_ptr [label="unique_ptr<T>"];
+    const_unique_ptr [label="unique_ptr<const T>"];
+
+    sharing -> noshare_write [label=" no"];
+    noshare_write -> noshare_readonly_small [label=" no"];
+    noshare_readonly_small -> T [label=" definitely"];
+    noshare_readonly_small -> const_T_ref [label=" no/unsure"];
+    sharing -> shared [label=" yes"];
+    shared -> unique_write [label=" no"];
+    shared -> shared_write [label=" yes"];
+    unique_write -> const_unique_ptr [label=" no"];
+    unique_write -> unique_ptr [label=" yes"];
+    shared_write -> const_shared_ptr [label=" no"];
+    shared_write -> shared_ptr [label=" yes"];
+}

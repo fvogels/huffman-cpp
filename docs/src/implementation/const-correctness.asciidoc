@@ -1,0 +1,64 @@
+# Const-Correctness
+
+## Const Methods
+
+Whenever you add a method to a class, ask yourself the question, does this method modify the object in any way?
+If not, you should add `const` to the method's signature.
+
+[source,language='cpp']
+----
+class Counter
+{
+    int value;
+
+public:
+    // This method does not modify the Counter object, so it should be const
+    int count() const
+    {
+        return value;
+    }
+
+    // This method clearly makes a change to the object, so it cannot be const
+    int inc()
+    {
+        ++value;
+    }
+}
+----
+
+## Const and Non-Const Overloads
+
+Note that sometimes, you need both a `const` and a non`const` version.
+
+[source,language='cpp']
+----
+class Counter
+{
+    int value;
+
+public:
+    // This method does not modify the Counter object, so it should be const
+    int count() const
+    {
+        return value;
+    }
+
+    // While the method may not modify the object,
+    // it does return a writeable reference to its field
+    int& count()
+    {
+        return value;
+    }
+}
+----
+
+[source,language='cpp']
+----
+void foo(const Counter& readonly, Counter& writeable)
+{
+    int x  = readonly.count(); // calls the const version, returns a copy of the count
+
+    int& y = writeable.count(); // calls the nonconst version, returns a reference to the count
+    y++; // y refers to writeable.value, so this effectively changes the field's value
+}
+----

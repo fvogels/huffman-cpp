@@ -10,5 +10,6 @@ The list below exists merely to provide an overview.
 
 * <<include-guards#,Include Guards>>
 * <<namespaces#,Namespaces>>
-* <<templates#,Templates>>
 * <<parameter-types#,Parameter Types>>
+* <<templates#,Templates>>
+* <<testing#,Testing>>

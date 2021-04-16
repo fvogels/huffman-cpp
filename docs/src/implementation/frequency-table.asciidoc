@@ -5,6 +5,17 @@
 The first thing (nonadaptive) Huffman encoding needs to do is count the frequencies of each byte in its input stream.
 We will create a class `FrequencyTable` to assist us in this task.
 
+A bit of terminology (apologies if this is confusing - I can change it if necessary):
+
+* The `FrequencyTable` clearly is a map-like data structure: it associates certain values with other values.
+  In our case, it associates values with frequencies.
+* When using maps, we generally say _keys_ are associated _values_.
+  Here, I used different terms: the `FrequencyTable` associates _values_ with _frequencies_.
+
+## Python Implementation
+
+See `freqtable.py`.
+
 ## Prerequisites
 
 None.
@@ -101,6 +112,22 @@ No destructor should be needed.
 
 `freqtable.increment(x)` method should increase the frequency of `x`.
 
+[TASK]
+====
+Implement this method.
+
+* It requires one parameter `x`.
+  What should its exact <<parameter-types#,type>> be?
+** `increment` needs only read access to `x`.
+** `increment` needs to store ``x``'s value somewhere in its internal data structure, but it needs to be a _copy_ of `x`.
+   This is due to the fact that it will be used as a key in a map-like data structure, and we can't allow keys to be modified lest the map fail to work.
+   Making a copy is the safest way to make sure no one gets to modify the key.
+** You know nothing about `T`: it might be small or large.
+   Better play it safe.
+** No ownership transfer is necessary (neither full or partial).
+* Think of <<const-correctness#,`const`-correctness>>: is this a `const` method?
+====
+
 .Example usage
 [%collapsible]
 ====
@@ -112,6 +139,33 @@ freqtable.increment('a'); // a has now frequency 1
 ====
 
 ### Indexing
+
+We need a way to ask a `FrequencyTable` what the frequency of some value `x` is.
+Instead of using a regular method, we will be using the syntax `freqtable[x]`.
+
+[TASK]
+====
+Overload the `[]` operator.
+
+* It takes the value as parameter. What should its exact <<parameter-types#,type>> be?
+  Note that this function will use it in more or less the same way as `increment`:
+** Size of `T` is unknown, so do not assume it is small.
+** No write access needed.
+** No ownership transfer.
+====
+
+[NOTE]
+====
+If you look online, they will often show an implementation that returns a reference.
+This gives write access to the caller:
+
+[source,language='cpp']
+----
+freqtable[x] = 5;
+----
+
+We do not want such functionality.
+====
 
 .Example usage
 [%collapsible]
@@ -127,6 +181,11 @@ freqtable['a']; // returns 1
 
 ### Method `values`
 
+[TASK]
+====
+Implement this method.
+====
+
 .Example usage
 [%collapsible]
 ====
@@ -138,37 +197,3 @@ freqtable.increment('a');
 freqtable.values() // returns list { 'a' }
 ----
 ====
-
-## Python Implementation
-
-[source,language="python"]
-----
-class FrequencyTable(Generic[T]):
-    __table : dict[T, int]
-
-    def __init__(self):
-        '''
-        Initializes the freqtable
-        '''
-        self.__table = {}
-
-    def __getitem__(self, value : T) -> int:
-        '''
-        freqtable[x] returns the frequency of x.
-        If x has not been encountered before, its frequency is 0.
-        '''
-        return self.__table.get(value, 0)
-
-    def increment(self, value : T) -> None:
-        '''
-        freqtable.increment(x) increments the frequency of x by one.
-        '''
-        self.__table[value] = self[value] + 1
-
-    @property
-    def values(self) -> Iterable[T]:
-        '''
-        freqtable.values returns a sequence of only the values (i.e., not their frequencies).
-        '''
-        return self.__table.keys()
-----

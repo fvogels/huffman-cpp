@@ -9,6 +9,7 @@ These pages contain extra information regarding implementation details.
 These are also linked to by the guiding texts, so there's no need to go through these one by one.
 The list below exists merely to provide an overview.
 
+* <<bitwise-operations#,Bitwise Operations>>
 * <<const-correctness#,Const Correctness>>
 * <<include-guards#,Include Guards>>
 * <<namespaces#,Namespaces>>

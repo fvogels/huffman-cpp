@@ -1,0 +1,37 @@
+# Utility Functions
+
+[TASK]
+====
+* Create a new file `util.h` in the root of your project (i.e., not in a subdirectory.)
+* Add an <<include-guards#,include guard>>.
+====
+
+## Type aliasing
+
+We will be using 64 bit integers a lot.
+Since the {cpp} standard does not specify fixed sizes for `int`, `long`, etc. we will make use of `uint64_t`, defined in `cstdint.h`.
+However, it's not an easy name to type.
+We'd prefer something shorter.
+
+[TASK]
+====
+Create a <<typedefs#,type alias>> for `uint64_t` named `u64`.
+====
+
+We will be using `u64` to represent data (to be compressed or decompressed.)
+However, it'd be nice if we could differentiate between 'regular integers' and `actual data`.
+To help us keep both concepts separate, we introduce a new type named `Datum`.
+
+[TASK]
+====
+Create a <<typedefs#,type alias>> for `uint64_t` named `Datum`.
+====
+
+For example, if we have a list of data, we would use `std::vector<Datum>`.
+The size of this list might then be represented using `u64`.
+
+[NOTE]
+====
+The distinction between `u64` and `Datum` is merely psychological.
+It's purely intended as an aid.
+====

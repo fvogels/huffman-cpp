@@ -1,0 +1,196 @@
+# Bitwise Operations
+
+When working with `int`s, you generally see them as numbers and use mathematical operators on them such as `+`, `-`, `*`, `/` and `%`.
+
+However, as you hopefully know, computers represent data using bits.
+You could also see an `int` as a series of bits (32 or 64, depending on the platform and compiler).
+This alternative view on `int`s opens up different operators, namely the _bitwise operators_.
+
+[NOTE]
+====
+In the examples below, we'll mostly use 8-bit integers for the sake of clarity.
+It is easily generalized to 16, 32 and 64 bits.
+====
+
+[IMPORTANT]
+====
+We will work with binary notation in this text.
+When we do so, we will prefix it with `0b`.
+For example, `10` stands for ten, while `0b10` is binary for two.
+
+We will also use `'` to group binary digits, typically in groups of four, e.g., `0b0000'1111`.
+The `'` does not mean anything, it is merely a visual aid.
+
+These notations are valid {cpp}: `0b0000'1111` will be recognized by the compiler as 15.
+====
+
+## Left Shifting
+
+Consider ``x = 0b0000'1111`.
+It is possible to _shift_ ``x``'s bits any number of places to the left using the `<<` operator.
+
+[.center,%header,width=50%,cols="^,^"]
+|====
+| Operation | Result
+| `x << 0`  | `0b0000'1111`
+| `x << 1`  | `0b0001'1110`
+| `x << 2`  | `0b0011'1100`
+| `x << 3`  | `0b0111'1000`
+| `x << 4`  | `0b1111'0000`
+| `x << 5`  | `0b1110'0000`
+| `x << 6`  | `0b1100'0000`
+| `x << 7`  | `0b1000'0000`
+|====
+
+Note the following details:
+
+* `x << n` moves all bits `n` positions to the left.
+* New `0`s are added to the right.
+* Bits "fall off the cliff" on the left: they're simply lost.
+
+[NOTE]
+====
+Shifting to the left is the same as multiplying by a power of 2.
+
+[.center,%header,width=50%,cols="^,^"]
+|====
+| Operation | Equivalent
+| `x << 0`  | `x * 1`
+| `x << 1`  | `x * 2`
+| `x << 2`  | `x * 4`
+| `x << 3`  | `x * 8`
+| `x << 4`  | `x * 16`
+|====
+
+In the past, games would rely on such bitshifting because multiplication was too CPU intensive.
+For example, `x * 320` would be written as `(x << 8) + (x << 6)`.
+Multiplication by `320` was important: the screen had a resolution of 320&times;200.
+
+These days, however, there is no point in such tricks:
+
+* Multiplication has become much faster, so that splitting it up in multiple operations is not beneficial anymore.
+* The compiler knows best: if multiplying happens to be faster user shifts, the compiler will take care of translating it to bitshifts.
+====
+
+## Right Shifting
+
+It should come as no surprise that `x >> n` also exists and shifts bits `n` positions to the right.
+
+[.center,%header,width=50%,cols="^,^"]
+|====
+| Operation | Result
+| `x >> 0`  | `0b0000'1111`
+| `x >> 1`  | `0b0000'0111`
+| `x >> 2`  | `0b0000'0011`
+| `x >> 3`  | `0b0000'0001`
+| `x >> 4`  | `0b0000'0000`
+|====
+
+[NOTE]
+====
+Shifting to the right is the same as integer division:
+
+[.center,%header,width=50%,cols="^,^"]
+|====
+| Operation | Equivalent
+| `x >> 0`  | `x / 1`
+| `x >> 1`  | `x / 2`
+| `x >> 2`  | `x / 4`
+| `x >> 3`  | `x / 8`
+| `x >> 4`  | `x / 16`
+|====
+====
+
+## Bitwise AND
+
+The familiar `&&` operator is known as _logical AND_ and takes boolean values as operands.
+There is also the `&` operator, known as _bitwise AND_`.
+It performs the same AND operation, but on a bit level.
+For 32-bit ``int``s, `x & y` basically performs 32 AND operations at once.
+
+.Bitwise AND
+[example]
+====
+`10 & 12` evaluates to `8`.
+
+To understand this result, first convert both to binary: `0b1010 & 0b1100`.
+Next, perform AND operations bit by bit:
+
+[.center,cols="3,^,^,^,^",width="50%"]
+|===
+| Left operand  | `1` | `0` | `1` | `0`
+| Right operand | `1` | `1` | `0` | `0`
+| Result        | `1` | `0` | `0` | `0`
+|===
+
+The resulting bits form a new number: `0b1000` which is equal to `8`.
+====
+
+### Masking
+
+The `&` operator is often used to "extract" certain bits.
+Say you have a 4 byte integer `x = 0x12'34'56'78` and want to extract the bytes `0x12`, `0x34`, `0x56` and `0x78`.
+Remember that `0xF` is `0b1111` in binary, i.e., all bits are set.
+
+[.center,&header,cols="^,^2,^",width="75%"]
+|===
+| Byte | Operation | Result
+| Rightmost | `x & 0x00'00'00'FF` | `0x00'00'00'78`
+| Second | `x & 0x00'00'FF'00` | `0x00'00'56'00`
+| Third | `x & 0x00'FF'00'00` | `0x00'34'00'00`
+| Leftmost | `x & 0xFF'00'00'00` | `0x12'00'00'00`
+|===
+
+With some extra shifts you can move the byte to the rightmost position:
+
+[.center,&header,cols="^,^2,^",width="75%"]
+|===
+| Byte | Operation | Result
+| Rightmost | `x & 0x00'00'00'FF` | `0x00'00'00'78`
+| Second | `(x & 0x00'00'FF'00) >> 8` | `0x00'00'00'56`
+| Third | `(x & 0x00'FF'00'00) >> 16` | `0x00'00'00'34`
+| Leftmost | `(x & 0xFF'00'00'00) >> 24` | `0x00'00'00'12`
+|===
+
+## Bitwise OR
+
+Predictably, the logical OR operator `||` also has a bitwise brother `|`.
+
+.Bitwise AND
+[example]
+====
+`10 | 12` evaluates to `14`.
+
+First convert both to binary: `0b1010 & 0b1100`.
+Next, perform OR operations bit by bit:
+
+[.center,cols="3,^,^,^,^",width="50%"]
+|===
+| Left operand | `1` | `0` | `1` | `0`
+| Right operand | `1` | `1` | `0` | `0`
+| Result | `1` | `1` | `1` | `0`
+|===
+====
+
+### Combining
+
+The `|` operator is often used to combine parts into a single whole.
+
+For example, say you have `a = 0x11`, `b = 0x22`, `c = 0x33` and `d = 0x44`, and you wish to group them into a single 32-bit integer `0x11223344`.
+First, you would shift them in position:
+
+[.center,&header,cols="^,^",width="50%"]
+|===
+| Operation | Result
+| `a << 24` | `0x11'00'00'00`
+| `b << 16` | `0x00'22'00'00`
+| `c << 8`  | `0x00'00'33'00`
+| `d`       | `0x00'00'00'44`
+|===
+
+Next, you can combine them using `|`:
+
+[.center,cols="^",width="50%"]
+|===
+| `(a << 24) \| (b << 16) \| (c << 8) \| d`
+|===

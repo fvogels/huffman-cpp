@@ -2,7 +2,7 @@
 
 Namespaces serve a similar purpose to packages in Java: they help organize your code.
 Java demands that a package `foo` resides in a directory `foo`.
-C++ has no such limitation, but we'll follow the same rule anyway: everything residing in a namespace `foo` will be placed in a folder named `foo`.
+{cpp} has no such limitation, but we'll follow the same rule anyway: everything residing in a namespace `foo` will be placed in a folder named `foo`.
 
 .foo.h
 [source,language="cpp"]

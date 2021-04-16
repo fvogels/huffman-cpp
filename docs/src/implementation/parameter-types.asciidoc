@@ -1,7 +1,7 @@
 # Parameter Types
 
 Say you are writing a function which should receive a value `x` of some type `T`.
-C++ offers many ways to pass this value along.
+{cpp} offers many ways to pass this value along.
 This text serves as a guide to help you pick the correct way.
 
 ## `T x`

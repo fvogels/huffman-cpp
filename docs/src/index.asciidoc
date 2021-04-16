@@ -5,7 +5,7 @@ While conceptually Huffman encoding is not difficult to understand, implementing
 One of the goals of this project is to force you to take small steps and create the habit of checking your work as often as possible.
 If you write 50 lines of code and find out it doesn't work as expected, you will have 50 lines of code to check.
 If, however, you make sure to check your code every 10 lines, you only need to check those 10.
-It is important to limit the amount of code you need to verify in case of a bug, _especially_ when using C++.
+It is important to limit the amount of code you need to verify in case of a bug, _especially_ when using {cpp}.
 
 When tackling a problem of nontrivial size, you need to find ways to reduce its complexity.
 For this project, there are multiple ways to help you achieve this:

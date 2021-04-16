@@ -1,0 +1,33 @@
+# Typedefs
+
+{cpp} allows you to define new names for types:
+
+[source,language='cpp']
+----
+typedef existing_type new_name;
+----
+
+For example, this can be used to introduce shorter names:
+
+[source,language='cpp']
+----
+typedef std::shared_ptr<std::vector<std::string>> strvec;
+----
+
+It can also by used to improve readability by having the type better express the intent:
+
+[source,language='cpp']
+----
+typedef unsigned index;
+
+for ( index i = 0; i != vector.size(); ++i )
+{
+    ...
+}
+----
+
+[NOTE]
+====
+`typedef`s do not define _new_ types.
+Internally, the compiler does not distinguish between `unsigned` and `index`.
+====

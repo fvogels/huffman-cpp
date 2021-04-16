@@ -16,8 +16,8 @@ namespace
         io::MemoryBuffer<2> buffer2;
         io::MemoryBuffer<IN> buffer3;
 
-        encoding::encode(buffer1.source(), encoding, buffer2.destination());
-        encoding::decode(buffer2.source(), encoding, buffer3.destination());
+        encoding::encode<IN, 2>(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode<IN, 2>(buffer2.source(), encoding, buffer3.destination());
 
         auto results = buffer3.data();
 
@@ -30,8 +30,8 @@ namespace
     }
 }
 
-#define TESTN(N, ...) TEST_CASE("Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check(std::vector<Datum> { __VA_ARGS__ }, encoding::huffman_encoding<N>()); } \
-                      TEST_CASE("Adaptive Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check(std::vector<Datum> { __VA_ARGS__ }, encoding::adaptive_huffman<N>()); }
+#define TESTN(N, ...) TEST_CASE("Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check<N>(std::vector<Datum> { __VA_ARGS__ }, encoding::huffman_encoding<N>()); } \
+                      TEST_CASE("Adaptive Huffman Encoding (DS=" #N ") on { " #__VA_ARGS__ " }") { check<N>(std::vector<Datum> { __VA_ARGS__ }, encoding::adaptive_huffman<N>()); }
 
 
 #define TEST4(...)   TESTN(4, __VA_ARGS__)

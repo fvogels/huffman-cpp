@@ -191,9 +191,6 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\encoding\prediction-encoding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tests\io\io-util-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

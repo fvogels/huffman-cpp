@@ -87,7 +87,6 @@
     <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\huffman\tree-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
-    <ClCompile Include="tests\encoding\prediction-encoding.cpp" />
     <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />

@@ -11,7 +11,7 @@ namespace
     template<unsigned GROUP_SIZE>
     void check(const std::vector<byte>& data)
     {
-        constexpr auto domain_size = 1 << GROUP_SIZE;
+        constexpr long unsigned int domain_size = 1 << GROUP_SIZE;
         auto encoding = encoding::bit_grouper<GROUP_SIZE>();
 
         io::MemoryBuffer<2> buffer1(data);

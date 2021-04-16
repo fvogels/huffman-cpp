@@ -173,7 +173,7 @@
     <ClCompile Include="tests\data\frequency-table-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\data\type-selection.cpp">
+    <ClCompile Include="tests\type-selection-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp">
@@ -203,7 +203,13 @@
     <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\util-tests.cpp">
+    <ClCompile Include="tests\binary-search-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\bits-needed-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\bytes-needed-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

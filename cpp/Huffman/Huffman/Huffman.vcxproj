@@ -61,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="tests\bytes-needed-tests.cpp" />
+    <ClCompile Include="tests\bits-needed-tests.cpp" />
     <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="encoding\bit-grouper.cpp" />
     <ClCompile Include="encoding\eof-encoding.cpp" />
@@ -81,7 +83,7 @@
     <ClCompile Include="encoding\inverter.cpp" />
     <ClCompile Include="tests\data\frequency-table-tests.cpp" />
     <ClCompile Include="tests\data\trie-tests.cpp" />
-    <ClCompile Include="tests\data\type-selection.cpp" />
+    <ClCompile Include="tests\type-selection-tests.cpp" />
     <ClCompile Include="tests\encoding\bit-grouper-tests.cpp" />
     <ClCompile Include="tests\encoding\combinator-tests.cpp" />
     <ClCompile Include="tests\encoding\huffman\huffman-encoding-tests.cpp" />
@@ -91,7 +93,7 @@
     <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp" />
     <ClCompile Include="tests\io\io-util-tests.cpp" />
     <ClCompile Include="tests\tests.cpp" />
-    <ClCompile Include="tests\util-tests.cpp" />
+    <ClCompile Include="tests\binary-search-tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

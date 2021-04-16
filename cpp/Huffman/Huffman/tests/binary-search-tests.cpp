@@ -16,7 +16,6 @@ namespace
 
 #define TEST(expected, value, ...) TEST_CASE("Binary search for " #value " in " #__VA_ARGS__) { check(value, std::vector<int> { __VA_ARGS__ }, expected ); }
 
-
 TEST(-1, 0)
 TEST(0, 0, 0)
 TEST(-1, 1, 0)

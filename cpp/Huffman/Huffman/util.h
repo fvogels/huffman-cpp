@@ -95,7 +95,7 @@ constexpr unsigned bytes_needed(u64 domain_size)
     return (bits_needed(domain_size) + 7) / 8;
 }
 
-template<unsigned NBITS> struct SelectIntegerTypeByBytes;
+template<unsigned NBYTES> struct SelectIntegerTypeByBytes;
 
 template<> struct SelectIntegerTypeByBytes<1> { typedef uint8_t type; };
 template<> struct SelectIntegerTypeByBytes<2> { typedef uint16_t type; };

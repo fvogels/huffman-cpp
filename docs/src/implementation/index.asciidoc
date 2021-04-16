@@ -2,6 +2,7 @@
 
 * <<utility-functions#,Utility Functions>>
 * <<frequency-table#,FrequencyTable>>
+* <<binary-tree#,BinaryTree>>
 
 ## Auxiliary Pages
 
@@ -11,6 +12,7 @@ The list below exists merely to provide an overview.
 
 * <<bitwise-operations#,Bitwise Operations>>
 * <<const-correctness#,Const Correctness>>
+* <<first-class-functions#,First Class Functions>>
 * <<include-guards#,Include Guards>>
 * <<namespaces#,Namespaces>>
 * <<parameter-types#,Parameter Types>>

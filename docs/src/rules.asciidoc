@@ -13,9 +13,10 @@
 
 ## Code
 
-* No `#pragma once` allowed. Use old fashioned <<implementation/include-guards#,include guards>>.
+* No `\#pragma once` allowed. Use old fashioned <<implementation/include-guards#,include guards>>.
 * Every header file needs an include guard.
 * Do *not* ignore warnings.
 * No `using namespace` allowed in header files.
-* No `const_cast`.
 * Stay away from `new` and `delete` as much as you can. Stack allocation, `std::make_shared` and `std::make_unique` are your friends.
+* No `const_cast`.
+* No C-style casts, i.e., use `static_cast<T>`, `dynamic_cast<T>` or `reinterpret_cast<T>` (do pick the right one, not just any one of them), but never `(T)`.

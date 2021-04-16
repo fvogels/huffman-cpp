@@ -1,0 +1,193 @@
+# BinaryTree
+
+## Context
+
+After having counted the frequencies of each byte, the Huffman encoding algorithm needs to build a binary tree.
+Let's create the necessary classes.
+
+## Python Implementation
+
+See `tree.py`.
+
+## Specifications
+
+A Huffman tree with weights looks as shown below:
+
+.Example Huffman Tree
+image::huffman-tree.svg[Static,align="center"]
+
+The weights can be removed, leaving only this:
+
+image::huffman-tree-raw.svg[Static,align="center"]
+
+* Every branch (internal node) has exactly two children.
+* The leaves carry information.
+** In the first diagram, they carry a datum with its frequency.
+** In the second diagram, they carry only a datum.
+* There is no need to _modify_ the tree.
+  Once a node is created, it stays the way it is.
+
+.UML
+image::binary-tree-uml.svg[Static,align="center"]
+
+## Skeleton
+
+We make the tree a <<templates#class,template class>>, so as to be able to choose what kind of data a leaf carries.
+
+[TASK]
+====
+* Create a file `data/binary-tree.h`.
+* We won't need a `.cpp` since we're dealing with a template class.
+* Add an <<include-guards#,include guard>>.
+* Write a declaration for <<namespaces#,namespace>> `data`.
+====
+
+## Class Hierarchy
+
+[TASK]
+====
+Define three template classes:
+
+* `Node<T>`
+* `Branch<T>` inherits from `Node<T>`.
+* `Leaf<T>` inherits from `Node<T>`.
+====
+
+## Virtual Destructor
+
+[TASK]
+====
+Give `Node` a virtual destructor.
+Its body should be empty.
+
+You shouldn't have to override it in subclasses.
+====
+
+## Branch
+
+[NOTE]
+====
+`Branch` object will _only_ keep track of their children.
+The diagram above implies that a branch also has a weight, but in order to simplify the implementation, we will omit that part.
+No information is lost: the weight can easily be computed by taking the sum of the weights of the children.
+====
+
+### Fields
+
+A `Branch<T>` must have two children of type `Node<T>` so that the children themselves can be either branches or leaves.
+
+[TASK]
+====
+Add two fields `left_child` and `right_child`.
+Choose the exact type based on the following facts:
+
+* The two children are objects that are part of a class hierarchy.
+  This means you should keep track of them using their memory address, i.e., through a pointer or reference.
+* The `Branch` object should have _ownership_ over its children.
+  Not only that, it is the only object that should have ownership; children should not be shared.
+  You want the child nodes to be freed automatically as soon as the parent branch is freed itself.
+* The child objects themselves will not be modified, nor will we change who the children are of the branch.
+====
+
+### Constructor
+
+[TASK]
+====
+Give `Branch` a constructor.
+
+* It should receive the two children as parameters.
+* The parameter types should be quite similar to the field's types.
+* Rely on the initializer list to initialize the fields.
+  The constructor body should be empty (except perhaps for assertions.)
+====
+
+### Accessors
+
+[TASK]
+====
+Add two methods that return the left and right child, respectively.
+
+* Do not give away ownership!
+  Instead, simply return it as a reference.
+* Think of <<const-correctness#,`const` correctness>>.
+====
+
+## Leaf
+
+### Fields
+
+[TASK]
+====
+The leaf must be able to carry along a value of type `T`.
+Choose the exact type based on
+
+* The leaf will want its own copy. No need to bother with pointers/references.
+* The leaf will not want to modify the value.
+====
+
+### Constructor
+
+[TASK]
+====
+Define the constructor.
+
+* It receives one parameter in order to be able to initialize its sole field.
+* Readonly access is sufficient.
+* No ownership transfer: a copy will be made.
+* You don't know the size of `T`; it might be large.
+* Make use of initializer lists.
+* The constructor body should be empty.
+====
+
+### Accessors
+
+[TASK]
+====
+Add a method that allows you to retrieve the data associated with the leaf.
+
+* Returning by value is risky since you don't know how large `T` is.
+* Be careful not give the caller write access to your field.
+* As always, think of <<const-correctness#,`const` correctness>>.
+====
+
+## Function `map`
+
+Let's bring back the nice trees shown earlier.
+During Huffman encoding, first we construct the tree
+
+image::huffman-tree.svg[Static,align="center"]
+
+But we will want to dump all weights:
+
+image::huffman-tree-raw.svg[Static,align="center"]
+
+Note how the shape of the tree is maintained: only the leaf values are changed.
+We will now implement a helper function that takes a tree and constructs a new tree with exactly the same shape, but with new leaf values.
+
+[TASK]
+====
+Add the following code to `binary-tree.h` inside the `data` namespace:
+
+[source,language='cpp']
+----
+template<typename IN, typename OUT>
+std::unique_ptr<Node<OUT>> map(const Node<IN>& tree, std::function<OUT(const IN&)> function)
+{
+    /*
+
+    if tree is leaf
+        create new leaf with value = function(old_value)
+    else tree is branch
+        new_left_child = apply map to left child
+        new_right_child = apply map to right child
+        create new branch with new_left_child and new_right_child
+    */
+}
+----
+
+* `map` is a template function with two type parameters:
+** `IN` represents the type of the existing tree's data. In our case, that would be a tuple containing both the datum and the weight.
+** `OUT` represents the type of the new tree's data. In our case, that would be just the datum without the weight.
+* The parameter `function` will represent which operation to apply on each leaf's data.
+  If you need some help regarding `function`, read <<first-class-functions#,this>>.
+====

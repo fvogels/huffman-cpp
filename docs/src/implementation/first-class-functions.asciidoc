@@ -1,0 +1,80 @@
+# First Class Functions
+
+``int``s, ``bool``s, ``double``s are "things" you can store in variables, pass to functions, apply operations on, etc.
+Functions are no different: they are "things" that have one operation defined on them, namely the function call.
+Given a function `f`, you can call it using the syntax `f(x, y, z)`.
+
+## Type
+
+You need to be able to express the type of a function.
+A type must contain all information needed to be able to use the function:
+
+* Parameter types to enable to compiler to check whether you're passing the right parameters.
+* Return type to enable the compiler to check that you're assigning the result in the right variable.
+
+If the parameter types are `T1`, `T2`, `T3` and the return type is `R`, the function's type is written
+
+[.center,width=50%,cols="^"]
+|===
+| `std::function<R(T1, T2, T3)>`
+|===
+
+[IMPORTANT]
+====
+You must include `functional.h` in order to use this type.
+====
+
+### Passing Functions as Parameters
+
+Simply pass functions by value, i.e., no pointers or references.
+
+### Returning Functions
+
+Return functions by value, i.e., no pointers or references.
+
+## Lambdas
+
+A lambda is an anonymous function.
+In {cpp}, it has the following syntax:
+
+[.center,width=50%,cols="^"]
+|===
+| `[capture_list](parameters) { body }`
+|===
+
+The capture list indicates which variables the body needs to access from outside the function and how they should be captured.
+Don't worry about this: we'll help you out whenever the need arises.
+
+## Example
+
+[source,language='cpp']
+----
+/*
+ * Checks if a specific condition is true for all elements in the list.
+ */
+template<typename T>
+bool all(const std::vector<T>& list,              // <1>
+         std::function<bool(const T&)> predicate) // <2>
+{
+    for ( auto& x : list )                        // <3>
+    {
+        if ( !predicate(x) )                      // <4>
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+std::vector<Person> people;
+int minimum_age;
+
+// Are all people above the minimum age?
+all(people, [minimum_age](const Person& p) { return p.age >= minimum_age } ); // <5>
+----
+<1> The list is passed as a `const` reference: the list could be big, hence by reference. Only read access is needed, hence the `const`.
+<2> `predicate` is a function that takes a `const T&` (efficient readonly access) and returns a `bool`.
+<3> We iterate over the list. `auto` lets the compiler infer the type, the `&` tells it to do it by reference, thereby avoiding that each element is copied in turn.
+<4> `predicate` can be called as any other function.
+<5> The body over the lambda refers to `minimum_age`, which therefore needs to be listed in the capture list.

@@ -1,0 +1,32 @@
+digraph G
+{
+    node [shape=none,fontname=Consolas,margin="0.3,0.1"];
+    rankdir=BT;
+
+    Super [
+      label =<<TABLE BORDER="2" CELLBORDER="0" CELLSPACING="1" CELLPADDING="5">
+                      <TR><TD PORT="header"><B><U>Node</U></B></TD></TR>
+                      <TR><TD PORT="destructor">~Node()</TD></TR>
+                  </TABLE>>
+    ];
+
+    Branch [
+      label =<<TABLE BORDER="2" CELLBORDER="0" CELLSPACING="1" CELLPADDING="5">
+                      <TR><TD PORT="header"><B><U>Branch</U></B></TD></TR>
+                      <TR><TD PORT="childa">left_child</TD></TR>
+                      <TR><TD PORT="childb">right_child</TD></TR>
+                  </TABLE>>
+    ];
+
+    Leaf [
+      label =<<TABLE BORDER="2" CELLBORDER="0" CELLSPACING="1" CELLPADDING="5">
+                      <TR><TD PORT="header"><B><U>Leaf</U></B></TD></TR>
+                      <TR><TD PORT="value">value</TD></TR>
+                  </TABLE>>
+    ];
+
+    Branch -> Super [arrowhead=onormal];
+    Leaf -> Super  [arrowhead=onormal];
+    Branch:childa:w -> Super:header:w;
+    Branch:childb:w -> Super:header:w;
+}

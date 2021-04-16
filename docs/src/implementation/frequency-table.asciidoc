@@ -16,7 +16,7 @@ A bit of terminology (apologies if this is confusing - I can change it if necess
 
 See `freqtable.py`.
 
-## Goal
+## Specifications
 
 * `FrequencyTable` must be able to count _any_ kind of values. E.g., we want to be able to count chars with a `FrequencyTable<char>`, or strings with `FrequencyTable<std::string>`, etc.
 * Required functionality:

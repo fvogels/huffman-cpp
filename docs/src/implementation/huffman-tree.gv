@@ -1,0 +1,20 @@
+digraph G
+{
+    a[label="a:12"];
+    b[label="b:7"];
+    c[label="c:3"];
+    d[label="d:14"];
+    e[label="e:29"];
+
+    bc[label="10"];
+    bc -> {b c};
+
+    ad[label="26"];
+    ad -> {a d};
+
+    bcad[label="36"];
+    bcad -> {bc ad};
+
+    root[label="65"];
+    root -> {bcad e};
+}

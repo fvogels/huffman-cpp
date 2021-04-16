@@ -1,6 +1,6 @@
 # Bitwise Operations
 
-When working with `int`s, you generally see them as numbers and use mathematical operators on them such as `+`, `-`, `*`, `/` and `%`.
+When working with integers, you generally see them as numbers and use mathematical operators on them such as `+`, `-`, `*`, `/` and `%`.
 
 However, as you hopefully know, computers represent data using bits.
 You could also see an `int` as a series of bits (32 or 64, depending on the platform and compiler).
@@ -10,6 +10,11 @@ This alternative view on `int`s opens up different operators, namely the _bitwis
 ====
 In the examples below, we'll mostly use 8-bit integers for the sake of clarity.
 It is easily generalized to 16, 32 and 64 bits.
+====
+
+[IMPORTANT]
+====
+When using bitwise operations, it is highly recommended to work with _unsigned_ integers.
 ====
 
 [IMPORTANT]
@@ -109,7 +114,7 @@ Shifting to the right is the same as integer division:
 The familiar `&&` operator is known as _logical AND_ and takes boolean values as operands.
 There is also the `&` operator, known as _bitwise AND_`.
 It performs the same AND operation, but on a bit level.
-For 32-bit ``int``s, `x & y` basically performs 32 AND operations at once.
+For 32-bit integers, `x & y` basically performs 32 AND operations at once.
 
 .Bitwise AND
 [example]
@@ -155,6 +160,24 @@ With some extra shifts you can move the byte to the rightmost position:
 | Third | `(x & 0x00'FF'00'00) >> 16` | `0x00'00'00'34`
 | Leftmost | `(x & 0xFF'00'00'00) >> 24` | `0x00'00'00'12`
 |===
+
+[#isbitset]
+### Checking Bits
+
+The `&` operator can be used to check whether a certain bit is set in some integer x.
+If we number the bits from right to left as shown below:
+
+[.center,cols="^,^,^,^,^,^,^,^",width="50%"]
+|===
+| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0
+|===
+
+Say we want to found out if the ``K``th bit is set.
+
+* First, create an `int` where only this ``K``th bit is set: `1 << K`.
+* Next, combine it with `x` using the bitwise AND.
+* If the result is zero, `x` did not have its ``K``th bit set.
+  If the result is nonzero, `x` did have its ``K``th bit set.
 
 [#or]
 ## Bitwise OR

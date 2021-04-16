@@ -17,8 +17,8 @@ namespace
         io::MemoryBuffer<256> buffer2;
         io::MemoryBuffer<256> buffer3;
 
-        encoding::encode<256, 256>(buffer1.source(), encoding, buffer2.destination());
-        encoding::decode<256, 256>(buffer2.source(), encoding, buffer3.destination());
+        encoding::encode(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
 
         auto decoded_data = buffer3.data();
 

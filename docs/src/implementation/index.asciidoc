@@ -1,5 +1,6 @@
 # Implementation
 
+* <<utility-functions#,Utility Functions>>
 * <<frequency-table#,FrequencyTable>>
 
 ## Auxiliary Pages
@@ -14,3 +15,4 @@ The list below exists merely to provide an overview.
 * <<parameter-types#,Parameter Types>>
 * <<templates#,Templates>>
 * <<testing#,Testing>>
+* <<typedefs#,Typedefs>>

@@ -16,8 +16,8 @@ namespace
         io::MemoryBuffer<2> buffer2;
         io::MemoryBuffer<IN> buffer3;
 
-        encoding::encode<IN, 2>(buffer1.source(), encoding, buffer2.destination());
-        encoding::decode<IN, 2>(buffer2.source(), encoding, buffer3.destination());
+        encoding::encode(buffer1.source(), encoding, buffer2.destination());
+        encoding::decode(buffer2.source(), encoding, buffer3.destination());
 
         auto results = buffer3.data();
 

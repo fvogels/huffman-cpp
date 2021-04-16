@@ -19,7 +19,7 @@ namespace encoding
         virtual void decode(io::InputStream& input, io::OutputStream& output) const = 0;
     };
 
-    template<unsigned IN, unsigned OUT>
+    template<u64 IN, u64 OUT>
     class Encoding
     {
         std::shared_ptr<EncodingImplementation> m_implementation;

@@ -39,11 +39,16 @@ namespace encoding
         }
     };
 
+    template<u64 N1, u64 N2, u64 N3>
+    Encoding<N1, N3> combine(Encoding<N1, N2> encoding1, Encoding<N2, N3> encoding2)
+    {
+        return Encoding<N1, N3>(std::make_shared<EncodingCombinerImplementation<N1, N2, N3>>(encoding1, encoding2));
+    }
 
     template<u64 N1, u64 N2, u64 N3>
     Encoding<N1, N3> operator |(Encoding<N1, N2> encoding1, Encoding<N2, N3> encoding2)
     {
-        return Encoding<N1, N3>(std::make_shared<EncodingCombinerImplementation<N1, N2, N3>>(encoding1, encoding2));
+        return combine<N1, N2, N3>(encoding1, encoding2);
     }
 }
 

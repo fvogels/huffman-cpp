@@ -16,6 +16,8 @@ namespace data
     public:
         U data;
 
+        Trie() : data() { }
+
         Trie<T, U>& operator[](const T& key)
         {
             if (!contains(key))

@@ -45,6 +45,73 @@ Tests will not run if this is not the case.
 If you can't be bothered with writing out decent descriptions, feel free to use `FrequencyTable 1`, `FrequencyTable 2`, or something similar.
 ====
 
+[#many]
+### Write Many Tests
+
+Don't limit yourself to writing a single test per function.
+Make sure you test it for a large range of inputs.
+
+For your sake, try to keep redundancy down.
+Below is an example of how to generate many tests with little effort.
+Note the use of an <<namespaces#anonymous,anonymous namespace>>.
+
+[source,language='cpp']
+----
+#ifdef TEST_BUILD
+
+#include "catch.hpp"
+
+
+namespace
+{
+    void check(int a, int b, int expected)
+    {
+        int actual = a + b;
+
+        CHECK(actual == expected);
+    }
+}
+
+#define TEST(A, B, EXPECTED) TEST_CASE(#A " + " #B " should equal " #EXPECTED) { check(A, B, EXPECTED); }
+
+TEST(0, 0, 0)
+TEST(0, 1, 1)
+TEST(1, 0, 1)
+TEST(1, 1, 2)
+
+#endif
+----
+
+If you don't want to bother generating unique test names (easier to write, but harder to deal with when bugs arise):
+
+[source,language='cpp']
+----
+#ifdef TEST_BUILD
+
+#include "catch.hpp"
+
+
+namespace
+{
+    void check(int a, int b, int expected)
+    {
+        int actual = a + b;
+
+        CHECK(actual == expected);
+    }
+}
+
+TEST_CASE("Addition tests")
+{
+  check(0, 0, 0);
+  check(0, 1, 1);
+  check(1, 0, 1);
+  check(1, 1, 2);
+}
+
+#endif
+----
+
 ## Running Tests
 
 * Select testing build.

@@ -29,3 +29,37 @@ void foo::bar()
 When defining a function `bar` in a namespace `foo`, do not forget to qualify the function name with its namespace!
 More specifically, notice how the definition mentions `foo::bar`, not just `bar`.
 ====
+
+## Anonymous Namespaces
+
+{cpp} (more specifically the linker) doesn't like it if you reuse the same name in different `.cpp` files, even if you don't make them public by declaring them in the `.h` file.
+If you want multiple `.cpp` files to be able to reuse the same identifier, you can rely on anonymous namespaces.
+This can come in handy when <<testing#many,writing tests>>.
+
+.a.cpp
+[source,language='cpp']
+----
+namespace         // <-- Look, no name
+{
+    void foo()
+    {
+        ...
+    }
+}
+----
+
+.b.cpp
+[source,language='cpp']
+----
+namespace         // <-- Look, also no name
+{
+    void foo()
+    {
+        ...
+    }
+}
+----
+
+Here, both `a.cpp` and `b.cpp` contain a function `foo`.
+Without the anonymous namespaces, the linker would complain that the same function `foo` is defined twice.
+You can imagine that the compiler generates a unique name when it encounters an anonymous namespace and puts all definitions in it.

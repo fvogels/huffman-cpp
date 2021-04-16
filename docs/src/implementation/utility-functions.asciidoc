@@ -35,3 +35,186 @@ The size of this list might then be represented using `u64`.
 The distinction between `u64` and `Datum` is merely psychological.
 It's purely intended as an aid.
 ====
+
+## Function `bits_needed`
+
+We need a function `bits_needed(domain_size)` that returns the number of bits we'll minimally need in order to accommodate `domain_size` number of combinations.
+
+[.center,cols="<4,^",width="40%"]
+|===
+| Expression | Result
+| `bits_needed(2)` | `1`
+| `bits_needed(3)` | `2`
+| `bits_needed(4)` | `2`
+| `bits_needed(5)` | `3`
+| `bits_needed(6)` | `3`
+| `bits_needed(7)` | `3`
+| `bits_needed(8)` | `3`
+| `bits_needed(9)` | `4`
+| `bits_needed(128)` | `7`
+| `bits_needed(129)` | `8`
+| `bits_needed(1'000'000)` | `20`
+|===
+
+[TASK]
+====
+Write a function using the following template:
+
+[source,language='cpp']
+----
+constexpr unsigned bits_needed(u64 domain_size)
+{
+    // ...
+}
+----
+
+The function does not have to be split into a declaration and definition.
+Instead, simply put its definition in `util.h`.
+
+Suggested algorithm:
+
+* Use the <<bitwise-operations#rightshift,right shift operator>> to move all bits to the right.
+* Count the number of times you need to shift the bits until you get `0`.
+====
+
+[TASK]
+====
+Make sure to <<testing#,write tests>> that check the cases listed above.
+There _is_ a small gotcha, so you might want to catch it.
+====
+
+
+## Function `bytes_needed`
+
+We need a function `bytes_needed(domain_size)` that returns the number of _bytes_ we'll minimally need in order to accommodate `domain_size` number of combinations.
+
+[.center,cols="<4,^",width="40%"]
+|===
+| Expression | Result
+| `bytes_needed(2)` | `1`
+| `bytes_needed(128)` | `1`
+| `bytes_needed(129)` | `1`
+| `bytes_needed(255)` | `1`
+| `bytes_needed(256)` | `1`
+| `bytes_needed(257)` | `2`
+| `bytes_needed(1'000'000)` | `3`
+|===
+
+[TASK]
+====
+Write a function using the following template:
+
+[source,language='cpp']
+----
+constexpr unsigned bytes_needed(u64 domain_size)
+{
+    // ...
+}
+----
+
+The function does not have to be split into a declaration and definition.
+Instead, simply put its definition in `util.h`.
+====
+
+## SelectIntegerTypeByBytes
+
+Some advanced C++ ahead.
+But no need to panic, it'll mostly be a matter of copy pasting.
+
+Given a minimal byte size, we want to be able to determine which is the smallest unsigned integer type.
+For example,
+
+[.center,cols="^,^",width="40%"]
+|===
+| Bits Needed | Type
+| 1 | `uint8_t`
+| 2 | `uint16_t`
+| 3 | `uint32_t`
+| 4 | `uint32_t`
+| 5 | `uint64_t`
+|===
+
+As you can see, if only one byte of storage is required, a `uint8_t` will suffice.
+The more bytes you need, the larger the type needed, moving from `uint8_t` to `uint16_t`, `uint32_t` and finally `uint64_t`.
+
+[TASK]
+====
+Add the following code `defs.h`:
+
+[source,language='cpp']
+----
+template<unsigned NBITS> struct SelectIntegerTypeByBytes;
+
+template<> struct SelectIntegerTypeByBytes<1> { typedef uint8_t type; };
+template<> struct SelectIntegerTypeByBytes<2> { typedef uint16_t type; };
+// ???
+
+template<u64 DOMAIN_SIZE> struct SelectIntegerTypeByDomainSize
+{
+    typedef typename SelectIntegerTypeByBytes<bytes_needed(DOMAIN_SIZE)>::type type;
+};
+----
+
+You will have to add extra lines of code at the position indicated by `// ???`.
+Copy the line above and add cases for `3` up to `8`.
+Always pick the right type.
+====
+
+Let's also test this.
+Since this is quite advanced, we'll just give you the code.
+
+[TASK]
+====
+Add the following file to your `tests` folder.
+
+[NOTE]
+=====
+These tests are a bit special: they rely on `static_assert`.
+This is a built-in kind of assertion that will ask the _compiler_ to check certain conditions.
+(I'm not doing this to be fancy; we're testing types here, and types only exist at compile time.)
+
+With regular assertions, the compiler generates the test code after which you have to start the program to actually run the tests.
+Here, the testing is done directly during the compilation phase.
+This means that the code won't even compile if the tests fail.
+This also means that if this code compiles, you know that your code is correct.
+=====
+
+.type-selection-tests.cpp
+[source,language='cpp']
+----
+#ifdef TEST_BUILD
+
+#include "util.h"
+#include "catch.hpp"
+#include <type_traits>
+
+
+void test_types()
+{
+#define CHECK_TYPE(N, TYPE) static_assert(std::is_same<SelectIntegerTypeByBytes<N>::type, TYPE>::value, "SelectIntegerTypeByBytes<" #N "> is not " #TYPE)
+    CHECK_TYPE(1, uint8_t);
+    CHECK_TYPE(2, uint16_t);
+    CHECK_TYPE(3, uint32_t);
+    CHECK_TYPE(4, uint32_t);
+    CHECK_TYPE(5, uint64_t);
+    CHECK_TYPE(6, uint64_t);
+    CHECK_TYPE(7, uint64_t);
+    CHECK_TYPE(8, uint64_t);
+#undef CHECK_TYPE
+
+#define CHECK_TYPE(N, TYPE) static_assert(std::is_same<SelectIntegerTypeByDomainSize<N>::type, TYPE>::value, "SelectIntegerTypeByDomainSize<" #N "> is not " #TYPE)
+    CHECK_TYPE(2, uint8_t);
+    CHECK_TYPE(255, uint8_t);
+    CHECK_TYPE(256, uint8_t);
+    CHECK_TYPE(65535, uint16_t);
+    CHECK_TYPE(65536, uint16_t);
+    CHECK_TYPE(65537, uint32_t);
+    CHECK_TYPE(4294967295, uint32_t);
+    CHECK_TYPE(4294967296, uint32_t);
+    CHECK_TYPE(4294967297, uint64_t);
+#undef CHECK_TYPE
+}
+
+#endif
+----
+====

@@ -13,6 +13,9 @@
 
 ## Code
 
+* `#include` your header files using a path relative to the project root.
+  For example, say you have a file `frequency-table.h` in a folder `data`.
+  You should always use `#include "data/frequency-table.h` to include this header file.
 * No `\#pragma once` allowed. Use old fashioned <<implementation/include-guards#,include guards>>.
 * Every header file needs an include guard.
 * Do *not* ignore warnings.

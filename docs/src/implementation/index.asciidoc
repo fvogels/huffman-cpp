@@ -6,6 +6,7 @@
 * <<binary-io#,Binary IO>>
 * Encoding
 ** <<encoding-design#,Design>>
+** <<encoding-implementation#,Implementation>>
 
 ## Auxiliary Pages
 

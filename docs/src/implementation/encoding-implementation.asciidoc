@@ -1,0 +1,102 @@
+# Encoding Implementation
+
+For technical reasons, we will split the encoding-related functionality in multiple classes:
+
+* We will introduce (the {cpp} equivalent of) an abstract class named `EncodingImplementation`.
+* The actual logic will be hidden in `EncodingImplementation` subclasses.
+* Each `EncodingImplementation` object will be wrapped in a helper object of type `Encoding<IN, OUT>`.
+
+## Preparing
+
+[TASK]
+====
+* Create a file `encoding/encoding.h`. No `.cpp` will be necessary.
+* Add an <<include-guards#,include guard>>.
+* Add a declaration for <<namespaces#,namespace>> `encoding`.
+====
+
+## EncodingImplementation
+
+`EncodingImplementation` will take care of the actual encoding and decoding.
+It will have two methods:
+
+* `encode` takes an `InputStream` and an `OutputStream`.
+  It reads data from the former, _encodes_ it and writes the result to the latter.
+* `decode` also takes an `InputStream` and an `OutputStream`.
+  It reads data from the former, _decodes_ it and writes the result to the latter.
+
+[TASK]
+====
+* Define the class `EncodingImplementation`.
+* Add an empty virtual destructor.
+* Add a virtual method named `encode` that takes an `InputStream` and an `OutputStream` as parameters.
+** Pass both parameters as (nonconst) references.
+** No return value.
+** Think of <<const-correctness#,`const` correctness>>.
+* Add a virtual method named `decode`.
+  Exact same rules apply as with `encode` (same parameters, etc.)
+====
+
+## Encoding
+
+Next comes the `Encoding`.
+
+### Class
+
+We want it to carry the input and output domain sizes.
+
+[TASK]
+====
+Define a *template* class `Encoding`.
+It has two template parameters of type `u64` called `IN` and `OUT`.
+====
+
+### Fields
+
+The goal of `Encoding` is that it wraps an `EncodingImplementation` object.
+
+[TASK]
+====
+Add a field to keep track of an `EncodingImplementation` object.
+
+* It cannot keep a raw `EncodingImplementation` object: it is an abstract class.
+  Instead, some sort of pointer/reference must be used.
+* We want the `Encoding` object to have ownership.
+* We'll want to copy `Encoding` objects (e.g., when passing by value), each copy having a link to the same `EncodingImplementation` object.
+====
+
+### Constructor
+
+[TASK]
+====
+Add a single constructor that initializes the field with a value received as parameter.
+====
+
+### Operator `->`
+
+`EncodingImplementation` contains the methods `encode` and `decode` but it is wrapped within an `Encoding` object.
+We could write
+
+[source,language='cpp']
+----
+encoding.implementation()->encode(input, output);
+----
+
+However, that's a bit long.
+We would like to access `encode` and `decode` directly from `Encoding`:
+
+[source,language='cpp']
+----
+encoding->encode(input, output);
+----
+
+This is possible by overloading the `->` operator on `Encoding`.
+
+[TASK]
+====
+Overload the `->` operator.
+
+* It takes no parameters.
+* It must return something on which you can apply the `->` operator.
+  You want this to lead to an `EncodingImplementation` object.
+====

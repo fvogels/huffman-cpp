@@ -7,7 +7,9 @@ digraph G {
     shared [label="Shared with others?"];
     unique_write [label="Write access needed?"];
     shared_write [label="Write access needed?"];
+    hierarchy [label="Part of hierarchy?"];
     T [label="T"];
+    T_ptr [label="T*"];
     const_T_ref [label="const T&"];
     shared_ptr [label="shared_ptr<T>"];
     const_shared_ptr [label="shared_ptr<const T>"];
@@ -16,7 +18,10 @@ digraph G {
 
     sharing -> noshare_write [label=" no"];
     noshare_write -> noshare_readonly_small [label=" no"];
-    noshare_readonly_small -> T [label=" definitely"];
+    noshare_write -> T_ptr [label=" yes"];
+    noshare_readonly_small -> hierarchy [label=" definitely"];
+    hierarchy -> T [label=" no"];
+    hierarchy -> const_T_ref [label=" yes"];
     noshare_readonly_small -> const_T_ref [label=" no/unsure"];
     sharing -> shared [label=" yes"];
     shared -> unique_write [label=" no"];

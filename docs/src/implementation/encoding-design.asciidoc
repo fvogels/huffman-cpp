@@ -210,6 +210,11 @@ auto pipeline = eof_encoding() | huffman_encoding() | bit_grouper();
 
 ### Compiler Checks
 
+[NOTE]
+====
+This paragraph is a bit advanced, but once the time has come for you to implement it, you will receive the necessary guidance.
+====
+
 We only want to allow to combine encodings that are compatible with each other.
 If one encoding produces data with domain size `N`, the next in line should accept such data.
 Not only do we want to check this, we want to do so at _compile-time_.
@@ -223,4 +228,13 @@ We need to encode the domain sizes in the type using <<templates#nontype,templat
 * `bit_grouper` will be an `Encoding<2, 1 << K>` where `K` is the group size.
   `1 << K` is actually equal to 2^`K`^, meaning if we take `K` bits together, we get domain size 2^`K`^.
   Don't worry about this part if it isn't entirely clear.
+
+The combiner operator `|` will then have to check that the domain sizes match up:
+
+[.center,cols="^",width=75%]
+|===
+| `Encoding<N1, N2> \| Encoding<N2, N3>` &rarr; `Encoding<N1, N3>`
+|===
+
+Notice how the output domain size of the left operand (`N2`) is equal to the input domain size of the right operand.
 

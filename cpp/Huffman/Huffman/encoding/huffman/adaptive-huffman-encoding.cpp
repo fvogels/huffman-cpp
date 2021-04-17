@@ -6,6 +6,7 @@
 #include "data/frequency-table.h"
 #include "data/binary-tree.h"
 #include "io/memory-buffer.h"
+#include "io/binary-io.h"
 #include "io/streams.h"
 #include "io/io-util.h"
 #include "util.h"

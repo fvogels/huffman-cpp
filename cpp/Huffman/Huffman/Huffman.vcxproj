@@ -42,6 +42,7 @@
     <ClInclude Include="encoding\huffman\tree-encoding.h" />
     <ClInclude Include="encoding\inverter.h" />
     <ClInclude Include="encoding\move-to-front.h" />
+    <ClInclude Include="io\binary-io.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="encoding\encoding.h" />
     <ClInclude Include="encoding\encodings.h" />
@@ -50,8 +51,7 @@
     <ClInclude Include="encoding\predictive\oracles.h" />
     <ClInclude Include="encoding\predictive\repeating-oracle.h" />
     <ClInclude Include="encoding\predictive\trie-oracle.h" />
-    <ClInclude Include="io\data-destination.h" />
-    <ClInclude Include="io\data-source.h" />
+    <ClInclude Include="io\data-endpoints.h" />
     <ClInclude Include="io\files.h" />
     <ClInclude Include="io\streams.h" />
     <ClInclude Include="io\io-util.h" />
@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="io\binary-io.cpp" />
     <ClCompile Include="tests\bytes-needed-tests.cpp" />
     <ClCompile Include="tests\bits-needed-tests.cpp" />
     <ClCompile Include="easylogging++.cc" />
@@ -91,7 +92,7 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp" />
     <ClCompile Include="tests\encoding\prediction\predictive-encoding-tests.cpp" />
     <ClCompile Include="tests\encoding\prediction\trie-oracle-tests.cpp" />
-    <ClCompile Include="tests\io\io-util-tests.cpp" />
+    <ClCompile Include="tests\io\binary-io-tests.cpp" />
     <ClCompile Include="tests\tests.cpp" />
     <ClCompile Include="tests\binary-search-tests.cpp" />
   </ItemGroup>

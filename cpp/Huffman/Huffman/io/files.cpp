@@ -22,7 +22,7 @@ namespace
             assert(file);
         }
 
-        void write(u64 datum)
+        void write(Datum datum)
         {
             assert(datum <= std::numeric_limits<uint8_t>::max());
 

@@ -69,10 +69,7 @@
     <ClInclude Include="encoding\predictive\oracle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io\data-source.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="io\data-destination.h">
+    <ClInclude Include="io\data-endpoints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\memory-buffer.h">
@@ -106,6 +103,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encoding\predictive\trie-oracle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io\binary-io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -191,7 +191,7 @@
     <ClCompile Include="tests\encoding\move-to-front-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests\io\io-util-tests.cpp">
+    <ClCompile Include="tests\io\binary-io-tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\data\trie-tests.cpp">
@@ -210,6 +210,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\bytes-needed-tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="io\binary-io.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

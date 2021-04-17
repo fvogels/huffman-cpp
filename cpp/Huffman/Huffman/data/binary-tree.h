@@ -28,11 +28,11 @@ namespace data
     class Branch : public Node<T>
     {
     private:
-        std::unique_ptr<Node<T>> m_left_child;
-        std::unique_ptr<Node<T>> m_right_child;
+        const std::unique_ptr<const Node<T>> m_left_child;
+        const std::unique_ptr<const Node<T>> m_right_child;
 
     public:
-        Branch(std::unique_ptr<Node<T>> left_child, std::unique_ptr<Node<T>> right_child) : m_left_child(std::move(left_child)), m_right_child(std::move(right_child))
+        Branch(std::unique_ptr<const Node<T>> left_child, std::unique_ptr<const Node<T>> right_child) : m_left_child(std::move(left_child)), m_right_child(std::move(right_child))
         {
             assert(m_left_child != nullptr);
             assert(m_right_child != nullptr);
@@ -70,7 +70,7 @@ namespace data
     class Leaf : public Node<T>
     {
     private:
-        T m_value;
+        const T m_value;
 
     public:
         Leaf(const T& value) : m_value(value)

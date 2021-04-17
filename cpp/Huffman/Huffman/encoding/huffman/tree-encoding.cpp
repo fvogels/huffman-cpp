@@ -1,6 +1,6 @@
 #include "encoding/huffman/tree-encoding.h"
 #include "encoding/encoding.h"
-#include "io/io-util.h"
+#include "io/binary-io.h"
 #include "util.h"
 
 

@@ -2,8 +2,7 @@
 #define ENCODING_H
 
 #include "io/streams.h"
-#include "io/data-source.h"
-#include "io/data-destination.h"
+#include "io/data-endpoints.h"
 #include "util.h"
 #include <memory>
 

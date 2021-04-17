@@ -2,8 +2,7 @@
 #define FILE_OUTPUT_STREAM_H
 
 #include "io/streams.h"
-#include "io/data-source.h"
-#include "io/data-destination.h"
+#include "io/data-endpoints.h"
 #include <cstdint>
 #include <memory>
 #include <string>

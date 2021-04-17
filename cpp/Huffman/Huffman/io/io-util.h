@@ -18,9 +18,6 @@ namespace io
 
     void transfer(io::InputStream& input, io::OutputStream& output);
     void transfer(io::InputStream& input, io::OutputStream& output, unsigned count);
-
-    void write_bits(u64 value, unsigned nbits, io::OutputStream& output);
-    u64 read_bits(unsigned nbits, io::InputStream& input);
 }
 
 #endif

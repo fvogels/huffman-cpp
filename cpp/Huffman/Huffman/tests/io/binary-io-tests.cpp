@@ -1,6 +1,6 @@
 #ifdef TEST_BUILD
 
-#include "io/io-util.h"
+#include "io/binary-io.h"
 #include "io/memory-buffer.h"
 #include "util.h"
 #include "catch.hpp"

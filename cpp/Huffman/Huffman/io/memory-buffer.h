@@ -1,8 +1,7 @@
 #ifndef MEMORY_DATA_SOURCE_H
 #define MEMORY_DATA_SOURCE_H
 
-#include "data-source.h"
-#include "data-destination.h"
+#include "data-endpoints.h"
 #include <assert.h>
 #include <utility>
 #include <vector>
@@ -24,7 +23,7 @@ namespace io
             // NOP
         }
 
-        u64 read() override
+        Datum read() override
         {
             assert(m_index < m_contents->size());
 
@@ -49,7 +48,7 @@ namespace io
             // NOP
         }
 
-        void write(u64 value)
+        void write(Datum value)
         {
             assert(value <= std::numeric_limits<T>::max());
 

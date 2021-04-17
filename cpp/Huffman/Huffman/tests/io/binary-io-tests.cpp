@@ -10,7 +10,7 @@ namespace
 {
     void check(u64 n, unsigned nbits)
     {
-        io::MemoryBuffer<655365, Datum> buffer;
+        io::MemoryBuffer<2> buffer;
         auto input = buffer.source()->create_input_stream();
         auto output = buffer.destination()->create_output_stream();
         io::write_bits(n, nbits, *output);

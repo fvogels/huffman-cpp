@@ -26,10 +26,57 @@ public:
 }
 ----
 
+[[overloads]]
 ## Const and Non-Const Overloads
 
-Note that sometimes, you need both a `const` and a non`const` version.
+Note that sometimes, you need both a `const` and a non``const`` version.
+For example, a non``const`` version would return a writeable reference, while the `const` version a nonwriteable version.
 
+.Example: Person
+[%collapsible]
+=====
+[source,language='cpp']
+----
+class Person
+{
+    std::string m_name;
+
+public:
+    // This method does not modify the Counter object, so it should be const
+    const std::string& name() const
+    {
+        return m_name;
+    }
+
+    // While the method may not modify the object,
+    // it does return a writeable reference to its field
+    std::string& name()
+    {
+        return m_name;
+    }
+}
+----
+
+[source,language='cpp']
+----
+void foo(Person& p1, const Person& p2)
+{
+    // Calls the nonconst version of name()
+    // This returns a nonconst reference, meaning we
+    // get direct access to the field and can alter it
+    p1.name() += " Jr";
+
+    // Calls the const version of name()
+    // Returns a const reference, which disallows mutations.
+    // The line below will generate a compiler error.
+    p2.name() += " Jr";
+}
+----
+=====
+
+.Example: Counter
+[%collapsible]
+=====
 [source,language='cpp']
 ----
 class Counter
@@ -62,3 +109,4 @@ void foo(const Counter& readonly, Counter& writeable)
     y++; // y refers to writeable.value, so this effectively changes the field's value
 }
 ----
+=====

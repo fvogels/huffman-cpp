@@ -160,9 +160,67 @@ image::huffman4.svg[Static,align="center"]
 
 ## Encoders &amp; Decoders
 
+### Symmetry
+
 As you can see in the <<figeof,diagram above>>, the compression/decompression process is split in multiple steps.
 These steps are also each other's inverse operations:
 
 * EOF adder and EOF remover counteract each other.
 * Huffman encoder and Huffman decoder counteract each other.
 * Bit grouper and byte splitter counteract each other.
+
+### Domain Size Constraints
+
+Note also that the components interact with the domain sizes:
+
+* EOF adder takes in data with domain size `N` and will add an extra symbol, so it outputs data with domain size `N + 1`.
+* EOF remover does the exact opposite: data with domain size `N` is transformed into data with domain size `N - 1`.
+* The Huffman encoder can take any kind of data, but always reduces it to data with domain size 2 (i.e. bits).
+* The Huffman decoder, as expected, does the opposite: it expects input with domain size 2 and generates data of any domain size.
+* The bit grouper expects input with domain size 2 and can produce datums of any size, e.g., it can bunch bits together in groups of 2, 8, 16, etc.
+  In our use case, we need 8, but there's no real limitation.
+* The byte splitter takes datums of any size and produces bits (domain size 2).
+
+In other words, we cannot link any two components but have to keep their limitations in mind.
+
+### The Encoding Type
+
+Our goal is to be able to easily construct such "inverse pipelines" and have the compiler check that the different components are indeed compatible with each other.
+To achieve this, we will introduce a class `Encoding`.
+It will have the following purpose:
+
+* It will pair up the encoder and decoder.
+* Encodings can be combined into a pipeline, as we have done above.
+* Its type will express which domain sizes it operates on.
+  This will allow the compiler to check we're respecting the different encoders' demands.
+
+For example, in the pipeline shown above, we have three encodings:
+
+* The `eof_encoding` (the encoder adds {eof}, the decoder removes {eof}.)
+* The `huffman_encoding` (the encoder compresses, the decoder decompresses.)
+* The `bit_grouper` encoding (the encoder groups bits, the decoder splits into bits.)
+
+Combining would be done using the `|` operator.
+The following code would produce both the forward (compressing) and backward (decompressing) pipeline discussed earlier:
+
+[source,language='cpp']
+----
+auto pipeline = eof_encoding() | huffman_encoding() | bit_grouper();
+----
+
+### Compiler Checks
+
+We only want to allow to combine encodings that are compatible with each other.
+If one encoding produces data with domain size `N`, the next in line should accept such data.
+Not only do we want to check this, we want to do so at _compile-time_.
+
+To make this possible, the compiler needs to know about each encoder's expectations.
+We need to encode the domain sizes in the type using <<templates#nontype,template parameters>>: we will be using `Encoding<IN, OUT>`, where `IN` and `OUT` denote the domain sizes.
+
+* `eof_encoding` will be an `Encoding<N, N+1>` with `N` freely chosen.
+  This means that the _encoder_ will take data with domain size `N` and produce data with domain size `N+1`, while the _decoder_ will perform the opposite operation.
+* `huffman_encoding` will be an `Encoding<N, 2>`: it reduces everything to bits.
+* `bit_grouper` will be an `Encoding<2, 1 << K>` where `K` is the group size.
+  `1 << K` is actually equal to 2^`K`^, meaning if we take `K` bits together, we get domain size 2^`K`^.
+  Don't worry about this part if it isn't entirely clear.
+

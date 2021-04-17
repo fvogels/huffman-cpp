@@ -1,0 +1,194 @@
+# Binary IO
+
+## Streams
+
+In our project, we'll work with _streams_.
+You probably encountered them many times in the past as they are a fairly standard way to deal with data.
+
+A stream is a very abstract view on a sequence of data elements.
+If these data elements have type `T`, a typical way to represent a sequence of `T` values is to rely on a list data structure.
+However, lists provide many operations, most of which we don't need.
+We will strip those away and focus solely on getting access to the elements one by one, as you will see shortly.
+In other words, you can see streams as very limited lists.
+
+### Implementation
+
+[source,language='cpp']
+----
+struct InputStream
+{
+    virtual ~InputStream()           { }
+
+    virtual Datum read()              = 0;
+    virtual bool  end_reached() const = 0;
+};
+
+struct OutputStream
+{
+    virtual ~OutputStream()         { }
+
+    virtual void write(Datum value) = 0;
+};
+----
+
+Take a good look at the code above and understand the ramifications:
+
+* Instead of having one type that supports both reading and writing, we have separated both.
+* `InputStream` only allows to go through the sequence once, in sequential order.
+* `OutputStream` only allows to write data to the stream.
+* We limited the streams to dealing with data elements of type `Datum`.
+  Remember that this is merely an alias for `uint64_t`.
+
+### Intended Usage
+
+It is important for you to understand how streams will be used.
+We give you a quick peek into the future.
+
+First, we will need to read data from files.
+We will do so byte by byte.
+For this, we can rely on `InputStream`.
+Similarly, we will also want to write data to files, byte by byte.
+This is of course where `OutputStream` will come in handy.
+
+Huffman encoding, however, takes a stream of _bytes_ (256 possible values) and will produce a stream of _bits_ (2 possible values.)
+In order to write those bits to file, we will have to bundle them back together into bytes, as that's how the OS wants it.
+This means we need two kinds of streams: one for bytes and one for bits.
+
+image::streams.svg[Static,align="center"]
+
+For reasons we won't delve into now, we will also need streams that allow for values that don't fit in bytes (more than 256 possible values).
+So that adds an extra kind of stream.
+
+All our needs can be satisfied with a single kind of streams, i.e., one that operates on `uint64_t`s.
+These are large enough to contain bits, bytes and larger values.
+
+[NOTE]
+====
+Making `InputStream` a template class would have made more sense, but due to technical reasons we decided to keep it simple and limit ourselves to `Datum`s.
+====
+
+[TASK]
+====
+You are given code in the `io` folder.
+Include these in the project: right click on the `io` folder and pick `Include In Project`.
+====
+
+## Function `read_bits`
+
+Let's start with setting up the necessary files.
+
+[TASK]
+====
+* Create files `io/binary-io.cpp` and `io/binary-io.h`.
+* Add an <<include-guards#,include guard>> to the header file.
+* Add a declaration for a <<namespaces#,namespace>> called `io`.
+====
+
+Our Huffman implementation will need to read bits from a stream and group them together.
+For this, we will write a helper function `read_bits`.
+This function will receive an `InputStream` which can assume the only data elements it will encounter on the stream are `0` and `1`.
+The function will also need to know how many bits to read.
+For example, for a byte it will need to read 8 bits, but we prefer not to hardcode this value.
+
+.Example
+[%collapsible]
+====
+=====
+Let's say the stream contains
+
+`0 1 0 0 1 0 1 0 1 0 0 1 0 1 1 0 1 0 ...`
+
+We want to read a full byte (8 bits) from this stream.
+This means we will need to call `read` 8 times, which yields the bits
+
+`0 1 0 0 1 0 1 0`
+
+Converted to decimal notation, we get `74`.
+This is also the value which should be returned by `read_bits`.
+=====
+====
+
+[TASK]
+====
+Write a function with signature
+
+[source,language='cpp']
+----
+u64 io::read_bits(unsigned nbits, io::InputStream& input)
+----
+
+* Add a declaration in `io/binary-io.h`.
+* Add the definition in `io/binary-io.cpp`.
+* Rely on the <<bitwise-operations#,bitwise operations>> `<<` and `|` to implement `read_bits`.
+====
+
+[NOTE]
+====
+Note that `read_bits` receives an `io::InputStream&`, not a `const io::InputStream&`.
+Why do you think that is?
+====
+
+## Function `write_bits`
+
+As mentioned before, many things during this project will come in pairs.
+If at some point we need to read bits, we'll also need to write them elsewhere.
+
+[TASK]
+====
+Write a function with signature
+
+[source,language='cpp']
+----
+void io::write_bits(u64 value, unsigned nbits, io::OutputStream& output);
+----
+
+* Add a declaration in `io/binary-io.h`.
+* Add the definition in `io/binary-io.cpp`.
+* Rely on the <<bitwise-operations#,bitwise operations>> `>>` and `&` to implement `write_bits`.
+====
+
+## Testing
+
+Does it matter that `write_bits` writes bits away correctly?
+Not really.
+Our only concern is that whatever `write_bits` produces can be read back in by `read_bits` and yields our original value.
+For example, if `write_bits` writes bits in reversed order, that would be okay, as long as `read_bits` reads them in reversed order.
+
+Conceptually, we want to test it as shown below
+
+[source]
+----
+for all n
+    bits = write_bits(n)
+    result = read_bits(bits)
+    assert n == result
+----
+
+However, reality is a bit more complicated since `read_bits` and `write_bits` operate on streams.
+Luckily for you, we have provided classes which make it relatively easy to work with streams.
+
+[source,language='cpp']
+----
+void check(u64 n, unsigned nbits)
+{
+    io::MemoryBuffer<2> buffer;
+    auto input = buffer.source()->create_input_stream();
+    auto output = buffer.destination()->create_output_stream();
+    io::write_bits(n, nbits, *output);
+    auto result = io::read_bits(nbits, *input);
+
+    REQUIRE(n == result);
+}
+----
+
+* `MemoryBuffer` is a class that creates a `std::vector` and will use that to store data.
+* `MemoryBuffer` takes a template parameter.
+  However, contrary to what you're used to, this parameter is not a type, but a _number_.
+  It tells the memory buffer how large the numbers will be it needs to store.
+  In the code above, we want it to store data elements which can take on `2` different values; `MemoryBuffer` will be smart enough to use `uint8_t` internally, which is the smallest type.
+  If we had specified a larger number, it would have used `uint16_t`, `uint32_t`, or `uint64_t`.
+  For this, it relies on what you implemented <<utility-functions#selectint,earlier>>.
+* `MemoryBuffer.source()->create_input_stream()` creates an `InputStream` that will read data from the buffer's internal `std::vector`.
+* `MemoryBuffer.destination()->create_output_stream()` creates an `OutputStream` that will write data to the buffer's internal `std::vector`.
+
+So basically, we create a `std::vector`, `write_bits` writes

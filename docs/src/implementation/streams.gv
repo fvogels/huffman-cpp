@@ -1,0 +1,13 @@
+digraph G {
+    node [shape="box"];
+    rankdir=LR;
+
+    input_file[label="Input File"];
+    output_file[label="Output File"];
+    huffman[label="Huffman Encoding"];
+    packer[label="Bit Grouper"];
+
+    input_file -> huffman [label="byte stream"];
+    huffman -> packer [label="bit stream"];
+    packer -> output_file [label="byte stream"];
+}

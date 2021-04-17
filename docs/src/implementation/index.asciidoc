@@ -3,6 +3,7 @@
 * <<utility-functions#,Utility Functions>>
 * <<frequency-table#,FrequencyTable>>
 * <<binary-tree#,BinaryTree>>
+* <<binary-io#,Binary IO>>
 
 ## Auxiliary Pages
 

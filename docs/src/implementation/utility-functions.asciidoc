@@ -116,6 +116,7 @@ The function does not have to be split into a declaration and definition.
 Instead, simply put its definition in `util.h`.
 ====
 
+[[selectint]]
 ## SelectIntegerTypeByBytes
 
 Some advanced C++ ahead.

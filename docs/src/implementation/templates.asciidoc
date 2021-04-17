@@ -50,3 +50,131 @@ U some_function(const T& x)
     // ...
 }
 ----
+
+[[nontype]]
+## Non-Type Parameters
+
+Typically, templates are used with _type_ parameters:
+
+[source,language='cpp']
+----
+template<typename T>
+class Container
+{
+
+};
+----
+
+Note how `typename` preceeds `T`: you can see it as the type of `T`.
+What is the type of a type?
+Apparently `typename`.
+
+`Container` expects a type as template parameter: this can be `int`, `double`, `std::vector<std::string>`, anything.
+But you are not allowed to give a number as parameter: `Container<10>` would be rejected.
+Makes sense, because what would it mean?
+
+[NOTE]
+====
+Actually, some language (such as https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types[TypeScript]) do assign meaning to it.
+It's less weird than you might think.
+====
+
+[source,language='cpp']
+----
+template<unsigned N>
+class Foo
+{
+
+};
+----
+
+Notice that now, the template expects an `unsigned` instead of a `typename`:
+
+[source,language='cpp']
+----
+Foo<4> x;
+----
+
+So what does this `4` mean?
+Well, that simply depends on how you use it inside the implementation of the class: it can use `N` wherever it wants, it's really just a number.
+
+Then why bother passing this `unsigned` as a template parameter instead of a regular constructor parameter:
+
+[source,language='cpp']
+----
+template<unsigned N>
+class Foo
+{
+
+};
+
+// What's the difference with
+
+class Foo
+{
+    unsigned N;
+
+public:
+    Foo(unsigned n) : N(n) { }
+};
+----
+
+When using templates, the value of `N` has to be known at _compile-time_.
+For example, the following code is invalid:
+
+[source,language='cpp']
+----
+unsigned n = read_from_file();
+Foo<n> x;
+----
+
+The value of `n` is not known to the compiler and it will therefore reject this code.
+
+That then raises the question, why should the compiler know this `N`?
+Are there any benefits?
+Glad you asked.
+
+* The information can be used by the compiler to produce better code.
+* The information can help the compiler detect errors.
+
+### Example
+
+Consider mathematical vectors, such as (x, y) or (x, y, z) for 2D and 3D vectors respectively.
+Games do not https://docs.microsoft.com/en-us/windows/win32/dxtecharts/the-direct3d-transformation-pipeline[shy away from four coordinates].
+You can go as far as you want: a 100D vector aren't anything special to people in scientific fields.
+
+So, instead of defining separate classes `Vector2D`, `Vector3D`, `Vector4D`, etc. you could define a single class `Vector<N>`.
+
+[source,language='cpp']
+----
+template<unsigned N>
+struct Vector
+{
+public:
+    double coordinates[N];
+
+    Vector<N> operator+(const Vector<N>& other) const
+    {
+        Vector<N> result;
+
+        for ( unsigned i = 0; i != N; ++i )
+        {
+            result.coordinates[i] = this->coordinates[i] + other.coordinates[i];
+        }
+
+        return result;
+    }
+}
+----
+
+Let's compare this with a `Vector` class whose size is given as a constructor parameter.
+
+* If `N` is known at compile time, the vector can be allocated on the stack, otherwise you would have to rely on the heap, which is much less efficient.
+* When adding two vectors, all coordinates have to be added one to one.
+  If the compiler does not know how many coordinates there are, it will need to generate a loop.
+  It the size `N` of the vector is known, however, the compiler only needs to `N` additions (this is known as https://en.wikipedia.org/wiki/Loop_unrolling[loop unrolling].)
+  This would run many times faster.
+* Addition can only take place between two vectors with the same size.
+  If `N` is known, the compiler can refuse to compile your code when you made a mistake.
+  Otherwise, the check must happen at runtime and you'd only know there's a bug if you happen to come across it.
+  Compile time checks are your friend.

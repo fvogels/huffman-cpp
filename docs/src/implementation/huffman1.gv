@@ -1,0 +1,22 @@
+digraph G {
+    rankdir=LR;
+    newrank=true;
+
+    subgraph c2 {
+        compressed2 [label="compressed data",shape="none"];
+        decompression [shape="box",label="Huffman decoder"];
+        data2 [shape="none",label="original data"];
+
+        compressed2 -> decompression;
+        decompression -> data2;
+    }
+
+    subgraph c1 {
+        data [shape="none",label="original data"];
+        compression [shape="box",label="Huffman encoder"];
+        compressed [label="compressed data",shape="none"];
+
+        data -> compression;
+        compression -> compressed;
+    }
+}

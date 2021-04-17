@@ -1,0 +1,19 @@
+digraph G
+{
+    a[label="A"];
+    b[label="B"];
+    c[label="C"];
+    eof[label="&omega;"];
+
+    b1[label=""];
+    b1 -> c [label=" 0"];
+    b1 -> eof [label=" 1"];
+
+    b2[label=""];
+    b2 -> b [label=" 0"];
+    b2 -> b1 [label=" 1"];
+
+    b3[label=""];
+    b3 -> a [label=" 0"];
+    b3 -> b2 [label=" 1"];
+}

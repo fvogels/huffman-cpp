@@ -1,0 +1,14 @@
+digraph G
+{
+    a[label="A"];
+    b[label="B"];
+    c[label="C"];
+
+    bc[label=""];
+    bc -> b [label=" 0"];
+    bc -> c [label=" 1"];
+
+    root[label=""];
+    root -> a [label=" 0"];
+    root -> bc [label=" 1"];
+}

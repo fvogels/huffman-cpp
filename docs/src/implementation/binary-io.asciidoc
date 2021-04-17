@@ -120,6 +120,11 @@ u64 io::read_bits(unsigned nbits, io::InputStream& input)
 * Add a declaration in `io/binary-io.h`.
 * Add the definition in `io/binary-io.cpp`.
 * Rely on the <<bitwise-operations#,bitwise operations>> `<<` and `|` to implement `read_bits`.
+
+[IMPORTANT]
+=====
+If there are insufficient bits available on `input`, pretend there are extra `0` bits so as to be able to read `nbits` in total.
+=====
 ====
 
 [NOTE]

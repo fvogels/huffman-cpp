@@ -4,10 +4,12 @@
 * <<frequency-table#,FrequencyTable>>
 * <<binary-tree#,BinaryTree>>
 * <<binary-io#,Binary IO>>
+* Encoding
+** <<encoding-design#,Design>>
 
 ## Auxiliary Pages
 
-These pages contain extra information regarding implementation details.
+These pages contain extra information about {cpp} concepts needed during the implementation of the project.
 These are also linked to by the guiding texts, so there's no need to go through these one by one.
 The list below exists merely to provide an overview.
 

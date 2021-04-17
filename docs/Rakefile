@@ -24,6 +24,7 @@ def compile_asciidoc(source, destination)
     'toclevels' => '4',
     'cpp' => 'C++',
     'experimental' => 'true',
+    'eof' => '&omega;'
   }
 
   Asciidoctor.convert_file(source.to_s, safe: :safe, backend: 'html', to_file: destination.to_s, attributes: attributes)

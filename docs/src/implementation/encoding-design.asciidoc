@@ -1,0 +1,168 @@
+# Encoding Design
+
+Before we start with this part of the project, it is essential that you receive some background information.
+Without it, you would have no idea of what you're doing or should be doing.
+
+## Huffman Coding
+
+### Abstract View
+
+Let's start with a high level view of what Huffman coding is about.
+
+.High Level View
+image::huffman1.svg[Static,align="center"]
+
+### Bits and Bytes
+
+Let's add some detail.
+While technically, Huffman can operate on all kinds of input data, we will assume it receives a sequence of _bytes_.
+Each individual byte will be counted, a Huffman tree will be built that is then used to assign a Huffman code to each byte, and finally Huffman will go over the input data again and, for each byte, output the corresponding Huffman code.
+
+Huffman codes operate on the level of bits: they can be 3 bits long, 5 bits, 99 bits.
+Any number of bits is possible.
+Our goal, however, is to write this compressed data to file, and files want bytes, not individual bits.
+This means we will have to take care of bundling bits into bytes ourselves.
+Conversely, when decompressing, we will need to do the opposite: the Huffman decoder expects bits as input, while the original data is expressed in bytes.
+
+For this reason, we add a bit grouper and a byte splitter to the diagram.
+
+.Splitting and Grouping
+image::huffman2.svg[Static,align="center"]
+
+Let's replace the arrow labels by the number of possible values transmitted: bits have 2 possible values, byte have 256.
+
+.With Domain Sizes
+image::huffman3.svg[Static,align="center"]
+
+### EOF
+
+There's a snag unfortunately.
+Let's Huffman encode the string
+
+[.center,%header,cols="^",width=25%]
+|===
+| `AAAABCB`
+|===
+
+The frequency table is
+
+[.center,%header,cols="^,^",width=50%]
+|===
+| Datum | Frequency
+| `A` | 4
+| `B` | 2
+| `C` | 1
+|===
+
+We build a Huffman tree:
+
+image::huffman-tree2.svg[Static,align="center"]
+
+The Huffman codes are then
+
+[.center,%header,cols="^,^",width=50%]
+|===
+| Datum | Code
+| `A` | 0
+| `B` | 10
+| `C` | 11
+|===
+
+We use these codes to encode the input stream:
+
+[.center,%header,cols="^",width=25%]
+|===
+| `0000101110`
+|===
+
+These are 10 bits.
+Grouping them into bytes gives us
+
+[.center,%header,cols="^",width=25%]
+|===
+| `00001011 10000000`
+|===
+
+where we needed to pad the second byte with ``0``s to reach a required 8 bit length.
+Now let's decompress it:
+
+[.center,%header,cols="^",width=25%]
+|===
+| `AAAABCBAAAAAA`
+|===
+
+Oh no!
+The padding needed get to 2 bytes is being interpreted as extra data.
+We need a way to tell the algorithm where the bit stream ends.
+
+As always, there are multiple ways to go about it.
+What we will do, is add an extra data element at the end of the original data stream, named EOF (End Of File).
+Let's use {eof} as a symbol for EOF.
+Our input stream would then become
+
+[.center,%header,cols="^",width=25%]
+|===
+| `AAAABCB{eof}`
+|===
+
+What's peculiar about this symbol is that it can't be any one of the 256 possible byte values in the input stream.
+Say we'd use `!`` to indicate EOF, then we couldn't compress any data containing `!` as it would be mistaken for EOF.
+This means we need to add a 257th value to the list, a wholly new value.
+Remark that {eof} does not appear in the http://www.asciitable.com/[ASCII table], further confirming it falls outside the range of bytes.
+
+[NOTE]
+====
+When dealing with input data elements, it's better to use the term _datum_ instead of _byte_.
+Byte is linked to 8 bits and 256 possible values.
+We need a more general concept, one that also allows for 257 possible values (or more, or less.)
+
+This is also why out `InputStream` and `OutputStream` classes don't work with `uint8_t` but with `uint64_t`: it gives us breathing room to add new symbols.
+====
+
+If we perform our compression on our updated input stream, we get as frequencies
+
+[.center,%header,cols="^,^",width=50%]
+|===
+| Datum | Frequency
+| `A` | 4
+| `B` | 2
+| `C` | 1
+| `{eof}` | 1
+|===
+
+This leads to
+
+image::huffman-tree3.svg[Static,align="center"]
+
+[.center,%header,cols="^,^",width=50%]
+|===
+| Datum | Code
+| `A` | 0
+| `B` | 10
+| `C` | 110
+| `{eof}` | 111
+|===
+
+and finally
+
+[.center,%header,cols="^",width=25%]
+|===
+| `00001011 01011100`
+|===
+
+While decompressing, we will know the file ended as soon as we encounter {eof}.
+
+We will the responsibility of dealing with {eof} in a separate component:
+
+.Dealing with EOF
+[[figeof]]
+image::huffman4.svg[Static,align="center"]
+
+## Encoders &amp; Decoders
+
+As you can see in the <<figeof,diagram above>>, the compression/decompression process is split in multiple steps.
+These steps are also each other's inverse operations:
+
+* EOF adder and EOF remover counteract each other.
+* Huffman encoder and Huffman decoder counteract each other.
+* Bit grouper and byte splitter counteract each other.

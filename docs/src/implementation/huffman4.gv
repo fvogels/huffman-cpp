@@ -1,0 +1,30 @@
+digraph G {
+    rankdir=LR;
+    newrank=true;
+
+    subgraph c2 {
+        compressed2 [label="compressed data",shape="none"];
+        bytesplitter [shape="box",label="byte splitter"];
+        decompression [shape="box",label="Huffman decoder"];
+        eofdel [shape="box",label="EOF remover"];
+        data2 [shape="none",label="original data"];
+
+        compressed2 -> bytesplitter [label="256"];
+        bytesplitter -> decompression [label="2"];
+        decompression -> eofdel [label="257"];
+        eofdel -> data2 [label="256"];
+    }
+
+    subgraph c1 {
+        data [shape="none",label="original data"];
+        eofadd [shape="box",label="EOF adder"];
+        compression [shape="box",label="Huffman encoder"];
+        bitgrouper [shape="box",label="bit grouper"]
+        compressed [label="compressed data",shape="none"];
+
+        data -> eofadd [label="256"];
+        eofadd -> compression [label="257"];
+        compression -> bitgrouper [label="2"];
+        bitgrouper -> compressed [label="256"];
+    }
+}

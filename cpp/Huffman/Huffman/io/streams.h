@@ -16,7 +16,7 @@ namespace io
 
     struct OutputStream
     {
-        virtual ~OutputStream() { }
+        virtual ~OutputStream()         { }
 
         virtual void write(Datum value) = 0;
     };

@@ -191,4 +191,6 @@ void check(u64 n, unsigned nbits)
 * `MemoryBuffer.source()->create_input_stream()` creates an `InputStream` that will read data from the buffer's internal `std::vector`.
 * `MemoryBuffer.destination()->create_output_stream()` creates an `OutputStream` that will write data to the buffer's internal `std::vector`.
 
-So basically, we create a `std::vector`, `write_bits` writes
+So basically, we create a temporary `std::vector`, `write_bits` writes its bits to it, and `read_bits` reads them again.
+
+image::read-write-bits.svg[Static,align="center"]

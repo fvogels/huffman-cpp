@@ -1,0 +1,26 @@
+digraph G {
+    node [shape="box"];
+    rankdir=LR;
+
+    n1[label="value"];
+    write_bits[label="write_bits"];
+    output_stream[label="OutputStream"];
+
+    subgraph cluster_buffer
+    {
+        label="buffer";
+
+        vector[label="std::vector"];
+    }
+
+    input_stream[label="InputStream"];
+    read_bits[label="read_bits"];
+    n2[label="value"];
+
+    n1 -> write_bits;
+    write_bits -> output_stream;
+    output_stream -> vector;
+    vector -> input_stream;
+    input_stream -> read_bits;
+    read_bits -> n2;
+}

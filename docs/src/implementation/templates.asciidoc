@@ -7,7 +7,7 @@ This is due to the fact that the compiler needs access to the complete source to
 Remember that code inside another `.cpp` is off limits.
 ====
 
-[#class]
+[[class]]
 ## Classes
 
 TODO
@@ -39,7 +39,7 @@ public:
 };
 ----
 
-[#functions]
+[[functions]]
 ## Functions
 
 [source,language='cpp']

@@ -29,7 +29,7 @@ The `'` does not mean anything, it is merely a visual aid.
 These notations are valid {cpp}: `0b0000'1111` will be recognized by the compiler as 15.
 ====
 
-[#leftshift]
+[[leftshift]]
 ## Left Shifting
 
 Consider ``x = 0b0000'1111`.
@@ -78,7 +78,7 @@ These days, however, there is no point in such tricks:
 * The compiler knows best: if multiplying happens to be faster user shifts, the compiler will take care of translating it to bitshifts.
 ====
 
-[#rightshift]
+[[rightshift]]
 ## Right Shifting
 
 It should come as no surprise that `x >> n` also exists and shifts bits `n` positions to the right.
@@ -108,7 +108,7 @@ Shifting to the right is the same as integer division:
 |====
 ====
 
-[#and]
+[[and]]
 ## Bitwise AND
 
 The familiar `&&` operator is known as _logical AND_ and takes boolean values as operands.
@@ -134,7 +134,7 @@ Next, perform AND operations bit by bit:
 The resulting bits form a new number: `0b1000` which is equal to `8`.
 ====
 
-[#masking]
+[[masking]]
 ### Masking
 
 The `&` operator is often used to "extract" certain bits.
@@ -161,7 +161,7 @@ With some extra shifts you can move the byte to the rightmost position:
 | Leftmost | `(x & 0xFF'00'00'00) >> 24` | `0x00'00'00'12`
 |===
 
-[#isbitset]
+[[isbitset]]
 ### Checking Bits
 
 The `&` operator can be used to check whether a certain bit is set in some integer x.
@@ -179,7 +179,7 @@ Say we want to found out if the ``K``th bit is set.
 * If the result is zero, `x` did not have its ``K``th bit set.
   If the result is nonzero, `x` did have its ``K``th bit set.
 
-[#or]
+[[or]]
 ## Bitwise OR
 
 Predictably, the logical OR operator `||` also has a bitwise brother `|`.
@@ -200,7 +200,7 @@ Next, perform OR operations bit by bit:
 |===
 ====
 
-[#combining]
+[[combining]]
 ### Combining
 
 The `|` operator is often used to combine parts into a single whole.

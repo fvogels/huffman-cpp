@@ -45,7 +45,7 @@ Tests will not run if this is not the case.
 If you can't be bothered with writing out decent descriptions, feel free to use `FrequencyTable 1`, `FrequencyTable 2`, or something similar.
 ====
 
-[#many]
+[[many]]
 ### Write Many Tests
 
 Don't limit yourself to writing a single test per function.

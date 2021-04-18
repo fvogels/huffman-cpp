@@ -238,5 +238,6 @@ The combiner operator `|` will then have to check that the domain sizes match up
 | `Encoding<N1, N2> \| Encoding<N2, N3>` &rarr; `Encoding<N1, N3>`
 |===
 
-Notice how the output domain size of the left operand (`N2`) is equal to the input domain size of the right operand.
-
+* Notice how the output domain size of the left operand (`N2`) is equal to the input domain size of the right operand.
+* Also notice how combining two encodings yields a new encoding.
+  This allows us to chain as many encodings as we want.

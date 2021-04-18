@@ -1,0 +1,72 @@
+# Encoding Auxiliary Functions
+
+Now that we can foundations for encodings, we need to be able to use them.
+You have been provided with a few classes to help you out.
+
+## Streams
+
+Remember that an encoding provides two methods:
+
+* `encode`
+* `decode`
+
+Both get their data from an `InputStream` and write the results to an `OutputStream`.
+However, these two `Stream` classes are abstract.
+In order to actually be able to call `encode` and `decode`, you need actual concrete implementations of these `Stream` classes.
+
+We have provided you with two such implementations:
+
+* `io/memory-buffer.h` provides ``Stream``s that can read from and write to a `std::vector`.
+* `io/files.h` provides ``Stream``s that interact with files.
+
+### Example: Memory Buffer Streams
+
+An encoding needs data to encode, so let's create a memory buffer and fill it with some bytes:
+
+[source,language='cpp']
+----
+auto original_data = std::make_shared<std::vector<Datum>>();
+original_data.push_back(0);
+original_data.push_back(1);
+original_data.push_back(2);
+original_data.push_back(3);
+
+auto input_stream = io::create_memory_input_stream(original_data);
+----
+
+Were we to read from the `input_stream`, we'd get `0`, `1`, `2` and `3`.
+
+Next, we need a buffer to store the results in:
+
+[source,language='cpp']
+----
+auto data_receiver = std::make_shared<std::vector<Datum>>();
+auto output_stream = io::create_memory_output_stream(data_receiver);
+----
+
+Whenever we call `output_stream->write(x)`, this `x` will be added to `data_receiver`.
+
+Finally, we can give these two streams to an encoding:
+
+[source,language='cpp']
+----
+Encoding encoding = create_some_encoding();
+encoding->encode(input_stream, output_stream);
+
+// data_receiver now contains the encoded data
+----
+
+image::memory-stream.svg[Static,align="center"]
+
+## Example: File Streams
+
+The same approach is possible with files:
+
+[source,language='cpp']
+----
+auto input_stream  = io::create_file_input_stream("data.txt");
+auto output_stream = io::create_file_input_stream("data.compressed");
+
+Encoding encoding = create_some_encoding();
+encoding->encode(input_stream, output_stream);
+----

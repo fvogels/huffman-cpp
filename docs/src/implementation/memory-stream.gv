@@ -1,0 +1,31 @@
+digraph G {
+    rankdir=LR;
+    node[shape=box];
+
+    subgraph cluster_input
+    {
+        rank=same;
+        {
+            input_buffer [label="original_data"];
+            input_stream [label="InputStream"];
+
+            input_stream -> input_buffer [dir=back];
+        }
+    }
+
+    subgraph cluster_output
+    {
+        rank=same;
+        {
+            output_buffer [label="data_receiver"];
+            output_stream [label="OutputStream"];
+
+            output_stream -> output_buffer;
+        }
+    }
+
+    encoding [label="encoding"];
+
+    input_stream -> encoding;
+    encoding -> output_stream;
+}

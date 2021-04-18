@@ -57,6 +57,18 @@ namespace io
     };
 
     template<typename T>
+    std::unique_ptr<InputStream> create_memory_input_stream(std::shared_ptr<std::vector<T>> buffer)
+    {
+        return std::make_unique<MemoryInputStream<T>>(buffer);
+    }
+
+    template<typename T>
+    std::unique_ptr<OutputStream> create_memory_output_stream(std::shared_ptr<std::vector<T>> buffer)
+    {
+        return std::make_unique<MemoryOutputStream<T>>(buffer);
+    }
+
+    template<typename T>
     class MemoryDataSourceImplementation : public DataSourceImplementation
     {
     private:
@@ -70,7 +82,7 @@ namespace io
 
         std::unique_ptr<InputStream> create_input_stream() override
         {
-            return std::make_unique<MemoryInputStream<T>>(m_contents);
+            return create_memory_input_stream<T>(m_contents);
         }
     };
 
@@ -88,7 +100,7 @@ namespace io
 
         std::unique_ptr<OutputStream> create_output_stream() override
         {
-            return std::make_unique<MemoryOutputStream<T>>(m_contents);
+            return create_memory_output_stream<T>(m_contents);
         }
     };
 

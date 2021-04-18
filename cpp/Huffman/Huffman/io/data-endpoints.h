@@ -31,6 +31,11 @@ namespace io
         {
             return m_implementation.get();
         }
+
+        const DataSourceImplementation* operator->() const
+        {
+            return m_implementation.get();
+        }
     };
 
     class DataDestinationImplementation
@@ -54,6 +59,11 @@ namespace io
         }
 
         DataDestinationImplementation* operator->()
+        {
+            return m_implementation.get();
+        }
+
+        const DataSourceImplementation* operator->() const
         {
             return m_implementation.get();
         }

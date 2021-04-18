@@ -1,4 +1,5 @@
 #include "encoding/eof-encoding.h"
+#include "io/io-util.h"
 
 
 namespace
@@ -6,7 +7,7 @@ namespace
     class EofImplementation : public encoding::EncodingImplementation
     {
     private:
-        u64 m_domain_size;
+        const u64 m_domain_size;
 
     public:
         EofImplementation(u64 domain_size) : m_domain_size(domain_size)
@@ -18,12 +19,7 @@ namespace
         {
             const Datum eof = m_domain_size;
 
-            while (!input.end_reached())
-            {
-                auto datum = input.read();
-                output.write(datum);
-            }
-
+            io::transfer(input, output);
             output.write(eof);
         }
 

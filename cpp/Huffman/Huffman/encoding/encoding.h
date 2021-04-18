@@ -24,9 +24,6 @@ namespace encoding
         std::shared_ptr<EncodingImplementation> m_implementation;
 
     public:
-        constexpr static unsigned input_domain_size = IN;
-        constexpr static unsigned output_domain_size = OUT;
-
         Encoding(std::shared_ptr<EncodingImplementation> implementation) : m_implementation(implementation)
         {
             // NOP
@@ -40,11 +37,6 @@ namespace encoding
         const EncodingImplementation* operator->() const
         {
             return m_implementation.get();
-        }
-
-        std::shared_ptr<EncodingImplementation> implementation() const
-        {
-            return m_implementation;
         }
     };
 

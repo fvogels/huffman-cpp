@@ -18,7 +18,6 @@ namespace
 
         void encode(io::InputStream& input, io::OutputStream& output) const override
         {
-            u64 buffer = 0;
             unsigned nbits = 0;
 
             while (!input.end_reached())

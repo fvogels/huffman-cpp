@@ -140,6 +140,7 @@ For example, you want `eof_encoding<5>` to return an `Encoding<5, 6>` object.
 The function's body will be deferred to a later step.
 ====
 
+[[factory]]
 ## Factory Function
 
 We're in a bit of trouble:

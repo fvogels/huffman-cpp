@@ -73,6 +73,7 @@ You are given code in the `io` folder.
 Include these in the project: right click on the `io` folder and pick `Include In Project`.
 ====
 
+[[readbits]]
 ## Function `read_bits`
 
 Let's start with setting up the necessary files.
@@ -133,6 +134,7 @@ Note that `read_bits` receives an `io::InputStream&`, not a `const io::InputStre
 Why do you think that is?
 ====
 
+[[writebits]]
 ## Function `write_bits`
 
 As mentioned before, many things during this project will come in pairs.

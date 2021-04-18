@@ -1,0 +1,62 @@
+# Bit Grouper Encoding
+
+This class will be implemented in exactly the same way as the EOF encoding.
+
+## Groundworks
+
+[TASK]
+====
+* Create new files `encoding/bit-grouper.cpp` and `encoding/bit-grouper.h`.
+* Add an <<include-guards#,include guards>>.
+====
+
+## BitGrouperImplementation
+
+[IMPORTANT]
+====
+Do not be confused by the name Bit Grouper.
+
+* It _groups_ bits into bytes when _encoding_.
+* It _splits_ bytes into splits when _decoding_.
+====
+
+[TASK]
+====
+In the `.cpp` file:
+
+* Inside an anonymous namespace, define the class `BitGrouperImplementation`, subclass of `EncodingImplementation`.
+* It has a single field: `group_size`, which represents the number of bits it has to group together.
+* Define the constructor.
+* Define `encode`.
+** Use the <<binary-io#readbits,previously implemented function `read_bits`>> to read `group_size` bits from the `InputStream`.
+** Write the result to the `OutputStream`.
+* Define `decode`.
+====
+
+## Factory Function
+
+[TASK]
+====
+We need a function `create_bit_grouper_implementation` that has the same role as <<eof-encoding#factory,`create_eof_encoding_implementation`>>.
+
+* In the `.h` file, _declare_ the function.
+* In the `.cpp` file, _define_ the function.
+====
+
+## Encoding
+
+[TASK]
+====
+In the `.h` file, inside the `encoding` namespace, add
+
+[source,language='cpp']
+----
+template<unsigned GROUP_SIZE>
+encoding::Encoding<2, 1 << GROUP_SIZE>bit_grouper()
+{
+    // ???
+}
+----
+
+Complete the body.
+====

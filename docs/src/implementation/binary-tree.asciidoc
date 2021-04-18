@@ -30,7 +30,7 @@ image::huffman-tree-raw.svg[Static,align="center"]
 .UML
 image::binary-tree-uml.svg[Static,align="center"]
 
-## Skeleton
+## Groundwork
 
 We make the tree a <<templates#class,template class>>, so as to be able to choose what kind of data a leaf carries.
 

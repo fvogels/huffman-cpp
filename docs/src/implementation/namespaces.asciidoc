@@ -30,6 +30,7 @@ When defining a function `bar` in a namespace `foo`, do not forget to qualify th
 More specifically, notice how the definition mentions `foo::bar`, not just `bar`.
 ====
 
+[[anonymous]]
 ## Anonymous Namespaces
 
 {cpp} (more specifically the linker) doesn't like it if you reuse the same name in different `.cpp` files, even if you don't make them public by declaring them in the `.h` file.

@@ -1,5 +1,9 @@
 # Utility Functions
 
+Let's start with some utility definitions that will come in handy later.
+
+## Groundwork
+
 [TASK]
 ====
 * Create a new file `util.h` in the root of your project (i.e., not in a subdirectory.)

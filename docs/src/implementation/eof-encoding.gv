@@ -1,0 +1,29 @@
+digraph G
+{
+    node [shape="box"];
+
+    subgraph cluster_private
+    {
+        label="private";
+        labelloc="b";
+        style="filled";
+        color=lightcoral;
+
+        impl [label="EncodingImplementation"];
+        eof [label="EofEncodingImplementation"];
+
+        eof -> impl [arrowhead=onormal, label=" subclasses"];
+    }
+
+    subgraph cluster_public
+    {
+        label="public";
+
+        style="filled";
+        color=lightgreen;
+
+        enc [label="Encoding"];
+    }
+
+    enc -> eof [label=" wraps"];
+}

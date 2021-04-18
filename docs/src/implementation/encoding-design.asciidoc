@@ -34,6 +34,7 @@ Let's replace the arrow labels by the number of possible values transmitted: bit
 .With Domain Sizes
 image::huffman3.svg[Static,align="center"]
 
+[[eof]]
 ### EOF
 
 There's a snag unfortunately.
@@ -152,7 +153,7 @@ and finally
 
 While decompressing, we will know the file ended as soon as we encounter {eof}.
 
-We will the responsibility of dealing with {eof} in a separate component:
+We will place the responsibility of dealing with {eof} in a separate component:
 
 .Dealing with EOF
 [[figeof]]
@@ -208,6 +209,7 @@ The following code would produce both the forward (compressing) and backward (de
 auto pipeline = eof_encoding() | huffman_encoding() | bit_grouper();
 ----
 
+[[checks]]
 ### Compiler Checks
 
 [NOTE]

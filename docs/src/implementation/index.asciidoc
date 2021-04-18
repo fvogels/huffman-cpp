@@ -7,6 +7,8 @@
 * Encoding
 ** <<encoding-design#,Design>>
 ** <<encoding-implementation#,Implementation>>
+* <<eof-encoding#,Eof Encoding>>
+* <<bit-grouper-encoding#,Bit Grouper Encoding>>
 
 ## Auxiliary Pages
 

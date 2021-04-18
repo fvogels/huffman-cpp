@@ -49,7 +49,7 @@ std::vector<char> letters = freqtable.values(); // -> { 'a', 'b' }
 
 ## Class Implementation
 
-### Skeleton
+### Groundwork
 
 [TASK]
 ====

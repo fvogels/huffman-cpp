@@ -6,7 +6,7 @@ For technical reasons, we will split the encoding-related functionality in multi
 * The actual logic will be hidden in `EncodingImplementation` subclasses.
 * Each `EncodingImplementation` object will be wrapped in a helper object of type `Encoding<IN, OUT>`.
 
-## Preparing
+## Groundwork
 
 [TASK]
 ====

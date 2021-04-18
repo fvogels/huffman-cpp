@@ -1,0 +1,184 @@
+# EOF Encoding
+
+As explained <<encoding-design#eof,previously>>, we need to add an extra symbol to our input data designating its end so that while decompressing, we know when to stop.
+In this step, we will develop the EOF adder/EOF remover components in <<encoding-design#figeof,this diagram>>.
+
+## Groundwork
+
+[TASK]
+====
+* Add files `encoding/eof-encoding.cpp` and `encoding/eof-encoding.h` to the project.
+* Add an <<include-guards#,include guard>>.
+* Add a declaration for namespace `encoding`.
+====
+
+## Code Organization
+
+The implementation of an encoding (in this case the EOF encoding) consists of two parts:
+
+* Subclassing `EncodingImplementation` and adding the actual encoding/decoding logic to it.
+* Creating an `Encoding` wrapper.
+
+Typically, we would add declarations in the `.h` file and corresponding definitions in the `.cpp` file.
+We will deviate from this in order to improve both abstraction and compile times.
+
+Everything in the `.h` file will be visible to the rest of the code (because it can be ``#include``d), whereas the contents of the `.cpp` are essentially hidden from the rest of the world.
+
+The `EncodingImplementation` subclass is merely an implementation detail.
+We don't want the rest of our code to know about it.
+The functionality will be made accessible through `Encoding`.
+For this reason, we will hide this class in the `.cpp` file and only export the minimum necessary to the `.h` file.
+
+image::eof-encoding.svg[Static,align="center"]
+
+## EofEncodingImplementation
+
+As explained earlier, we will hide this class entirely in the `.cpp` file.
+As a precaution, we will put it in an <<namespaces#anonymous,anonymous namespace>>.
+
+### Groundwork
+
+[TASK]
+====
+* In the file `eof-encoding.cpp`, add an anonymous namespace.
+* Inside this anonymous namespace, start the definition of a class named `EofEncodingImplementation` which subclasses `EncodingImplementation`.
+====
+
+### Fields
+
+The EOF encoding needs to add an _extra_ symbol.
+For example, if its input stream has domain size 16, it should add a 17th symbol.
+In our <<encoding-design#eof,example>>, we had domain size 256, making EOF the 257th symbol.
+However, there is no reason our implementation of EOF encoding should make any assumptions about the domain size of its input.
+Instead, it should be told what it is by its creator.
+
+[TASK]
+====
+Add a private field named `domain_size` with type `u64`.
+Make it `const` since the domain size cannot be changed.
+====
+
+### Constructor
+
+[TASK]
+====
+Add a constructor that initializes this field.
+The constructor should receive this value as parameter.
+====
+
+### Method `encode`
+
+The `encode` method overrides the one defined in `EncodingImplementation`.
+This should make clear what its parameters and return type are.
+
+`encode` should first copy all data from the `InputStream` to the `OutputStream`.
+After this, it should write an extra EOF symbol to the `OutputStream`.
+
+This EOF symbol has to be a _new_ symbol.
+If the domain size is 256, you know that all existing symbols will range from 0 to 255.
+The first new available symbol would be 256.
+
+[TASK]
+====
+Implement `encode`.
+====
+
+### Method `decode`
+
+`decode` should read from the given `InputStream` and write every datum to the given `OutputStream`.
+When it encounters the EOF symbol, it should stop immediately.
+The EOF symbol itself should not be transmitted to the `OutputStream`.
+
+[TASK]
+====
+Implement `decode`.
+====
+
+## Encoding
+
+Our EOF encoding is fully implemented.
+We can now turn our attention to the `Encoding` wrapper.
+
+Note that the class has already been implemented: we only need to instantiate it and initialize it with an `EofEncodingImplementation` object.
+In other words, we merely need to define a function.
+We'll call it `eof_encoding`.
+
+<<encoding-design#checks,Remember>> that `Encoding` takes to template parameters: `IN` and `OUT`, representing the domain sizes of the input and output streams, respectively.
+In the case of EOF encoding, we know that the domain size increases by one due to the addition of the EOF symbol.
+Technically, we would have to produce one wrapping function for each possibility:
+
+[source,language='cpp']
+----
+Encoding<2, 3> eof_encoding2();
+Encoding<3, 4> eof_encoding3();
+Encoding<4, 5> eof_encoding4();
+Encoding<5, 6> eof_encoding5();
+...
+----
+
+This would be a lot of work.
+Luckily, templates are here to help out with exactly that.
+
+[TASK]
+====
+`eof_encoding` will be a <<templates#functions,template function>>, meaning its entire definition belongs in the header file.
+
+Add the following code to `eof-encoding.h`:
+
+[source,language='cpp']
+----
+template<u64 N>
+??? eof_encoding()
+{
+    // TODO
+}
+----
+
+Fill in the `???` with the correct return type.
+For example, you want `eof_encoding<5>` to return an `Encoding<5, 6>` object.
+
+The function's body will be deferred to a later step.
+====
+
+## Factory Function
+
+We're in a bit of trouble:
+
+* The wrapping function `eof_encoding` has to be in the `.h` file.
+  It needs to create an `EofEncodingImplementation` object.
+* `EofEncodingImplementation` is hidden in the `.cpp` file, where `eof_encoding` cannot reach it.
+
+We could of course move the class to the `.h` file, but we consider that overkill.
+We will only make the smallest of bridges necessary between the `.h` and `.cpp` file.
+
+The only thing that `eof_encoding` requires is a way to create the `EofEncodingImplementation`.
+So, in a way, only the constructor needs to be available.
+However, {cpp} does not allow us to only partially expose a class.
+
+Our solution is simple:
+
+* We create a function named `create_eof_implementation`.
+* It is _declared_ in the `.h` file, making it visible to `eof_encoding`.
+* It is _defined_ in the `.cpp` file, so that it can reach `EofEncodingImplementation`.
+
+[TASK]
+====
+In `eof-encoding.h`, add a _declaration_ for a function named `create_eof_implementation`.
+
+* It takes the domain size as a parameter.
+* It returns an `EncodingImplementation`, but do think about the exact type.
+  You will want to pass the result directly to the `Encoding` constructor.
+  So go look what the `Encoding` constructor needs and let that help you decide what the return type of `create_eof_implementation` should be.
+
+In `eof-encoding.cpp`, add the _definition_ for `create_eof_implementation`.
+====
+
+## Filling the Gap
+
+[TASK]
+====
+You can now give `eof_encoding` its body.
+
+* Create the implementation object relying on `create_eof_implementation`.
+* Put it in an `Encoding` wrapper object.
+====

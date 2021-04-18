@@ -50,7 +50,7 @@ Finally, we can give these two streams to an encoding:
 
 [source,language='cpp']
 ----
-Encoding encoding = create_some_encoding();
+auto encoding = create_some_encoding();
 encoding->encode(input_stream, output_stream);
 
 // data_receiver now contains the encoded data
@@ -58,15 +58,134 @@ encoding->encode(input_stream, output_stream);
 
 image::memory-stream.svg[Static,align="center"]
 
-## Example: File Streams
+### Example: File Streams
 
 The same approach is possible with files:
 
 [source,language='cpp']
 ----
 auto input_stream  = io::create_file_input_stream("data.txt");
-auto output_stream = io::create_file_input_stream("data.compressed");
+auto output_stream = io::create_file_output_stream("data.compressed");
 
 Encoding encoding = create_some_encoding();
 encoding->encode(input_stream, output_stream);
 ----
+
+## Data Sources and Destinations
+
+For technical reasons, `InputStream` and `OutputStream` do not carry information about their domain size.
+For example, given an `InputStream`, you cannot infer from its type whether it will produce bits, bytes or something else.
+
+We apply the approximately the same trick as with `EncodingImplementation` and `Encode`: we provide wrappers that add this information in a separate step.
+
+* `DataSource<N>` can create ``InputStream``s.
+  The `N` represents the domain size of the data carried by the `InputStream`.
+  For example, `DataSource<2>` represents a data source of bits, whereas `DataSource<256>` contains bytes.
+* Similarly, `DataDestination<N>` can create ``OutputStream``s.
+
+These classes have already been written for you.
+
+### Example: Memory Data Endpoints
+
+[source,language='cpp']
+----
+auto original_data = std::make_shared<std::vector<Datum>>();
+DataSource<256> data_source = io::create_memory_data_source<256>(original_data);
+
+auto bit_receiver = std::make_shared<std::vector<Datum>>();
+DataDestination<2> data_destination = io::create_memory_data_destination<2>(bit_receiver);
+
+Encoder<256, 2> huffman = huffman_encoding();
+huffman->encode(data_source->create_input_stream(), bit_receiver->create_output_stream());
+----
+
+### Example: File Data Endpoints
+
+[source,language='cpp']
+----
+DataSource<256> data_source = create_file_data_source("data.txt");
+DataDestination<256> data_destination = create_file_data_destination("data.encoded");
+
+Encoder<256, 256> encoder = huffman_encoder() | bit_grouper<8>();
+encoder->encode(data_source->create_input_stream(), bit_receiver->create_output_stream());
+----
+
+[NOTE]
+====
+Files always operate on bytes, which means their domain size is fixed on 256.
+====
+
+## MemoryBuffer
+
+In order to use the memory data source and data destination, you need to create a buffer yourself, then create the wrappers around it:
+
+[source,language='cpp']
+----
+auto buffer      = std::make_shared<std::vector<Datum>>();
+auto source      = io::create_memory_data_source<256>(buffer);
+auto destination = io::create_memory_data_destination<256>(buffer);
+----
+
+We have provided you with a helper class that does this for you:
+
+[source,language='cpp']
+----
+io::MemoryBuffer<256> buffer;
+
+auto source      = buffer.source();
+auto destination = buffer.destination();
+----
+
+The template parameter for `MemoryBuffer` corresponds to the domain size.
+Based on this information, it will create a vector with minimally sized data elements that can represent `N` different values.
+
+## Function `encode`
+
+Let's take a step back.
+We have an encoding, and to be able to use it we need an input and output stream.
+We've wrapped these streams in `DataSource` and `DataDestination` objects, but currently this is not very practical:
+
+[source,language='cpp']
+----
+DataSource<256>    source      = get_source();
+DataDestination<2> destination = get_destination();
+Encoding<256, 2>   huffman     = huffman_encoding();
+
+huffman->encode(source.create_input_stream(), destination.create_output_stream());
+----
+
+* We still need to create input and output streams explicitly.
+* The compiler does not check the domain sizes.
+
+What we want is to write
+
+[source,language='cpp']
+----
+DataSource<256>    source      = get_source();
+DataDestination<2> destination = get_destination();
+Encoding<256, 2>   huffman     = huffman_encoding();
+
+encode(source, huffman, destination);
+----
+
+[TASK]
+====
+Implement this function `encode` in `encoding/encoding.h`.
+
+* It has two template parameters `IN` and `OUT`, each of type `u64`.
+  They represent domain sizes.
+* It takes three parameters.
+* Pass all three parameters by value.
+* Make sure that the domain sizes match.
+* The body must perform the following steps:
+** Ask the data source for an input stream.
+** Ask the data destination for an output stream.
+** Call the encoding's `encode` method on these streams.
+====
+
+## Function `decode`
+
+[TASK]
+====
+Implement `decode` so that it does the opposite of `encode`.
+====

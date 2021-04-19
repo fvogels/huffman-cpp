@@ -184,6 +184,7 @@ Note also that the components interact with the domain sizes:
 
 In other words, we cannot link any two components but have to keep their limitations in mind.
 
+[[encoding]]
 ### The Encoding Type
 
 Our goal is to be able to easily construct such "inverse pipelines" and have the compiler check that the different components are indeed compatible with each other.

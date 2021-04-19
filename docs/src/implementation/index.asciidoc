@@ -10,6 +10,7 @@
 ** <<encoding-functions#,Auxiliary Functions>>
 * <<eof-encoding#,Eof Encoding>>
 * <<bit-grouper-encoding#,Bit Grouper Encoding>>
+* <<combining-encodings#,Combining Encodings>>
 
 ## Auxiliary Pages
 

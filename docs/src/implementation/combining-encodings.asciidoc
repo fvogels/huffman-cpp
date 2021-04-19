@@ -1,0 +1,127 @@
+# Combining Encodings
+
+As <<encoding-design#encoding,explained earlier>>, we want to combine encodings using the following syntax:
+
+[source,language='cpp']
+----
+Encoding<256, 2> huffman = huffman_encoding();
+Encoding<2, 256> grouper = bit_grouper<8>();
+
+Encoding<256, 256> combined = huffman | grouper;
+----
+
+In other words, an `Encoding<256, 2>` and an `Encoding<2, 256>` can be combined into a single `Encoding<256, 256>`.
+
+image::combining.svg[Static,align="center"]
+
+[NOTE]
+====
+We omitted the EOF encoder to keep things simpler.
+====
+
+## Approach
+
+The fact that we'll use a special notation (`e1 | e2`) does not change much.
+Implementing this part of the project will be very similar to the two previous ones:
+
+* We create an `EncodingImplementation` subclass.
+* We create a wrapping function.
+
+Previously, we named this wrapping function `eof_encoding` and `bit_grouper`.
+Instead of calling this wrapping function `combine`, we'll call it `|`.
+In other words, it's more of the same.
+
+## Groundworks
+
+Contrary to the two previous encodings we implemented, this one will be a template.
+Therefore, there will be no need for a `.cpp`.
+
+[TASK]
+====
+* Create a new file `encoding/encoding-combiner.h`.
+* Add an <<include-guards#,include guard>>.
+* Prepare namespace `encoding`.
+====
+
+## Implementation Class
+
+When combining two encodings `e1` and `e2`, three domain sizes are involved:
+
+* `N1`: The input domain size of `e1`.
+* `N2`: The output domain size of `e1` which must be equal to the input domain size of `e2`.
+* `N3`: The output domain size of `e2`
+
+[TASK]
+====
+Create a template class named `EncodingCombinerImplementation`.
+
+* Add the required template parameters.
+* Make it a subclass of `EncodingImplementation`.
+====
+
+### Fields
+
+The combiner object needs to keep track internally of the two encodings it combines.
+
+[TASK]
+====
+Add the necessary fields to `EncodingCombinerImplementation`.
+No need for pointers/references.
+Just keep everything by value.
+====
+
+### Constructor
+
+[TASK]
+====
+Add a constructor that initializes the fields.
+====
+
+## Method `encode`
+
+The `encode` method receives an `InputStream` and an `OutputStream`, let's call them `in` and `out`.
+`encode` pass on the data from `in` to the first encoder.
+This first encoder also needs an `OutputStream`: do *not* pass it `out`!
+`out` is only meant for the _final_ result.
+Instead, you have to create a temporary <<membuf,in-memory buffer>>, ask it for its output stream and pass _that_ stream to `e1`.
+Once `e1` is done writing its results to the buffer, you will have to feed this data to `e2`.
+
+image::combining2.svg[Static,align="center"]
+
+[TASK]
+====
+Implement `encode`.
+====
+
+## Method `decode`
+
+`decode` works similarly to `encode`.
+Make sure you invoke ``e1``'s en ``e2``'s `decode` method in the right order though!
+
+[TASK]
+====
+Implement `decode`.
+====
+
+## Operator
+
+[TASK]
+====
+Define `operator |`.
+
+* It is a template function with the same template parameters as `EncodingCombinerImplementation`.
+* It needs to create an `EncodingCombinerImplementation` object.
+  Its parameters are therefore the same as ``EncodingCombinerImplementation``'s constructor.
+====
+
+## Testing
+
+Due to all the compile-time checks that go on (namely checking the domain size compatibility), writing tests that is accepted by the compiler is in itself a goal.
+A second step would of course be that the correct results are returned.
+
+[TASK]
+====
+Write some tests to check that you can get `|` to compile and that it works.
+
+For example, in one test you could combine multiple EOF encodings and see if encoding then decoding returns the original results.
+====

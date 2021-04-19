@@ -1,0 +1,22 @@
+digraph G
+{
+    node [shape="box"];
+    rankdir=LR;
+
+    subgraph cluster_private
+    {
+        label="Combiner";
+
+        huffman [label="huffman"];
+        buffer [label="buffer"];
+        grouper [label="grouper"];
+
+        huffman -> buffer -> grouper [label="2"];
+    }
+
+    input [label="original data",shape=none];
+    output [label="compressed data",shape=none];
+
+    input -> huffman [label="256"];
+    grouper -> output [label="256"];
+}

@@ -18,6 +18,31 @@ $ git clone URL
 ----
 ====
 
+Also add a link to the original repository (i.e., mine) in case I make updates.
+
+[TASK]
+====
+Add an extra remote.
+
+[source,language="bash"]
+----
+$ git remote add upstream https://github.com/ucll-pvm/huffman-starter.git
+----
+====
+
+### Getting updates
+
+[TASK]
+====
+You can fetch updates using
+
+[source,language="bash"]
+----
+$ git pull upstream master
+----
+====
+
+
 ## Getting Acquainted
 
 ### Opening the Solution

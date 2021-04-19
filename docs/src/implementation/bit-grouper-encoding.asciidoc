@@ -60,3 +60,10 @@ encoding::Encoding<2, 1 << GROUP_SIZE>bit_grouper()
 
 Complete the body.
 ====
+
+## Tests
+
+[TASK]
+====
+Write some tests to check that the bit grouper performs its jobs.
+====

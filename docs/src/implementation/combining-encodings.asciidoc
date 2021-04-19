@@ -83,7 +83,7 @@ The `encode` method receives an `InputStream` and an `OutputStream`, let's call 
 `encode` pass on the data from `in` to the first encoder.
 This first encoder also needs an `OutputStream`: do *not* pass it `out`!
 `out` is only meant for the _final_ result.
-Instead, you have to create a temporary <<membuf,in-memory buffer>>, ask it for its output stream and pass _that_ stream to `e1`.
+Instead, you have to create a temporary <<encoding-functions#buffer,in-memory buffer>>, ask it for its output stream and pass _that_ stream to `e1`.
 Once `e1` is done writing its results to the buffer, you will have to feed this data to `e2`.
 
 image::combining2.svg[Static,align="center"]

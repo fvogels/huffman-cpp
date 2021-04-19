@@ -115,6 +115,7 @@ encoder->encode(data_source->create_input_stream(), bit_receiver->create_output_
 Files always operate on bytes, which means their domain size is fixed on 256.
 ====
 
+[[buffer]]
 ## MemoryBuffer
 
 In order to use the memory data source and data destination, you need to create a buffer yourself, then create the wrappers around it:

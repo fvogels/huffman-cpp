@@ -193,3 +193,10 @@ std::unique_ptr<Node<OUT>> map(const Node<IN>& tree, std::function<OUT(const IN&
 * The Python implementation implements `map` as a method, but this isn't possible in our case (virtual template functions are impossible to compile due to how templates work internally.)
   You will need to find a way to determine the dynamic type of the given `tree`.
 ====
+
+== Tests
+
+[TASK]
+====
+Write a few tests to make sure everything compiles and works as intended.
+====

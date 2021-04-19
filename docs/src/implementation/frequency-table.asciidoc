@@ -221,3 +221,10 @@ This function should reside _outside_ the class (but still inside the `data` nam
 ** The function does not store the vector internally.
 * Return type: return the `FrequencyTable` by value.
 ====
+
+## Testing
+
+`FrequencyTable` is a template class.
+This means that the compiler does not bother to actually check your code until you _use_ it.
+So even if everything compiles fine, this says very little about the quality of your code.
+It it therefore essential that you write tests.

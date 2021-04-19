@@ -183,3 +183,19 @@ You can now give `eof_encoding` its body.
 * Create the implementation object relying on `create_eof_implementation`.
 * Put it in an `Encoding` wrapper object.
 ====
+
+## Testing
+
+[TASK]
+====
+Write some tests to check that everything works.
+
+For example,
+
+* You could create two <<encoding-functions#buffer,MemoryBuffer>> with domain sizes 17 and 18.
+* Fill the first in with some data (values between `0` and `16`).
+* Let the EOF encoding loose on it.
+* Check that the second memory buffer has one more element, namely `17`.
+
+You can ask for a ``MemoryBuffer``s internal `std::buffer` by calling its `data` method.
+====

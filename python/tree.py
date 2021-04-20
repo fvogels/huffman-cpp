@@ -58,6 +58,9 @@ class Branch(Node[T]):
         return isinstance(other, Branch) and self.left == other.left and self.right == other.right
 
     def map(self : Branch[T], func : Callable[[T], U]) -> Branch[U]:
+        '''
+        Calls map on both children and constructs a new branch with the results.
+        '''
         # (for some reason, mypy fails to typecheck this line)
         left_child : Node[U] = self.left.map(func) # type: ignore
         right_child : Node[U] = self.right.map(func)
@@ -87,6 +90,9 @@ class Leaf(Node[T]):
         return isinstance(other, Leaf) and self.datum == other.datum
 
     def map(self, func : Callable[[T], U]) -> Leaf[U]:
+        '''
+        Applies func to the leaf's datum and constructs a new leaf with it.
+        '''
         return Leaf(func(self.datum))
 
     def __repr__(self) -> str:

@@ -18,7 +18,13 @@ $ git clone URL
 ----
 ====
 
-Also add a link to the original repository (i.e., mine) in case I make updates.
+[NOTE]
+====
+Due to technical troubles with GitHub Classroom, this will be an empty repository.
+This is expected.
+====
+
+Also add a link to the original repository.
 
 [TASK]
 ====
@@ -27,6 +33,17 @@ Add an extra remote.
 [source,language="bash"]
 ----
 $ git remote add upstream https://github.com/ucll-pvm/huffman-starter.git
+----
+====
+
+Fetch the starter code.
+
+[TASK]
+====
+
+[source,language="bash"]
+----
+$ git pull upstream master
 ----
 ====
 

@@ -101,3 +101,7 @@ Overload the `->` operator.
 * It must return something on which you can apply the `->` operator.
   You want this to lead to the `EncodingImplementation` object.
 ====
+
+== Testing
+
+There isn't really much to test right now.

@@ -131,7 +131,7 @@ For example,
 
 [.center,cols="^,^",width="40%"]
 |===
-| Bits Needed | Type
+| Bytes Needed | Type
 | 1 | `uint8_t`
 | 2 | `uint16_t`
 | 3 | `uint32_t`

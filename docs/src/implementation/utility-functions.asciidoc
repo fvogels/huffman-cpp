@@ -144,7 +144,7 @@ The more bytes you need, the larger the type needed, moving from `uint8_t` to `u
 
 [TASK]
 ====
-Add the following code `defs.h`:
+Add the following code `util.h`:
 
 [source,language='cpp']
 ----

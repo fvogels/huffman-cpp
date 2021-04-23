@@ -207,6 +207,7 @@ freqtable.values() // returns list { 'a' }
 ----
 ====
 
+[[countfreqs]]
 ## Helper Function
 
 We want a helper function `count_frequencies` that given a vector of values, counts them and returns the frequencies as a `FrequencyTable`.

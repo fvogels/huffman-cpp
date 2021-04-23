@@ -1,0 +1,131 @@
+# Huffman Coding
+
+This part will be more algorithmic in nature.
+We remind you that you have a working Python implementation.
+Use it to understand what you're supposed to be doing and to compare intermediate results.
+
+You are free to organize your code as you wish, but we suggest you spread your code over multiple files in a `encoding/huffman` folder.
+This allows you to easily exclude certain parts of your code.
+If you have multiple compile errors, you can then focus on one at a time by excluding unimportant files.
+
+[IMPORTANT]
+====
+Keep an eye on the whole.
+Know exactly what you're trying to achieve at every step.
+====
+
+[IMPORTANT]
+====
+Don't be afraid to split code into multiple functions and test each function separately.
+If you ask for help and I see big chunks of code, I'll simply tell you to split it up and write tests for each.
+====
+
+## Groundworks
+
+We will implement Huffman coding as another kind of encoding.
+
+[TASK]
+====
+In a `.cpp` file (e.g. `encoding/huffman/huffman-encoding.cpp`), inside an anonymous namespace, start a class definition `HuffmanEncodingImplementation`.
+We'll add fields as we need them.
+
+Add empty `encode` and `decode` overriding methods.
+====
+
+## Huffman Encoding
+
+Encoding consists of multiple steps:
+
+* Count the frequency of each datum in the input stream.
+* Build a Huffman tree.
+* Determine the Huffman code for every datum.
+* For each datum in the input stream, write its corresponding Huffman code to the output stream.
+
+### Copying the InputData
+
+``InputStream``s only allows you to query its data once.
+Yet, we need to go through it twice: once for counting, once for encoding.
+The only way around this is to store all data in memory.
+
+[TASK]
+====
+Write a function `copy_to_vector` that takes an `InputStream` and copies all data into a `std::vector`.
+
+You can implement this function in several ways:
+
+* As a member of `HuffmanEncodingImplementation`.
+  This prevents you from testing it though, since the class is hidden inside a `.cpp`.
+* As a standalone function (i.e., not part of a class).
+  You can then make it available to the tests by adding a declaration in the corresponding `.h` file.
+  The disadvantage of this approach is that you need all code in the same file to compile before you can run the tests.
+* In its own files, e.g., `copy-to-vector.cpp` and `copy-to-vector.h`.
+  Testing-wise, this affords you the most flexibility.
+  It's not great for abstraction though since you expose part of the inner workings of your class.
+====
+
+### Counting Frequencies
+
+Counting frequencies should require only very little work: you have already made a `FrequencyTable` and a helper function `count_frequencies`.
+
+[TASK]
+====
+Call <<frequency-table#countfreqs,`count_frequencies`>> to count the elements in the input stream.
+====
+
+### Building the Tree
+
+The algorithm goes as follows:
+
+* Create binary tree leaves carrying a datum and its corresponding frequency.
+* Put these in a list.
+* Loop until the list contains only one element anymore:
+** Take the two elements with the lowest weight.
+** Create a branch with these two elements as children.
+** Put this branch in the list.
+* At this point, the list contains one item, which is the root of the Huffman tree.
+
+[TASK]
+====
+Implement a function `encoding::huffman::build_tree` that takes a `FrequencyTable<Datum>` and returns a Huffman tree.
+
+* Think of the <<parameter-types#,parameter type>> for the frequency table.
+** It is a large object.
+** It needs no modifications.
+** No ownership transfer is necessary.
+* `build_tree` creates a tree.
+  This tree will have to be created on the heap, because otherwise there's no way to return it: if it were created on the stack, it would be deallocated again as soon as `build_tree` returns.
+  Once `build_tree` is done building the tree, it should not just return the tree, but also complete ownership.
+  Deallocating the tree thereby becomes the caller's responsibility.
+
+A few tips:
+
+* You need to represent binary trees.
+** Remember you have <<binary-tree#,already written code>> for this exact purpose.
+** `Node<T>` represents a tree whose leaves carry a `T`.
+   In our case, we want each leaf to carry both a `Datum` and a frequency.
+   You can make use of https://www.cplusplus.com/reference/utility/pair/pair/[`std::pair`] for this.
+* Given a tree node, whether it be a branch or a leaf, you need to be able to determine its weight.
+  For leaves, this is simple: they carry it around themselves.
+  For branches, you need to take the sum of the weights of their children.
+  Write a helper function `weight` that takes a `Node`, looks if its a leaf or a branch, and based on that determines the weight.
+* Given a list of nodes, you need to find the two that have the lowest weight.
+  There are multiple ways to achieve this.
+** You can sort the list making use of https://en.cppreference.com/w/cpp/algorithm/sort[`std::sort`].
+** You can find use https://en.cppreference.com/w/cpp/algorithm/min_element[`std::min_element`] to find the "smallest" element in a list.
+** Instead of keeping a randomly ordered list and having to find the smallest element, you could simply insert new elements in a smart way such that the list remains sorted at all times.
+* https://en.cppreference.com/w/cpp/container/vector[`std::vector`] does offer methods to add and remove elements at the end (`push_back` and `pop_back`), but there are no such methods to add and remove at the front (i.e., there are no `push_front` or `pop_front` methods), this due to this operation being slow.
+  If you choose to have the elements sorted in the list, it might be advantageous to have the smallest elements at the end of the list.
+====
+
+### Codes
+
+### Encoding
+
+### Writing Tree
+
+
+## Huffman Decoding
+
+### Reading Tree
+
+### Decoding

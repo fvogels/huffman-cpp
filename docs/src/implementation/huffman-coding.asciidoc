@@ -117,7 +117,24 @@ A few tips:
   If you choose to have the elements sorted in the list, it might be advantageous to have the smallest elements at the end of the list.
 ====
 
-### Codes
+### Building Codes
+
+[TASK]
+====
+Write a function `build_codes`.
+
+* `build_codes` takes a Huffman tree as parameter.
+** The tree does not need to be modified.
+** The tree is a large object.
+** `build_codes` is not interested in ownership.
+* `build_codes` must return codes for each `Datum`.
+  You need a data structure to store these codes in.
+** A https://en.cppreference.com/w/cpp/container/map[`std::map`] could work.
+** Since you know the ``Datum``s range from `0` to some maximum value, you could also use a https://en.cppreference.com/w/cpp/container/vector[std::vector], which will probably be much more efficient.
+   You can store the code for `Datum` `i` on index `i`.
+* Codes are really a sequence of bits.
+  You can simply use `std::vector<Datum>` for this purpose.
+====
 
 ### Encoding
 

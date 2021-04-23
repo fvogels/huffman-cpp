@@ -118,9 +118,9 @@ Implement this method.
 ** `increment` needs to store ``x``'s value somewhere in its internal data structure, but it needs to be a _copy_ of `x`.
    This is due to the fact that it will be used as a key in a map-like data structure, and we can't allow keys to be modified lest the map fail to work.
    Making a copy is the safest way to make sure no one gets to modify the key.
+   So, summarized, this means `increment` is not interested in receiving any kind of ownership: it will simply copy `x`.
 ** You know nothing about `T`: it might be small or large.
    Better play it safe.
-** No ownership transfer is necessary (neither full or partial).
 * Think of <<const-correctness#,`const`-correctness>>: is this a `const` method?
 ====
 

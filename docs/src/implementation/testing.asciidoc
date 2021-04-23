@@ -112,6 +112,20 @@ TEST_CASE("Addition tests")
 #endif
 ----
 
+## Organizing Test Files
+
+We suggest you create a hierarchy of tests.
+With this we mean that you make use of directories and subdirectories to organize your test files.
+Visual Studio allows you to include or exclude entire directory contents at once, so this makes it easy to select which tests you want to run.
+
+Of course, you can always choose to run all tests every time.
+
+* Including all tests increase your compilation time.
+  Sometimes this extra compilation time is negligible, but sometimes it's not.
+* Prior to running the tests, _all_ tests have to compile successfully.
+  It could happen that a change in your code requires multiple test files to be modified.
+  We would suggest to exclude all affected test files first, then re-include and fix them one by one.
+
 ## Running Tests
 
 * Select testing build.

@@ -1,0 +1,12 @@
+digraph G
+{
+    root[label=""];
+    a[label="A"];
+    b[label="B"];
+    c[label="C"];
+    branch[label=""];
+
+    root -> a;
+    root -> branch;
+    branch -> {b c};
+}

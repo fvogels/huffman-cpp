@@ -11,7 +11,9 @@
 * <<eof-encoding#,Eof Encoding>>
 * <<bit-grouper-encoding#,Bit Grouper Encoding>>
 * <<combining-encodings#,Combining Encodings>>
-* <<huffman-coding#,Huffman Coding>>
+* Huffman
+** <<tree-encoding#,Huffman Tree Encoding>>
+** <<huffman-encoding#,Huffman Encoding>>
 
 ## Auxiliary Pages
 

@@ -1,4 +1,4 @@
-# Huffman Coding
+# Huffman Encoding
 
 This part will be more algorithmic in nature.
 We remind you that you have a working Python implementation.
@@ -105,7 +105,7 @@ A few tips:
    In our case, we want each leaf to carry both a `Datum` and a frequency.
    You can make use of https://www.cplusplus.com/reference/utility/pair/pair/[`std::pair`] for this.
 * Given a tree node, whether it be a branch or a leaf, you need to be able to determine its weight.
-  For leaves, this is simple: they carry it around themselves.
+  For leaves, this is simple: they carry it themselves.
   For branches, you need to take the sum of the weights of their children.
   Write a helper function `weight` that takes a `Node`, looks if its a leaf or a branch, and based on that determines the weight.
 * Given a list of nodes, you need to find the two that have the lowest weight.
@@ -138,7 +138,16 @@ Write a function `build_codes`.
 
 ### Encoding
 
+This step should be trivial: go through all input data and look up the corresponding codes.
+Send this codes to the output stream, bit by bit.
+
+[TASK]
+====
+Implement the encoding step.
+====
+
 ### Writing Tree
+
 
 
 ## Huffman Decoding

@@ -1,0 +1,200 @@
+# Huffman Tree Encoding
+
+A quick recap of how Huffman encoding works:
+
+* Count the frequency of each byte in the input stream.
+* Build a Huffman tree based on these frequencies.
+* Determine codes for each datum in the input stream.
+* Write the corresponding code for each datum to the output stream.
+
+The decoding step goes as follows:
+
+* Have the Huffman tree ready.
+  Have a pointer point to its root.
+  Let's call the node the pointer points to the _current node_.
+* Loop over each bit in the input stream.
+** A `0` bit moves the pointer to the left child of the current node.
+** A `1` bit moves the pointer to the right child of the current node.
+** If the new current node is a leaf, write the associated datum to the output stream and move the pointer back to the root of the Huffman tree.
+
+This raises the question, how does the decoding step know what the Huffman tree looks like?
+The encoding step can build it because it has access to the actual data, but when decoding we have no information to rely on.
+
+Multiple solutions exist, but our solution will be to also write the Huffman tree to the output stream.
+The decoding step can then start by reading this Huffman tree back in and then proceed with the actual decoding.
+
+In this part, we will implement the functionality to write and read the Huffman tree.
+It might seem weird to keep it separate from the rest of the Huffman implementation, but we are doing this for testing purposes: reading and writing are opposite operations, so it's more practical to implement them together.
+
+[NOTE]
+====
+You are free to implement this part as you wish.
+The only constraint is that the decoder can successfully reconstruct the tree.
+
+Below we do give you some extra explanations about how you could go about it.
+====
+
+## Binary Data Format
+
+Finding a way to store a Huffman tree can be a bit tricky: you need to write bits that can unambiguously be read back in and reconstruct the original tree.
+Fortunately, once you understand _how_ it works, it isn't hard to implement it.
+
+Let's consider a simple Huffman tree:
+
+image::tree-encoding.svg[Static,align="center"]
+
+### Writing Bits
+
+We want to convert this tree to bits.
+Let's use the following approach:
+
+* We start at the root of the tree.
+  Let's call this the _current node_.
+* If the current node is a branch
+** We indicate this by writing a `1`.
+** We recursively write the left child.
+** We recursively write the right child.
+* If the current node is a leaf
+** We indicate this by writing a `0`.
+** We write the datum in full.
+
+Let's apply this algorithm ourselves.
+We use the following datum representations, which are simply their ASCII encodings:
+
+[.center,%header,cols="^,^",width=50%]
+|===
+| Datum | Bit Representation
+| `A` | `01000001`
+| `B` | `01000010`
+| `C` | `01000011`
+|===
+
+* We start at the root.
+* This root is a branch, so we write `1`.
+* We recursively write the left child.
+** The current node is the leaf carrying `A`.
+** We write `0` because it is a leaf.
+** We write `01000001` which represents the datum `A`.
+* We're back at the root and recursively write the right child.
+** The current node is a branch: we write `1`.
+** We recursively write the left child.
+*** The current node is a leaf carrying `B`.
+*** We write `0`, because we're at a leaf.
+*** We write `01000010` to represent the datum `B`.
+** Back up one level, we recursively write the right child.
+*** The current node is the leaf carrying `C`.
+*** We write `0`, because we're at a leaf.
+*** We write `01000011`, representing the datum `C`.
+
+So, we end up with
+
+[.center,%header,cols="^",width=50%]
+|===
+| `10010000011001000010001000011`
+|===
+
+### Reading Bits
+
+The algorithm goes as follows:
+
+* Read a bit
+* If it's a `1`, we're about to encounter a branch.
+** Recursively read the left child.
+** Recursively read the right child.
+** Create a branch with these two children.
+* If it's a `0`, we're about to encounter a leaf.
+** Read the 8 bits that form the datum.
+** Create a leaf, initializing it with the datum.
+
+Applying this to the bits from the previous section:
+
+[.center,%header,cols="^",width=50%]
+|===
+| `10010000011001000010001000011`
+|===
+
+To improve readability, we add some imaginary spaces.
+
+[.center,%header,cols="^",width=50%]
+|===
+| `1 0 01000001 1 0 01000010 0 01000011`
+|===
+
+* We read a bit, giving `1`.
+  Okay, we're about to read a branch.
+* We recursively read the left child.
+** We read a bit, giving `0`.
+** We read 8 bits, `01000001`.
+   According to the ASCII table, this is an `A`, exactly what we expect.
+   We create a leaf with this datum and return it.
+* Back up one level.
+  We have read in our left child, namely a leaf `A`.
+  Now we turn our attention to the right child.
+  We read it recursively.
+** We read one bit, we get `1`.
+   This means another branch.
+** We recursively read the left child.
+*** We read a bit, we get `0`.
+*** We read 8 bits forming the datum: `01000010`, which corresponds to `B`.
+*** We return a leaf with datum `B`.
+** One level up, we need to read the right child.
+*** We read a bit, we get `0`.
+*** We read 8 bits forming the datum: `01000011`, which corresponds to `C`.
+*** We return a leaf with datum `C`.
+** Back to our branch, we now have our left child (leaf `B`) and our right child (leaf `C`).
+   We create a branch object and return it.
+* We're back at the root of the tree.
+  We have read our left child (leaf `A`) and our right child (the branch with `B` and `C`).
+  We create a branch object with these children.
+
+As you can see, we have successfully reconstructed our Huffman tree.
+
+## Implementation
+
+### Groundworks
+
+[TASK]
+====
+* Create files `encoding/huffman/tree-encoding.cpp` and `encoding/huffman/tree.h`.
+* Add an <<include-guards#,include guard>>.
+* Begin a namespace `encoding`, with inside it another namespace `huffman`.
+====
+
+### Function `encode_tree`
+
+This function's purpose is to, given a Huffman tree, write it to an `OutputStream` as bits (only ``0``s and ``1``s allowed.)
+An important detail is that the function also needs to know how many bits it needs to use to encode each datum.
+
+[TASK]
+====
+Implement `encode_tree`.
+
+* It takes three parameters:
+** The root of the Huffman tree.
+*** It is a large object.
+*** No write access is necessary.
+*** It will not be stored internally for later use, so no ownership transfer is necessary.
+** The number of bits per datum.
+** An `OutputStream`.
+*** It's part of a hierarchy.
+*** Write access is needed.
+*** No ownership transfer.
+* The function returns nothing: it writes its result to the provided `OutputStream`.
+* Remember you already implemented <<binary-io#writebits,`io::write_bits`>>, which will come in handy to write a datum to the `OutputStream`.
+* While recursion is never mandatory, it will considerably simply the implementation.
+====
+
+### Function `decode_tree`
+
+[TASK]
+====
+Implement `decode_tree`.
+
+* It takes two parameters:
+** The number of bits per datum.
+** An `InputStream`.
+*** It's part of a hierarchy.
+*** Write access is needed.
+*** No ownership transfer.
+* Remember you already implemented <<binary-io#readbits,`io::read_bits`>>.
+====

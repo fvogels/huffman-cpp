@@ -242,7 +242,7 @@ Implement a function `decode_single_datum`.
 * It returns a `Datum`.
 ====
 
-## Decoding all Data
+### Decoding all Data
 
 This one is quite easy to implement: keep decoding a single datum until the end of the stream is reached.
 All `Datum` values returned by `decode_single_datum` need to be written to an `OutputStream`.
@@ -256,3 +256,13 @@ Implement a function `decode_bits`.
 ** A Huffman tree.
 ** An `OutputStream`.
 ====
+
+[TASK]
+====
+Call this function from `HuffmanEncodingImplementation::decode`.
+====
+
+## Testing
+
+Your Huffman implementation should be complete now.
+Test it thoroughly.

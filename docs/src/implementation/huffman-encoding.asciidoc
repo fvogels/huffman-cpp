@@ -39,6 +39,7 @@ Encoding consists of multiple steps:
 * Count the frequency of each datum in the input stream.
 * Build a Huffman tree.
 * Determine the Huffman code for every datum.
+* Write the Huffman tree to the output stream.
 * For each datum in the input stream, write its corresponding Huffman code to the output stream.
 
 ### Copying the InputData
@@ -63,13 +64,18 @@ You can implement this function in several ways:
   It's not great for abstraction though since you expose part of the inner workings of your class.
 ====
 
+[TASK]
+====
+Add this first step (copying the data) to `HuffmanEncodingImplementation::encode`.
+====
+
 ### Counting Frequencies
 
 Counting frequencies should require only very little work: you have already made a `FrequencyTable` and a helper function `count_frequencies`.
 
 [TASK]
 ====
-Call <<frequency-table#countfreqs,`count_frequencies`>> to count the elements in the input stream.
+Add code to `HuffmanEncodingImplementation::encode`: call <<frequency-table#countfreqs,`count_frequencies`>> to count the elements in the input stream.
 ====
 
 ### Building the Tree
@@ -117,6 +123,11 @@ A few tips:
   If you choose to have the elements sorted in the list, it might be advantageous to have the smallest elements at the end of the list.
 ====
 
+[TASK]
+====
+Add code to `HuffmanEncodingImplementation::encode` to build the tree.
+====
+
 ### Building Codes
 
 [TASK]
@@ -136,6 +147,26 @@ Write a function `build_codes`.
   You can simply use `std::vector<Datum>` for this purpose.
 ====
 
+[TASK]
+====
+Add code to `HuffmanEncodingImplementation::encode` to build the codes using the previously written function.
+====
+
+### Writing the Huffman Tree
+
+You've done the work in a previous step of this guide, so it's just a matter of calling the right function.
+However, it requires to be aware of the datum size.
+We need to get this information from somewhere.
+Let's apply the standard solution: ask for it in ``HuffmanEncodingImplementation``'s constructor and store it in a field.
+
+[TASK]
+====
+* Add a field storing the domain size.
+* Add a parameter `domain_size` to the `HuffmanEncodingImplementation` constructor and have it store it in the field.
+* Add code to `HuffmanEncodingImplementation::encode` to write the Huffman tree to the `OutputStream`.
+  Translate the domain size to actual bits needed using a previously written function.
+====
+
 ### Encoding
 
 This step should be trivial: go through all input data and look up the corresponding codes.
@@ -146,12 +177,82 @@ Send this codes to the output stream, bit by bit.
 Implement the encoding step.
 ====
 
-### Writing Tree
-
-
-
 ## Huffman Decoding
+
+We now turn our attention to the decoding part.
+This involves the following steps:
+
+* Reconstruct the Huffman tree.
+* Read the bits and decode them.
+
+[NOTE]
+====
+Decoding only requires a single pass, so contrary to `encode`, we do not need to copy all of our input data first.
+====
 
 ### Reading Tree
 
+You've already implemented this functionality earlier.
+
+[TASK]
+====
+Add code to `HuffmanEncodingImplementation::decode` to read in the Huffman tree from the `InputStream`.
+====
+
 ### Decoding
+
+### Decoding a Single Datum
+
+Let's focus on decoding a single datum.
+Next, we can simply call that functionality in a loop.
+
+Before beginning, make sure you understand how the decoding process works.
+We suggest the following approach for the implementation:
+
+* A raw pointer points to the _current node_.
+  Initially, this would be the root of the tree.
+  We assume this root is actually a `Branch`, not a `Leaf`.
+  If this is not the case, something went quite wrong.
+* Loop
+** Read a bit.
+** If `0`, move the pointer to the left child.
+** If `1`, move the pointer to the right child.
+** Check the dynamic type of the current node.
+*** If it's a `Leaf`, we're finished with the current Datum and can forcibly leave the loop by simply returning the ``Leaf``'s datum.
+
+[IMPORTANT]
+====
+Remember that while encoding, we needed to add extra bits so as to fill up the last byte so as to be able to write it to file.
+These extraneous bits have _not_ been removed at this point: your Huffman decoder will encounter these extra bits.
+
+So, what to do?
+Fortunately, the only problem you'll have to deal with is that you might encounter the end of the `InputStream` before reaching a `Leaf`.
+To remedy this, you need to check for the end of stream and, if you reach it, simply return `0` as datum.
+
+This datum is of course wrong, but that's okay: the EOF encoder will take care to remove it.
+====
+
+[TASK]
+====
+Implement a function `decode_single_datum`.
+
+* It receives two parameters:
+** The `InputStream`.
+** The Huffman tree.
+* It returns a `Datum`.
+====
+
+## Decoding all Data
+
+This one is quite easy to implement: keep decoding a single datum until the end of the stream is reached.
+All `Datum` values returned by `decode_single_datum` need to be written to an `OutputStream`.
+
+[TASK]
+====
+Implement a function `decode_bits`.
+
+* It takes three parameters:
+** An `InputStream`.
+** A Huffman tree.
+** An `OutputStream`.
+====

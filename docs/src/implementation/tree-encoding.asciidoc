@@ -198,3 +198,8 @@ Implement `decode_tree`.
 *** No ownership transfer.
 * Remember you already implemented <<binary-io#readbits,`io::read_bits`>>.
 ====
+
+## Testing
+
+As always, you should test this implementation thoroughly.
+Rely on the symmetric nature of the operations to quickly write many tests.

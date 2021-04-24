@@ -18,6 +18,9 @@ U = TypeVar('U')
 
 
 class TreeEncoding:
+    BRANCH_BIT : Bit = 0
+    LEAF_BIT : Bit = 1
+
     __bits_per_datum : int
 
     def __init__(self, bits_per_datum : int):
@@ -25,16 +28,16 @@ class TreeEncoding:
 
     def encode(self, tree : Node[Datum]) -> Iterable[Bit]:
         if isinstance(tree, Leaf):
-            yield 1
+            yield TreeEncoding.LEAF_BIT
             yield from bits(tree.datum, self.__bits_per_datum)
         else:
             assert isinstance(tree, Branch)
-            yield 0
+            yield TreeEncoding.BRANCH_BIT
             yield from self.encode(tree.left)
             yield from self.encode(tree.right)
 
     def decode(self, bits : Iterator[Bit]) -> Node[Datum]:
-        if next(bits) == 0:
+        if next(bits) == TreeEncoding.BRANCH_BIT:
             left = self.decode(bits)
             right = self.decode(bits)
             return Branch(left, right)

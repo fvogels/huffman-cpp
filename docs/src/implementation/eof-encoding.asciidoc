@@ -103,7 +103,7 @@ Note that the class has already been implemented: we only need to instantiate it
 In other words, we merely need to define a function.
 We'll call it `eof_encoding`.
 
-<<encoding-design#checks,Remember>> that `Encoding` takes to template parameters: `IN` and `OUT`, representing the domain sizes of the input and output streams, respectively.
+<<encoding-design#checks,Remember>> that `Encoding` takes two template parameters: `IN` and `OUT`, representing the domain sizes of the input and output streams, respectively.
 In the case of EOF encoding, we know that the domain size increases by one due to the addition of the EOF symbol.
 Technically, we would have to produce one wrapping function for each possibility:
 

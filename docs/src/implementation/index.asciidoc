@@ -14,6 +14,7 @@
 * Huffman
 ** <<tree-encoding#,Huffman Tree Encoding>>
 ** <<huffman-encoding#,Huffman Encoding>>
+* <<cli#,Command Line Interface>>
 
 ## Auxiliary Pages
 

@@ -1,3 +1,24 @@
 # Command Line Interface
 
-Coming soon
+As a final step, you would like to be able to actually make use of your compression algorithm.
+You would like to be able to invoke it on the shell as follows:
+
+[source,language='bash']
+----
+# Compress file.txt and write results to file.hf
+$ huffman compress file.txt file.hf
+
+# Decompress file.hf back to file2.txt
+$ huffman decompress file.hf file2.txt
+
+# file.txt and file2.txt must be identical
+----
+
+
+[TASK]
+====
+In `app.cpp`, add code to the `main` function so as to make your program callable from the shell.
+
+* Look online for how to get access to the command line arguments.
+* To open files, use the provided file data source and file data destination functionality made accessible in `io/files.h`.
+====

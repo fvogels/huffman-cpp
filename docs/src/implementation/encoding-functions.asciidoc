@@ -177,8 +177,9 @@ Implement this function `encode` in `encoding/encoding.h`.
 * It has two template parameters `IN` and `OUT`, each of type `u64`.
   They represent domain sizes.
 * It takes three parameters.
-* Pass all three parameters by value.
-* Make sure that the domain sizes match.
+** The types of the parameters can easily be inferred from the example code above.
+** Pass all three parameters by value.
+** Make sure that the domain sizes match.
 * The body must perform the following steps:
 ** Ask the data source for an input stream.
 ** Ask the data destination for an output stream.

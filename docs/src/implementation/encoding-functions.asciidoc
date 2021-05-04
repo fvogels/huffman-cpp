@@ -173,6 +173,7 @@ encode(source, huffman, destination);
 ====
 Implement this function `encode` in `encoding/encoding.h`.
 
+* As you can see in the example code above, `encode` must be a _free_ function, i.e., not be part of a class.
 * It has two template parameters `IN` and `OUT`, each of type `u64`.
   They represent domain sizes.
 * It takes three parameters.

@@ -17,7 +17,7 @@ This class will be implemented in exactly the same way as the EOF encoding.
 Do not be confused by the name Bit Grouper.
 
 * It _groups_ bits into bytes when _encoding_.
-* It _splits_ bytes into splits when _decoding_.
+* It _splits_ bytes into bits when _decoding_.
 ====
 
 [TASK]

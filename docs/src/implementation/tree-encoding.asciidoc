@@ -196,6 +196,9 @@ Implement `decode_tree`.
 *** It's part of a hierarchy.
 *** Write access is needed.
 *** No ownership transfer.
+* It returns a `Node<Datum>`.
+** The tree will need to be created on the heap.
+** While building the tree, the `decode_tree` function has ownership, but at the end needs to give it away to the caller of the function.
 * Remember you already implemented <<binary-io#readbits,`io::read_bits`>>.
 ====
 

@@ -170,7 +170,7 @@ An important detail is that the function also needs to know how many bits it nee
 Implement `encode_tree`.
 
 * It takes three parameters:
-** The root of the Huffman tree.
+** The root of the Huffman tree (`Node<Datum>`, no templates necessary here.)
 *** It is a large object.
 *** No write access is necessary.
 *** It will not be stored internally for later use, so no ownership transfer is necessary.

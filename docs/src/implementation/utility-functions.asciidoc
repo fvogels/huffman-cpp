@@ -70,6 +70,12 @@ constexpr unsigned bits_needed(u64 domain_size)
 {
     // ...
 }
+
+[IMPORTANT]
+=====
+Do not use `pow` or any kind of floating point arithmetic in this function.
+It might compile, it might pass tests, but it will cause trouble later on.
+=====
 ----
 
 The function does not have to be split into a declaration and definition.

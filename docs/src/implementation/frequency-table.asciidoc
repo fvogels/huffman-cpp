@@ -70,7 +70,7 @@ Create an empty <<templates#class,template class>> named `FrequencyTable` inside
 
 ### Fields
 
-A `FrequencyMap` associates values of type `T` with frequencies of integral type.
+A `FrequencyTable` associates values of type `T` with frequencies of integral type.
 There are many integral types, so which one would you use, taking into account that
 
 * frequencies cannot go negative;

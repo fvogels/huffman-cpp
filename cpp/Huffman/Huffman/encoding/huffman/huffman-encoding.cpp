@@ -40,7 +40,7 @@ namespace
         void decode(io::InputStream& input, io::OutputStream& output) const override
         {
             auto tree = encoding::huffman::decode_tree(m_bits_per_datum, input);
-            encoding::huffman::decode_bits(input, *tree, output, m_bits_per_datum);
+            encoding::huffman::decode_bits(input, *tree, output);
         }
 
     private:

@@ -10,9 +10,9 @@ namespace encoding
 {
     namespace huffman
     {
-        void decode_bits(io::InputStream& input, const data::Node<Datum>& tree, io::OutputStream& output, u64 domain_size);
+        void decode_bits(io::InputStream& input, const data::Node<Datum>& tree, io::OutputStream& output);
 
-        Datum decode_single_datum(io::InputStream& input, const data::Node<Datum>& tree, u64 domain_size);
+        Datum decode_single_datum(io::InputStream& input, const data::Node<Datum>& tree);
     }
 }
 

@@ -64,7 +64,7 @@ namespace
             while (true)
             {
                 auto tree = encoding::huffman::build_tree(frequencies);
-                auto datum = encoding::huffman::decode_single_datum(input, *tree, m_domain_size + 2);
+                auto datum = encoding::huffman::decode_single_datum(input, *tree);
                 
                 if (datum == m_eof)
                 {

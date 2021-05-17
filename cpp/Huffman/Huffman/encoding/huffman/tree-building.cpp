@@ -37,7 +37,7 @@ namespace
             return weight(branch.left_child()) + weight(branch.right_child());
         }
     }
-
+    
     void sort_queue(std::vector<std::unique_ptr<wnode>>& nodes)
     {
         std::sort(nodes.begin(), nodes.end(), [](const std::unique_ptr<wnode>& p, const std::unique_ptr<wnode>& q) {

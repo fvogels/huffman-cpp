@@ -155,7 +155,7 @@ As you can see, we have successfully reconstructed our Huffman tree.
 
 [TASK]
 ====
-* Create files `encoding/huffman/tree-encoding.cpp` and `encoding/huffman/tree.h`.
+* Create files `encoding/huffman/tree-encoding.cpp` and `encoding/huffman/tree-encoding.h`.
 * Add an <<include-guards#,include guard>>.
 * Begin a namespace `encoding`, with inside it another namespace `huffman`.
 ====

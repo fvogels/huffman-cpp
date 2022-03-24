@@ -139,7 +139,7 @@ freqtable.increment('a'); // a has now frequency 1
 We need a way to ask a `FrequencyTable` what the frequency of some value `x` is.
 Instead of using a regular method, we will be using the syntax `freqtable[x]`.
 
-If `x` has never been `increment`ed before, `freqtable[x]` should return `0`.
+If `x` has never been ``increment``ed before, `freqtable[x]` should return `0`.
 
 [TASK]
 ====

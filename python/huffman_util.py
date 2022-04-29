@@ -34,16 +34,18 @@ def build_tree(frequencies : FrequencyTable[T]) -> Node[T]:
 
 
 def build_codebook(tree : Node[T]) -> dict[T, list[Bit]]:
-    def build(node : Node[T], prefix : list[Bit], book : dict[T, list[Bit]]) -> None:
+    book : dict[T, list[Bit]] = {}
+
+    def build(node : Node[T], prefix : list[Bit]) -> None:
         if isinstance(node, Leaf):
             book[node.datum] = prefix
         else:
             assert isinstance(node, Branch)
-            build(node.left, [*prefix, 0], book)
-            build(node.right, [*prefix, 1], book)
-    result : dict[T, list[Bit]] = {}
-    build(tree, [], result)
-    return result
+            build(node.left, [*prefix, 0])
+            build(node.right, [*prefix, 1])
+
+    build(tree, [])
+    return book
 
 
 def encode_data(xs : Iterable[T], book : dict[T, list[Bit]]) -> Iterable[Bit]:

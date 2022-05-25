@@ -1,6 +1,6 @@
 # Encoding Auxiliary Functions
 
-Now that we can foundations for encodings, we need to be able to use them.
+Now that we created the foundations for encodings, we need to be able to use them.
 You have been provided with a few classes to help you out.
 
 ## Streams
@@ -152,7 +152,7 @@ DataSource<256>    source      = get_source();
 DataDestination<2> destination = get_destination();
 Encoding<256, 2>   huffman     = huffman_encoding();
 
-huffman->encode(source.create_input_stream(), destination.create_output_stream());
+huffman->encode(*source.create_input_stream(), *destination.create_output_stream());
 ----
 
 * We still need to create input and output streams explicitly.

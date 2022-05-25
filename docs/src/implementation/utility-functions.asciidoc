@@ -182,7 +182,7 @@ Add the following file to your `tests` folder.
 =====
 These tests are a bit special: they rely on `static_assert`.
 This is a built-in kind of assertion that will ask the _compiler_ to check certain conditions.
-(I'm not doing this to be fancy; we're testing types githere, and types only exist at compile time.)
+(I'm not doing this to be fancy; we're testing types here, and types only exist at compile time.)
 
 With regular assertions, the compiler generates the test code after which you have to start the program to actually run the tests.
 Here, the testing is done directly during the compilation phase.

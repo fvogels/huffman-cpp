@@ -172,7 +172,7 @@ If we number the bits from right to left as shown below:
 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0
 |===
 
-Say we want to found out if the ``K``th bit is set.
+Say we want to find out if the ``K``th bit is set.
 
 * First, create an `int` where only this ``K``th bit is set: `1 << K`.
 * Next, combine it with `x` using the bitwise AND.

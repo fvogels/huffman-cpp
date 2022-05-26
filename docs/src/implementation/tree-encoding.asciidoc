@@ -181,7 +181,7 @@ Implement `encode_tree`.
 *** No ownership transfer.
 * The function returns nothing: it writes its result to the provided `OutputStream`.
 * Remember you already implemented <<binary-io#writebits,`io::write_bits`>>, which will come in handy to write a datum to the `OutputStream`.
-* While recursion is never mandatory, it will considerably simply the implementation.
+* While recursion is never mandatory, it will considerably simplify the implementation.
 ====
 
 ### Function `decode_tree`

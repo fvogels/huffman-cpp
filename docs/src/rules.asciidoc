@@ -9,7 +9,8 @@
 
 ## Submitting Your Code
 
-* Your code has to compile. Remove (or put in comments) all code that does not compile.
+* Your code has to compile in all builds. Remove (or put in comments) all code that does not compile.
+* Your code should run both in debug and release build and yield the same results.
 
 ## Code
 

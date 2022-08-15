@@ -201,3 +201,8 @@ void check(u64 n, unsigned nbits)
 So basically, we create a temporary `std::vector`, `write_bits` writes its bits to it, and `read_bits` reads them again.
 
 image::read-write-bits.svg[Static,align="center"]
+
+[IMPORTANT]
+====
+Make sure to also test the case where the input stream has insufficient bits left in it.
+====

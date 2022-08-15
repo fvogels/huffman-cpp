@@ -18,8 +18,6 @@ namespace
 
         void encode(io::InputStream& input, io::OutputStream& output) const override
         {
-            unsigned nbits = 0;
-
             while (!input.end_reached())
             {
                 auto datum = io::read_bits(m_group_size, input);
